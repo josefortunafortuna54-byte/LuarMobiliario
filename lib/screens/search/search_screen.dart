@@ -7,7 +7,6 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/models/property_model.dart';
-import '../../core/models/land_model.dart';
 import '../../core/providers/search_provider.dart';
 import '../../core/utils/routes.dart';
 import '../../widgets/property_card.dart';

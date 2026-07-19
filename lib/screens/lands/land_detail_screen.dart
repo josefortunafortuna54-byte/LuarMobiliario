@@ -593,8 +593,6 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
   }
 
   Widget _buildBottomActions(LandModel land) {
-    final location = '${land.neighborhood}, ${land.city}';
-
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
       decoration: const BoxDecoration(

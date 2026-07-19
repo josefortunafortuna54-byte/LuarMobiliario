@@ -10,7 +10,6 @@ import '../../core/models/property_model.dart';
 import '../../core/providers/land_provider.dart';
 import '../../core/providers/property_provider.dart';
 import '../../core/utils/routes.dart';
-import '../../widgets/custom_button.dart';
 import '../../widgets/land_card.dart';
 import '../../widgets/property_card.dart';
 import '../../widgets/search_widget.dart';

@@ -5,7 +5,6 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:luar_company/widgets/property_card.dart';
-import 'package:test_api/fake.dart';
 
 // 1x1 transparent PNG
 final _kTransparentImage = Uint8List.fromList(<int>[
@@ -59,7 +58,6 @@ class _FakeHttpClientResponse extends Fake implements HttpClientResponse {
   @override
   bool get persistentConnection => true;
 
-  @override
   Future<Socket> get done => Future.error(SocketException('mock'));
 
   @override

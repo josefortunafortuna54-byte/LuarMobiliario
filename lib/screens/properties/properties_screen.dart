@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_constants.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/models/property_model.dart';
 import '../../core/providers/property_provider.dart';
@@ -39,13 +38,6 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
     'office',
     'warehouse',
     'shop',
-  ];
-
-  static const List<String> _sortLabels = [
-    'Mais recentes',
-    'Menor preço',
-    'Maior preço',
-    'Maior área',
   ];
 
   @override
@@ -93,13 +85,6 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
       _selectedFilterIndex = index;
     });
     _loadProperties();
-  }
-
-  void _onSortSelected(String sort) {
-    setState(() {
-      _sortOption = sort;
-      _showSortOptions = false;
-    });
   }
 
   List<PropertyModel> _sortProperties(List<PropertyModel> list) {
@@ -242,70 +227,6 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildSortDropdown() {
-    return AnimatedCrossFade(
-      firstChild: const SizedBox.shrink(),
-      secondChild: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16),
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.gray200),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.navy.withValues(alpha: 0.08),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          children: _sortLabels.map((label) {
-            final isSelected = _sortOption == label;
-            return InkWell(
-              onTap: () => _onSortSelected(label),
-              borderRadius: BorderRadius.circular(8),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                decoration: isSelected
-                    ? BoxDecoration(
-                        color: AppColors.navy.withValues(alpha: 0.06),
-                        borderRadius: BorderRadius.circular(8),
-                      )
-                    : null,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        label,
-                        style: AppTextStyles.bodySmall.copyWith(
-                          color: isSelected ? AppColors.navy : AppColors.gray700,
-                          fontWeight:
-                              isSelected ? FontWeight.w700 : FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    if (isSelected)
-                      const Icon(
-                        Icons.check_rounded,
-                        size: 18,
-                        color: AppColors.gold,
-                      ),
-                  ],
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-      ),
-      crossFadeState: _showSortOptions
-          ? CrossFadeState.showSecond
-          : CrossFadeState.showFirst,
-      duration: const Duration(milliseconds: 200),
     );
   }
 

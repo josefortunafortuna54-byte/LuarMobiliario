@@ -1,6 +1,6 @@
 String formatPrice(double value) {
-  final buffer = StringBuffer('AOA ');
   final text = value.toStringAsFixed(0);
+  final buffer = StringBuffer();
   var count = 0;
 
   for (var i = text.length - 1; i >= 0; i--) {
@@ -9,7 +9,8 @@ String formatPrice(double value) {
     count++;
   }
 
-  return buffer.toString().split('').reversed.join();
+  final formatted = buffer.toString().split('').reversed.join();
+  return 'AOA $formatted';
 }
 
 String formatDate(DateTime date) {

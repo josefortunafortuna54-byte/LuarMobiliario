@@ -76,38 +76,23 @@ void main() {
     });
 
     test('defaults to client role for unknown role string', () {
-      final json = {
-        'id': 'u3',
-        'role': 'unknown_role',
-      };
+      final json = {'id': 'u3', 'role': 'unknown_role'};
 
       final user = UserModel.fromJson(json);
       expect(user.role, UserRole.client);
     });
 
     test('defaults to client role when role is null', () {
-      final json = <String, dynamic>{
-        'id': 'u4',
-        'role': null,
-      };
+      final json = <String, dynamic>{'id': 'u4', 'role': null};
 
       final user = UserModel.fromJson(json);
       expect(user.role, UserRole.client);
     });
 
     test('handles all valid role strings', () {
-      expect(
-        UserModel.fromJson({'role': 'client'}).role,
-        UserRole.client,
-      );
-      expect(
-        UserModel.fromJson({'role': 'agent'}).role,
-        UserRole.agent,
-      );
-      expect(
-        UserModel.fromJson({'role': 'admin'}).role,
-        UserRole.admin,
-      );
+      expect(UserModel.fromJson({'role': 'client'}).role, UserRole.client);
+      expect(UserModel.fromJson({'role': 'agent'}).role, UserRole.agent);
+      expect(UserModel.fromJson({'role': 'admin'}).role, UserRole.admin);
     });
 
     test('fills empty strings for missing string fields', () {

@@ -72,15 +72,16 @@ class _CustomInputState extends State<CustomInput> {
     super.dispose();
   }
 
-  bool get _hasError => widget.errorText != null && widget.errorText!.isNotEmpty;
+  bool get _hasError =>
+      widget.errorText != null && widget.errorText!.isNotEmpty;
 
   @override
   Widget build(BuildContext context) {
     final borderColor = _hasError
         ? AppColors.error
         : _isFocused
-            ? AppColors.gold
-            : AppColors.gray200;
+        ? AppColors.gold
+        : AppColors.gray200;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -150,9 +151,7 @@ class _CustomInputState extends State<CustomInput> {
                 color: AppColors.error,
               ),
               filled: true,
-              fillColor: widget.enabled
-                  ? AppColors.white
-                  : AppColors.gray100,
+              fillColor: widget.enabled ? AppColors.white : AppColors.gray100,
               contentPadding: EdgeInsets.symmetric(
                 horizontal: 14,
                 vertical: widget.maxLines > 1 ? 16 : 14,
@@ -170,17 +169,11 @@ class _CustomInputState extends State<CustomInput> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(
-                  color: AppColors.gold,
-                  width: 1.5,
-                ),
+                borderSide: const BorderSide(color: AppColors.gold, width: 1.5),
               ),
               errorBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(
-                  color: AppColors.error,
-                  width: 1,
-                ),
+                borderSide: const BorderSide(color: AppColors.error, width: 1),
               ),
               focusedErrorBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),

@@ -148,9 +148,18 @@ void main() {
 
     test('handles all land type strings', () {
       expect(LandModel.fromJson({'type': 'urban'}).type, LandType.urban);
-      expect(LandModel.fromJson({'type': 'agricultural'}).type, LandType.agricultural);
-      expect(LandModel.fromJson({'type': 'industrial'}).type, LandType.industrial);
-      expect(LandModel.fromJson({'type': 'commercial'}).type, LandType.commercial);
+      expect(
+        LandModel.fromJson({'type': 'agricultural'}).type,
+        LandType.agricultural,
+      );
+      expect(
+        LandModel.fromJson({'type': 'industrial'}).type,
+        LandType.industrial,
+      );
+      expect(
+        LandModel.fromJson({'type': 'commercial'}).type,
+        LandType.commercial,
+      );
       expect(LandModel.fromJson({'type': 'lot'}).type, LandType.lot);
       expect(LandModel.fromJson({'type': 'farm'}).type, LandType.farm);
     });

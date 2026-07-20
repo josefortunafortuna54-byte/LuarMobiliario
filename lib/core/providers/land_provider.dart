@@ -33,10 +33,7 @@ class LandProvider extends ChangeNotifier {
       final from = 0;
       final to = AppConstants.defaultPageSize - 1;
 
-      var query = _client
-          .from('lands')
-          .select()
-          .eq('is_available', true);
+      var query = _client.from('lands').select().eq('is_available', true);
 
       if (filters != null) {
         for (final entry in filters.entries) {
@@ -94,10 +91,7 @@ class LandProvider extends ChangeNotifier {
       final from = _currentPage * AppConstants.defaultPageSize;
       final to = from + AppConstants.defaultPageSize - 1;
 
-      var query = _client
-          .from('lands')
-          .select()
-          .eq('is_available', true);
+      var query = _client.from('lands').select().eq('is_available', true);
 
       if (filters != null) {
         for (final entry in filters.entries) {
@@ -230,10 +224,7 @@ class LandProvider extends ChangeNotifier {
       final data = land.toJson();
       data['updated_at'] = DateTime.now().toIso8601String();
 
-      await _client
-          .from('lands')
-          .update(data)
-          .eq('id', land.id);
+      await _client.from('lands').update(data).eq('id', land.id);
 
       final index = _lands.indexWhere((l) => l.id == land.id);
       if (index != -1) {
@@ -261,10 +252,7 @@ class LandProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _client
-          .from('lands')
-          .update({'is_available': false})
-          .eq('id', id);
+      await _client.from('lands').update({'is_available': false}).eq('id', id);
 
       _lands.removeWhere((l) => l.id == id);
 
@@ -295,7 +283,9 @@ class LandProvider extends ChangeNotifier {
           .from('lands')
           .select()
           .eq('is_available', true)
-          .or('title.ilike.%$searchQuery%,description.ilike.%$searchQuery%,address.ilike.%$searchQuery%,city.ilike.%$searchQuery%,municipality.ilike.%$searchQuery%,neighborhood.ilike.%$searchQuery%')
+          .or(
+            'title.ilike.%$searchQuery%,description.ilike.%$searchQuery%,address.ilike.%$searchQuery%,city.ilike.%$searchQuery%,municipality.ilike.%$searchQuery%,neighborhood.ilike.%$searchQuery%',
+          )
           .order('created_at', ascending: false)
           .limit(AppConstants.defaultPageSize);
 

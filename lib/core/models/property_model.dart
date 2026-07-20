@@ -81,8 +81,9 @@ class PropertyModel {
       title: json['title'] as String? ?? '',
       description: json['description'] as String? ?? '',
       type: _propertyTypeFromString(json['type'] as String? ?? 'house'),
-      transactionType:
-          _transactionTypeFromString(json['transaction_type'] as String? ?? 'sale'),
+      transactionType: _transactionTypeFromString(
+        json['transaction_type'] as String? ?? 'sale',
+      ),
       price: (json['price'] as num?)?.toDouble() ?? 0.0,
       area: (json['area'] as num?)?.toDouble() ?? 0.0,
       bedrooms: (json['bedrooms'] as num?)?.toInt() ?? 0,
@@ -94,11 +95,13 @@ class PropertyModel {
       neighborhood: json['neighborhood'] as String? ?? '',
       latitude: (json['latitude'] as num?)?.toDouble() ?? 0.0,
       longitude: (json['longitude'] as num?)?.toDouble() ?? 0.0,
-      images: (json['images'] as List<dynamic>?)
+      images:
+          (json['images'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
           [],
-      features: (json['features'] as List<dynamic>?)
+      features:
+          (json['features'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
           [],

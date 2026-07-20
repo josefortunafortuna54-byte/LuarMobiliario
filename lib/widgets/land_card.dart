@@ -60,10 +60,7 @@ class LandCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildImage(),
-            _buildContent(),
-          ],
+          children: [_buildImage(), _buildContent()],
         ),
       ),
     );
@@ -112,9 +109,7 @@ class LandCard extends StatelessWidget {
             ),
             child: Text(
               badgeLabel,
-              style: AppTextStyles.labelMedium.copyWith(
-                color: AppColors.white,
-              ),
+              style: AppTextStyles.labelMedium.copyWith(color: AppColors.white),
             ),
           ),
         ),
@@ -130,11 +125,7 @@ class LandCard extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
-                  Icons.square_foot,
-                  size: 14,
-                  color: AppColors.gold,
-                ),
+                const Icon(Icons.square_foot, size: 14, color: AppColors.gold),
                 const SizedBox(width: 4),
                 Text(
                   '${area.toStringAsFixed(0)} m²',

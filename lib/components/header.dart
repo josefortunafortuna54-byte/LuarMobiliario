@@ -53,7 +53,8 @@ class CustomHeader extends StatelessWidget implements PreferredSizeWidget {
               ),
             )
           : const SizedBox.shrink(),
-      title: child ??
+      title:
+          child ??
           (title != null
               ? Text(
                   title!,

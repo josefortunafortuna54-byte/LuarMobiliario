@@ -43,7 +43,10 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
         if (provider.isLoading) {
           return const Scaffold(
             backgroundColor: AppColors.white,
-            body: LoadingWidget(isFullScreen: true, message: 'Carregando terreno...'),
+            body: LoadingWidget(
+              isFullScreen: true,
+              message: 'Carregando terreno...',
+            ),
           );
         }
 
@@ -53,17 +56,26 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
             appBar: AppBar(
               backgroundColor: AppColors.navy,
               foregroundColor: AppColors.white,
-              title: Text('Erro', style: AppTextStyles.h5.copyWith(color: AppColors.white)),
+              title: Text(
+                'Erro',
+                style: AppTextStyles.h5.copyWith(color: AppColors.white),
+              ),
             ),
             body: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.error_outline, size: 64, color: AppColors.error),
+                  const Icon(
+                    Icons.error_outline,
+                    size: 64,
+                    color: AppColors.error,
+                  ),
                   const SizedBox(height: 16),
                   Text(
                     provider.error ?? 'Terreno não encontrado',
-                    style: AppTextStyles.bodyMedium.copyWith(color: AppColors.gray600),
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.gray600,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 20),
@@ -75,8 +87,12 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    child: Text('Voltar',
-                        style: AppTextStyles.buttonMedium.copyWith(color: AppColors.white)),
+                    child: Text(
+                      'Voltar',
+                      style: AppTextStyles.buttonMedium.copyWith(
+                        color: AppColors.white,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -98,7 +114,7 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
       backgroundColor: AppColors.offWhite,
       body: CustomScrollView(
         slivers: [
-                _buildAppBar(land, location),
+          _buildAppBar(land, location),
           SliverToBoxAdapter(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -156,7 +172,9 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
                 }
               : null,
           icon: Icon(
-            _isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+            _isFavorite
+                ? Icons.favorite_rounded
+                : Icons.favorite_border_rounded,
             color: _isFavorite ? AppColors.gold : AppColors.white,
           ),
         ),
@@ -274,26 +292,36 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: isRent ? AppColors.navyLight : AppColors.gold,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   isRent ? 'ALUGUEL' : 'VENDA',
-                  style: AppTextStyles.labelMedium.copyWith(color: AppColors.white),
+                  style: AppTextStyles.labelMedium.copyWith(
+                    color: AppColors.white,
+                  ),
                 ),
               ),
               const SizedBox(width: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.navy.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   typeLabel,
-                  style: AppTextStyles.labelMedium.copyWith(color: AppColors.navy),
+                  style: AppTextStyles.labelMedium.copyWith(
+                    color: AppColors.navy,
+                  ),
                 ),
               ),
             ],
@@ -303,7 +331,11 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
           const SizedBox(height: 8),
           Row(
             children: [
-              const Icon(Icons.location_on_outlined, size: 18, color: AppColors.gold),
+              const Icon(
+                Icons.location_on_outlined,
+                size: 18,
+                color: AppColors.gold,
+              ),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
@@ -539,10 +571,7 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
             ),
             child: Row(
               children: [
-                AvatarWidget(
-                  name: land.agentName,
-                  size: AvatarSize.large,
-                ),
+                AvatarWidget(name: land.agentName, size: AvatarSize.large),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
@@ -623,7 +652,9 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
                 icon: const Icon(Icons.calendar_month_rounded, size: 20),
                 label: Text(
                   'Agendar Visita',
-                  style: AppTextStyles.buttonLarge.copyWith(color: AppColors.white),
+                  style: AppTextStyles.buttonLarge.copyWith(
+                    color: AppColors.white,
+                  ),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.gold,
@@ -651,15 +682,18 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
                           'https://wa.me/${land.agentPhone}?text=$message',
                         );
                         if (await canLaunchUrl(uri)) {
-                          await launchUrl(uri,
-                              mode: LaunchMode.externalApplication);
+                          await launchUrl(
+                            uri,
+                            mode: LaunchMode.externalApplication,
+                          );
                         }
                       },
                       icon: const Icon(Icons.chat_rounded, size: 18),
                       label: Text(
                         'WhatsApp',
-                        style: AppTextStyles.buttonMedium
-                            .copyWith(color: AppColors.white),
+                        style: AppTextStyles.buttonMedium.copyWith(
+                          color: AppColors.white,
+                        ),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.whatsapp,
@@ -686,13 +720,16 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
                       icon: const Icon(Icons.phone_rounded, size: 18),
                       label: Text(
                         'Ligar',
-                        style: AppTextStyles.buttonMedium
-                            .copyWith(color: AppColors.navy),
+                        style: AppTextStyles.buttonMedium.copyWith(
+                          color: AppColors.navy,
+                        ),
                       ),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.navy,
                         side: const BorderSide(
-                            color: AppColors.navy, width: 1.5),
+                          color: AppColors.navy,
+                          width: 1.5,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),

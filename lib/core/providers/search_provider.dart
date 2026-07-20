@@ -205,10 +205,7 @@ class SearchProvider extends ChangeNotifier {
   }
 
   Future<List<LandModel>> _searchLands() async {
-    var queryBuilder = _client
-        .from('lands')
-        .select()
-        .eq('is_available', true);
+    var queryBuilder = _client.from('lands').select().eq('is_available', true);
 
     if (_query.isNotEmpty) {
       queryBuilder = queryBuilder.or(
@@ -264,8 +261,7 @@ class SearchProvider extends ChangeNotifier {
   List<PropertyModel> get propertyResults =>
       _results.whereType<PropertyModel>().toList();
 
-  List<LandModel> get landResults =>
-      _results.whereType<LandModel>().toList();
+  List<LandModel> get landResults => _results.whereType<LandModel>().toList();
 
   void clearError() {
     _error = null;

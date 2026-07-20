@@ -15,11 +15,13 @@ class LocationModel {
     return LocationModel(
       id: json['id'] as String? ?? '',
       city: json['city'] as String? ?? '',
-      municipalities: (json['municipalities'] as List<dynamic>?)
+      municipalities:
+          (json['municipalities'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
           [],
-      neighborhoods: (json['neighborhoods'] as List<dynamic>?)
+      neighborhoods:
+          (json['neighborhoods'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
           [],

@@ -64,25 +64,25 @@ class _MessagesScreenState extends State<MessagesScreen> {
               ),
             )
           : _conversations.isEmpty
-              ? _buildEmptyState()
-              : RefreshIndicator(
-                  onRefresh: _loadConversations,
-                  color: AppColors.gold,
-                  child: ListView.separated(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    itemCount: _conversations.length,
-                    separatorBuilder: (_, __) => Divider(
-                      height: 1,
-                      indent: 80,
-                      endIndent: 16,
-                      color: AppColors.gray100,
-                    ),
-                    itemBuilder: (context, index) {
-                      final conversation = _conversations[index];
-                      return _buildConversationTile(conversation);
-                    },
-                  ),
+          ? _buildEmptyState()
+          : RefreshIndicator(
+              onRefresh: _loadConversations,
+              color: AppColors.gold,
+              child: ListView.separated(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                itemCount: _conversations.length,
+                separatorBuilder: (_, __) => Divider(
+                  height: 1,
+                  indent: 80,
+                  endIndent: 16,
+                  color: AppColors.gray100,
                 ),
+                itemBuilder: (context, index) {
+                  final conversation = _conversations[index];
+                  return _buildConversationTile(conversation);
+                },
+              ),
+            ),
     );
   }
 
@@ -128,8 +128,9 @@ class _MessagesScreenState extends State<MessagesScreen> {
                             color: hasUnread
                                 ? AppColors.gold
                                 : AppColors.gray400,
-                            fontWeight:
-                                hasUnread ? FontWeight.w600 : FontWeight.w400,
+                            fontWeight: hasUnread
+                                ? FontWeight.w600
+                                : FontWeight.w400,
                           ),
                         ),
                       ],
@@ -144,8 +145,9 @@ class _MessagesScreenState extends State<MessagesScreen> {
                               color: hasUnread
                                   ? AppColors.gray800
                                   : AppColors.gray500,
-                              fontWeight:
-                                  hasUnread ? FontWeight.w500 : FontWeight.w400,
+                              fontWeight: hasUnread
+                                  ? FontWeight.w500
+                                  : FontWeight.w400,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,

@@ -8,12 +8,72 @@ import 'package:luar_company/widgets/property_card.dart';
 
 // 1x1 transparent PNG
 final _kTransparentImage = Uint8List.fromList(<int>[
-  0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
-  0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
-  0x08, 0x06, 0x00, 0x00, 0x00, 0x1f, 0x15, 0xc4, 0x89, 0x00, 0x00, 0x00,
-  0x0a, 0x49, 0x44, 0x41, 0x54, 0x78, 0x9c, 0x62, 0x00, 0x00, 0x00, 0x02,
-  0x00, 0x01, 0xe2, 0x21, 0xbc, 0x33, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45,
-  0x4e, 0x44, 0xae, 0x42, 0x60, 0x82,
+  0x89,
+  0x50,
+  0x4e,
+  0x47,
+  0x0d,
+  0x0a,
+  0x1a,
+  0x0a,
+  0x00,
+  0x00,
+  0x00,
+  0x0d,
+  0x49,
+  0x48,
+  0x44,
+  0x52,
+  0x00,
+  0x00,
+  0x00,
+  0x01,
+  0x00,
+  0x00,
+  0x00,
+  0x01,
+  0x08,
+  0x06,
+  0x00,
+  0x00,
+  0x00,
+  0x1f,
+  0x15,
+  0xc4,
+  0x89,
+  0x00,
+  0x00,
+  0x00,
+  0x0a,
+  0x49,
+  0x44,
+  0x41,
+  0x54,
+  0x78,
+  0x9c,
+  0x62,
+  0x00,
+  0x00,
+  0x00,
+  0x02,
+  0x00,
+  0x01,
+  0xe2,
+  0x21,
+  0xbc,
+  0x33,
+  0x00,
+  0x00,
+  0x00,
+  0x00,
+  0x49,
+  0x45,
+  0x4e,
+  0x44,
+  0xae,
+  0x42,
+  0x60,
+  0x82,
 ]);
 
 class _TestHttpOverrides extends HttpOverrides {
@@ -67,18 +127,27 @@ class _FakeHttpClientResponse extends Fake implements HttpClientResponse {
     void Function()? onDone,
     bool? cancelOnError,
   }) {
-    return Stream<List<int>>.fromIterable(<List<int>>[_kTransparentImage])
-        .listen(onData, onError: onError, onDone: onDone, cancelOnError: cancelOnError);
+    return Stream<List<int>>.fromIterable(<List<int>>[
+      _kTransparentImage,
+    ]).listen(
+      onData,
+      onError: onError,
+      onDone: onDone,
+      cancelOnError: cancelOnError,
+    );
   }
 
   @override
   Future<T> fold<T>(T initialValue, T Function(T, List<int>) combine) =>
-      Stream<List<int>>.fromIterable(<List<int>>[_kTransparentImage])
-          .fold(initialValue, combine);
+      Stream<List<int>>.fromIterable(<List<int>>[
+        _kTransparentImage,
+      ]).fold(initialValue, combine);
 
   @override
   Future<void> forEach(void Function(List<int>) action) =>
-      Stream<List<int>>.fromIterable(<List<int>>[_kTransparentImage]).forEach(action);
+      Stream<List<int>>.fromIterable(<List<int>>[
+        _kTransparentImage,
+      ]).forEach(action);
 }
 
 class _FakeHttpHeaders extends Fake implements HttpHeaders {
@@ -138,82 +207,71 @@ void main() {
       });
 
       testWidgets('shows Venda badge for venda listing type', (tester) async {
-        await tester.pumpWidget(wrapInApp(
-          createCard(listingType: PropertyListingType.venda),
-        ));
+        await tester.pumpWidget(
+          wrapInApp(createCard(listingType: PropertyListingType.venda)),
+        );
         await tester.pumpAndSettle();
 
         expect(find.text('Venda'), findsWidgets);
       });
 
-      testWidgets('shows Arrendamento badge for arrendamento listing type',
-          (tester) async {
-        await tester.pumpWidget(wrapInApp(
-          createCard(listingType: PropertyListingType.arrendamento),
-        ));
+      testWidgets('shows Arrendamento badge for arrendamento listing type', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          wrapInApp(createCard(listingType: PropertyListingType.arrendamento)),
+        );
         await tester.pumpAndSettle();
 
         expect(find.text('Arrendamento'), findsWidgets);
       });
 
       testWidgets('displays formatted price with AOA prefix', (tester) async {
-        await tester.pumpWidget(wrapInApp(
-          createCard(price: 15000000),
-        ));
+        await tester.pumpWidget(wrapInApp(createCard(price: 15000000)));
         await tester.pumpAndSettle();
 
         expect(find.text('AOA 15.000.000'), findsOneWidget);
       });
 
       testWidgets('formats price with dot separators', (tester) async {
-        await tester.pumpWidget(wrapInApp(
-          createCard(price: 1500000),
-        ));
+        await tester.pumpWidget(wrapInApp(createCard(price: 1500000)));
         await tester.pumpAndSettle();
 
         expect(find.text('AOA 1.500.000'), findsOneWidget);
       });
 
       testWidgets('formats small price without separators', (tester) async {
-        await tester.pumpWidget(wrapInApp(
-          createCard(price: 500),
-        ));
+        await tester.pumpWidget(wrapInApp(createCard(price: 500)));
         await tester.pumpAndSettle();
 
         expect(find.text('AOA 500'), findsOneWidget);
       });
 
       testWidgets('shows bedroom count', (tester) async {
-        await tester.pumpWidget(wrapInApp(
-          createCard(bedrooms: 4),
-        ));
+        await tester.pumpWidget(wrapInApp(createCard(bedrooms: 4)));
         await tester.pumpAndSettle();
 
         expect(find.text('4'), findsWidgets);
       });
 
       testWidgets('shows bathroom count', (tester) async {
-        await tester.pumpWidget(wrapInApp(
-          createCard(bathrooms: 3),
-        ));
+        await tester.pumpWidget(wrapInApp(createCard(bathrooms: 3)));
         await tester.pumpAndSettle();
 
         expect(find.text('3'), findsWidgets);
       });
 
       testWidgets('shows area in m²', (tester) async {
-        await tester.pumpWidget(wrapInApp(
-          createCard(area: 250),
-        ));
+        await tester.pumpWidget(wrapInApp(createCard(area: 250)));
         await tester.pumpAndSettle();
 
         expect(find.text('250 m²'), findsOneWidget);
       });
 
       testWidgets('hides features when null', (tester) async {
-        await tester.pumpWidget(wrapInApp(
-          createCard(bedrooms: null, bathrooms: null, area: null),
-        ));
+        await tester.pumpWidget(
+          wrapInApp(createCard(bedrooms: null, bathrooms: null, area: null)),
+        );
         await tester.pumpAndSettle();
 
         expect(find.byIcon(Icons.king_bed_outlined), findsNothing);
@@ -224,9 +282,9 @@ void main() {
       testWidgets('calls onTap when card is tapped', (tester) async {
         var tapped = false;
 
-        await tester.pumpWidget(wrapInApp(
-          createCard(onTap: () => tapped = true),
-        ));
+        await tester.pumpWidget(
+          wrapInApp(createCard(onTap: () => tapped = true)),
+        );
         await tester.pumpAndSettle();
 
         await tester.tap(find.byType(PropertyCard));
@@ -235,13 +293,14 @@ void main() {
         expect(tapped, isTrue);
       });
 
-      testWidgets('calls onDetailsTap when details button is tapped',
-          (tester) async {
+      testWidgets('calls onDetailsTap when details button is tapped', (
+        tester,
+      ) async {
         var detailsTapped = false;
 
-        await tester.pumpWidget(wrapInApp(
-          createCard(onDetailsTap: () => detailsTapped = true),
-        ));
+        await tester.pumpWidget(
+          wrapInApp(createCard(onDetailsTap: () => detailsTapped = true)),
+        );
         await tester.pumpAndSettle();
 
         await tester.tap(find.text('Detalhes'));
@@ -260,9 +319,9 @@ void main() {
 
     group('horizontal variant', () {
       testWidgets('renders with horizontal variant', (tester) async {
-        await tester.pumpWidget(wrapInApp(
-          createCard(variant: PropertyCardVariant.horizontal),
-        ));
+        await tester.pumpWidget(
+          wrapInApp(createCard(variant: PropertyCardVariant.horizontal)),
+        );
         await tester.pumpAndSettle();
 
         expect(find.text('Vivenda Moderna'), findsOneWidget);
@@ -270,24 +329,25 @@ void main() {
       });
 
       testWidgets('shows Venda badge', (tester) async {
-        await tester.pumpWidget(wrapInApp(
-          createCard(
-            variant: PropertyCardVariant.horizontal,
-            listingType: PropertyListingType.venda,
+        await tester.pumpWidget(
+          wrapInApp(
+            createCard(
+              variant: PropertyCardVariant.horizontal,
+              listingType: PropertyListingType.venda,
+            ),
           ),
-        ));
+        );
         await tester.pumpAndSettle();
 
         expect(find.text('Venda'), findsWidgets);
       });
 
       testWidgets('shows formatted price', (tester) async {
-        await tester.pumpWidget(wrapInApp(
-          createCard(
-            variant: PropertyCardVariant.horizontal,
-            price: 2500000,
+        await tester.pumpWidget(
+          wrapInApp(
+            createCard(variant: PropertyCardVariant.horizontal, price: 2500000),
           ),
-        ));
+        );
         await tester.pumpAndSettle();
 
         expect(find.text('AOA 2.500.000'), findsOneWidget);
@@ -296,12 +356,14 @@ void main() {
       testWidgets('calls onTap on horizontal card', (tester) async {
         var tapped = false;
 
-        await tester.pumpWidget(wrapInApp(
-          createCard(
-            variant: PropertyCardVariant.horizontal,
-            onTap: () => tapped = true,
+        await tester.pumpWidget(
+          wrapInApp(
+            createCard(
+              variant: PropertyCardVariant.horizontal,
+              onTap: () => tapped = true,
+            ),
           ),
-        ));
+        );
         await tester.pumpAndSettle();
 
         await tester.tap(find.byType(PropertyCard));
@@ -313,12 +375,14 @@ void main() {
       testWidgets('calls onDetailsTap on horizontal card', (tester) async {
         var detailsTapped = false;
 
-        await tester.pumpWidget(wrapInApp(
-          createCard(
-            variant: PropertyCardVariant.horizontal,
-            onDetailsTap: () => detailsTapped = true,
+        await tester.pumpWidget(
+          wrapInApp(
+            createCard(
+              variant: PropertyCardVariant.horizontal,
+              onDetailsTap: () => detailsTapped = true,
+            ),
           ),
-        ));
+        );
         await tester.pumpAndSettle();
 
         await tester.tap(find.text('Detalhes'));
@@ -328,9 +392,9 @@ void main() {
       });
 
       testWidgets('shows Detalhes button', (tester) async {
-        await tester.pumpWidget(wrapInApp(
-          createCard(variant: PropertyCardVariant.horizontal),
-        ));
+        await tester.pumpWidget(
+          wrapInApp(createCard(variant: PropertyCardVariant.horizontal)),
+        );
         await tester.pumpAndSettle();
 
         expect(find.text('Detalhes'), findsOneWidget);

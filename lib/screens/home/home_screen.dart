@@ -139,17 +139,12 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 28),
           Text(
             'Encontre o seu\nimóvel ideal',
-            style: AppTextStyles.h2White.copyWith(
-              fontSize: 32,
-              height: 1.15,
-            ),
+            style: AppTextStyles.h2White.copyWith(fontSize: 32, height: 1.15),
           ),
           const SizedBox(height: 8),
           Text(
             'Casas, apartamentos, terrenos e mais',
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.gray400,
-            ),
+            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.gray400),
           ),
           const SizedBox(height: 24),
           SearchWidget(
@@ -170,11 +165,7 @@ class _HomeScreenState extends State<HomeScreen> {
         title: 'Apartamentos',
         count: 0,
       ),
-      _CategoryData(
-        icon: Icons.landscape_rounded,
-        title: 'Terrenos',
-        count: 0,
-      ),
+      _CategoryData(icon: Icons.landscape_rounded, title: 'Terrenos', count: 0),
       _CategoryData(
         icon: Icons.agriculture_rounded,
         title: 'Fazendas',
@@ -353,9 +344,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildPropertyCard(PropertyModel property) {
-    final imageUrl = property.images.isNotEmpty
-        ? property.images.first
-        : '';
+    final imageUrl = property.images.isNotEmpty ? property.images.first : '';
 
     final locationParts = [
       property.neighborhood,
@@ -378,10 +367,9 @@ class _HomeScreenState extends State<HomeScreen> {
       bathrooms: property.bathrooms,
       area: property.area,
       onTap: () {
-        Navigator.of(context).pushNamed(
-          AppRoutes.propertyDetail,
-          arguments: property.id,
-        );
+        Navigator.of(
+          context,
+        ).pushNamed(AppRoutes.propertyDetail, arguments: property.id);
       },
     );
   }
@@ -441,10 +429,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   separatorBuilder: (_, __) => const SizedBox(width: 16),
                   itemBuilder: (context, index) {
                     final land = featured[index];
-                    return SizedBox(
-                      width: 300,
-                      child: _buildLandCard(land),
-                    );
+                    return SizedBox(width: 300, child: _buildLandCard(land));
                   },
                 ),
               ),
@@ -578,9 +563,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 4),
             Text(
               service.description,
-              style: AppTextStyles.bodyTiny.copyWith(
-                color: AppColors.gray500,
-              ),
+              style: AppTextStyles.bodyTiny.copyWith(color: AppColors.gray500),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
@@ -595,7 +578,8 @@ class _HomeScreenState extends State<HomeScreen> {
       _BenefitData(
         icon: Icons.workspace_premium_outlined,
         title: 'Experiência no Mercado',
-        description: 'Mais de 10 anos de atuação no mercado imobiliário angolano',
+        description:
+            'Mais de 10 anos de atuação no mercado imobiliário angolano',
       ),
       _BenefitData(
         icon: Icons.handshake_outlined,
@@ -623,10 +607,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Por que escolher-nos?',
-                style: AppTextStyles.h5,
-              ),
+              Text('Por que escolher-nos?', style: AppTextStyles.h5),
               const SizedBox(height: 8),
               Text(
                 'A confiança que o mercado reconhece',
@@ -720,9 +701,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 12),
             Text(
               message,
-              style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.gray400,
-              ),
+              style: AppTextStyles.bodySmall.copyWith(color: AppColors.gray400),
               textAlign: TextAlign.center,
             ),
           ],
@@ -738,11 +717,7 @@ class _HomeScreenState extends State<HomeScreen> {
       elevation: 6,
       highlightElevation: 8,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: const Icon(
-        Icons.chat_rounded,
-        color: AppColors.white,
-        size: 28,
-      ),
+      child: const Icon(Icons.chat_rounded, color: AppColors.white, size: 28),
     );
   }
 

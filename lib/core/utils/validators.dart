@@ -1,7 +1,10 @@
 class Validators {
   Validators._();
 
-  static String? required(String? value, {String fieldName = 'Campo obrigatório'}) {
+  static String? required(
+    String? value, {
+    String fieldName = 'Campo obrigatório',
+  }) {
     if (value == null || value.trim().isEmpty) return fieldName;
     return null;
   }

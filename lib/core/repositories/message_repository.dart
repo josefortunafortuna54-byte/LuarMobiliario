@@ -19,18 +19,16 @@ class MessageRepository {
 
       final Map<String, MessageModel> latestByPartner = {};
       for (final msg in messages) {
-        final partnerId =
-            msg.senderId == userId ? msg.receiverId : msg.senderId;
+        final partnerId = msg.senderId == userId
+            ? msg.receiverId
+            : msg.senderId;
         if (!latestByPartner.containsKey(partnerId)) {
           latestByPartner[partnerId] = msg;
         }
       }
 
       return latestByPartner.entries
-          .map((e) => {
-                'partnerId': e.key,
-                'lastMessage': e.value,
-              })
+          .map((e) => {'partnerId': e.key, 'lastMessage': e.value})
           .toList();
     } catch (e) {
       return [];
@@ -61,17 +59,13 @@ class MessageRepository {
   Future<MessageModel> sendMessage(MessageModel message) async {
     final data = message.toJson()..remove('id');
 
-    final response =
-        await _client.from(_table).insert(data).select().single();
+    final response = await _client.from(_table).insert(data).select().single();
 
     return MessageModel.fromJson(response);
   }
 
   Future<void> markAsRead(String messageId) async {
-    await _client
-        .from(_table)
-        .update({'is_read': true})
-        .eq('id', messageId);
+    await _client.from(_table).update({'is_read': true}).eq('id', messageId);
   }
 
   Future<int> getUnreadCount(String userId) async {

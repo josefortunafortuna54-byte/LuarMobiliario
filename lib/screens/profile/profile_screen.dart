@@ -25,8 +25,9 @@ class ProfileScreen extends StatelessWidget {
             onPressed: () => Navigator.pop(ctx),
             child: Text(
               'Cancelar',
-              style:
-                  AppTextStyles.buttonMedium.copyWith(color: AppColors.gray600),
+              style: AppTextStyles.buttonMedium.copyWith(
+                color: AppColors.gray600,
+              ),
             ),
           ),
           TextButton(
@@ -36,8 +37,9 @@ class ProfileScreen extends StatelessWidget {
             },
             child: Text(
               'Sair',
-              style:
-                  AppTextStyles.buttonMedium.copyWith(color: AppColors.error),
+              style: AppTextStyles.buttonMedium.copyWith(
+                color: AppColors.error,
+              ),
             ),
           ),
         ],
@@ -100,24 +102,17 @@ class ProfileScreen extends StatelessWidget {
             borderColor: AppColors.gold,
           ),
           const SizedBox(height: 16),
-          Text(
-            user?.name ?? 'Utilizador',
-            style: AppTextStyles.h4White,
-          ),
+          Text(user?.name ?? 'Utilizador', style: AppTextStyles.h4White),
           const SizedBox(height: 4),
           Text(
             user?.email ?? '',
-            style: AppTextStyles.bodySmall.copyWith(
-              color: AppColors.gray400,
-            ),
+            style: AppTextStyles.bodySmall.copyWith(color: AppColors.gray400),
           ),
           if (user?.phone != null && user!.phone.isNotEmpty) ...[
             const SizedBox(height: 4),
             Text(
               user.phone,
-              style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.gray400,
-              ),
+              style: AppTextStyles.bodySmall.copyWith(color: AppColors.gray400),
             ),
           ],
           const SizedBox(height: 16),
@@ -126,9 +121,7 @@ class ProfileScreen extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppColors.gold.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: AppColors.gold.withValues(alpha: 0.3),
-              ),
+              border: Border.all(color: AppColors.gold.withValues(alpha: 0.3)),
             ),
             child: Text(
               (user?.role?.name ?? 'client').toUpperCase(),
@@ -145,11 +138,7 @@ class ProfileScreen extends StatelessWidget {
 
   Widget _buildMenuSection(BuildContext context) {
     final menuItems = [
-      _MenuItem(
-        icon: Icons.home_outlined,
-        title: 'Meus Imóveis',
-        route: null,
-      ),
+      _MenuItem(icon: Icons.home_outlined, title: 'Meus Imóveis', route: null),
       _MenuItem(
         icon: Icons.favorite_border_rounded,
         title: 'Favoritos',
@@ -210,16 +199,14 @@ class ProfileScreen extends StatelessWidget {
                   highlightColor: AppColors.gold.withValues(alpha: 0.05),
                   splashColor: AppColors.gold.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.vertical(
-                    top: index == 0
-                        ? const Radius.circular(16)
-                        : Radius.zero,
-                    bottom: isLast
-                        ? const Radius.circular(16)
-                        : Radius.zero,
+                    top: index == 0 ? const Radius.circular(16) : Radius.zero,
+                    bottom: isLast ? const Radius.circular(16) : Radius.zero,
                   ),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 16),
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
                     child: Row(
                       children: [
                         Container(
@@ -261,11 +248,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
               if (!isLast)
-                Divider(
-                  height: 1,
-                  indent: 74,
-                  color: AppColors.gray100,
-                ),
+                Divider(height: 1, indent: 74, color: AppColors.gray100),
             ],
           );
         }),
@@ -276,9 +259,7 @@ class ProfileScreen extends StatelessWidget {
   Widget _buildVersionInfo() {
     return Text(
       'Versão ${AppConstants.appVersion}',
-      style: AppTextStyles.bodyTiny.copyWith(
-        color: AppColors.gray400,
-      ),
+      style: AppTextStyles.bodyTiny.copyWith(color: AppColors.gray400),
     );
   }
 }

@@ -101,10 +101,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
 
           return TabBarView(
             controller: _tabController,
-            children: [
-              _buildPropertiesTab(),
-              _buildLandsTab(),
-            ],
+            children: [_buildPropertiesTab(), _buildLandsTab()],
           );
         },
       ),
@@ -140,7 +137,8 @@ class _FavoritesScreenState extends State<FavoritesScreen>
               final imageUrl = property.images.isNotEmpty
                   ? property.images.first
                   : '';
-              final listingType = property.transactionType == TransactionType.sale
+              final listingType =
+                  property.transactionType == TransactionType.sale
                   ? PropertyListingType.venda
                   : PropertyListingType.arrendamento;
               final location = [
@@ -194,8 +192,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
             itemCount: _favoriteLands.length,
             itemBuilder: (context, index) {
               final land = _favoriteLands[index];
-              final imageUrl =
-                  land.images.isNotEmpty ? land.images.first : '';
+              final imageUrl = land.images.isNotEmpty ? land.images.first : '';
               final location = [
                 land.neighborhood,
                 land.municipality,
@@ -248,11 +245,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
               ),
             ),
             const SizedBox(height: 24),
-            Text(
-              title,
-              style: AppTextStyles.h5,
-              textAlign: TextAlign.center,
-            ),
+            Text(title, style: AppTextStyles.h5, textAlign: TextAlign.center),
             const SizedBox(height: 8),
             Text(
               subtitle,

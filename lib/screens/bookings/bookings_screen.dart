@@ -60,14 +60,18 @@ class _BookingsScreenState extends State<BookingsScreen>
             onPressed: () => Navigator.pop(ctx, false),
             child: Text(
               'Não',
-              style: AppTextStyles.buttonMedium.copyWith(color: AppColors.gray600),
+              style: AppTextStyles.buttonMedium.copyWith(
+                color: AppColors.gray600,
+              ),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             child: Text(
               'Sim, Cancelar',
-              style: AppTextStyles.buttonMedium.copyWith(color: AppColors.error),
+              style: AppTextStyles.buttonMedium.copyWith(
+                color: AppColors.error,
+              ),
             ),
           ),
         ],
@@ -120,10 +124,7 @@ class _BookingsScreenState extends State<BookingsScreen>
 
           return TabBarView(
             controller: _tabController,
-            children: [
-              _buildUpcomingTab(provider),
-              _buildHistoryTab(provider),
-            ],
+            children: [_buildUpcomingTab(provider), _buildHistoryTab(provider)],
           );
         },
       ),
@@ -377,11 +378,7 @@ class _BookingsScreenState extends State<BookingsScreen>
               ),
             ),
             const SizedBox(height: 24),
-            Text(
-              title,
-              style: AppTextStyles.h5,
-              textAlign: TextAlign.center,
-            ),
+            Text(title, style: AppTextStyles.h5, textAlign: TextAlign.center),
             const SizedBox(height: 8),
             Text(
               subtitle,
@@ -417,9 +414,7 @@ class _BookingsScreenState extends State<BookingsScreen>
             const SizedBox(height: 8),
             Text(
               message,
-              style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.gray500,
-              ),
+              style: AppTextStyles.bodySmall.copyWith(color: AppColors.gray500),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),

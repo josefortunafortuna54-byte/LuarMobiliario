@@ -80,7 +80,9 @@ class NotificationService {
       if (projectId.isEmpty) return;
 
       await http.post(
-        Uri.parse('https://fcm.googleapis.com/v1/projects/$projectId/messages:send'),
+        Uri.parse(
+          'https://fcm.googleapis.com/v1/projects/$projectId/messages:send',
+        ),
         headers: <String, String>{
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ${EnvConfig.fcmSenderId}',
@@ -88,10 +90,7 @@ class NotificationService {
         body: jsonEncode({
           'message': {
             'token': fcmToken,
-            'notification': {
-              'title': title,
-              'body': body,
-            },
+            'notification': {'title': title, 'body': body},
             'data': {
               'type': 'notification',
               'timestamp': DateTime.now().toIso8601String(),
@@ -104,9 +103,7 @@ class NotificationService {
               },
             },
             'apns': {
-              'headers': {
-                'apns-priority': '10',
-              },
+              'headers': {'apns-priority': '10'},
             },
           },
         }),

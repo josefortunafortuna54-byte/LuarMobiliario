@@ -77,10 +77,7 @@ abstract final class AppConstants {
 
   // ── Property Transaction Types ─────────────────────────────────────
 
-  static const List<String> transactionTypes = [
-    'Venda',
-    'Arrendamento',
-  ];
+  static const List<String> transactionTypes = ['Venda', 'Arrendamento'];
 
   static const List<String> propertyTypes = [
     'Casa',
@@ -93,28 +90,16 @@ abstract final class AppConstants {
     'Condomínio',
   ];
 
-  static const List<String> bedroomOptions = [
-    '1',
-    '2',
-    '3',
-    '4',
-    '5+',
-  ];
+  static const List<String> bedroomOptions = ['1', '2', '3', '4', '5+'];
 
-  static const List<String> parkingOptions = [
-    '1',
-    '2',
-    '3',
-    '4+',
-  ];
+  static const List<String> parkingOptions = ['1', '2', '3', '4+'];
 
   // ── Regex Patterns ─────────────────────────────────────────────────
 
   static const String emailRegex =
       r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
 
-  static const String phoneRegex =
-      r'^(\+244\s?)?9[1-9]\d{7}$';
+  static const String phoneRegex = r'^(\+244\s?)?9[1-9]\d{7}$';
 
   // ── Shared Preferences Keys ────────────────────────────────────────
 

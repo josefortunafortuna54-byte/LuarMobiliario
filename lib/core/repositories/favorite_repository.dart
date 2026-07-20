@@ -33,8 +33,7 @@ class FavoriteRepository {
       'created_at': DateTime.now().toIso8601String(),
     };
 
-    final response =
-        await _client.from(_table).insert(data).select().single();
+    final response = await _client.from(_table).insert(data).select().single();
 
     return FavoriteModel.fromJson(response);
   }
@@ -62,10 +61,7 @@ class FavoriteRepository {
     String? landId,
   }) async {
     try {
-      var query = _client
-          .from(_table)
-          .select('id')
-          .eq('user_id', userId);
+      var query = _client.from(_table).select('id').eq('user_id', userId);
 
       if (propertyId != null) {
         query = query.eq('property_id', propertyId);

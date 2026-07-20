@@ -44,11 +44,7 @@ class CategoryCard extends StatelessWidget {
                 color: AppColors.gold.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: Icon(
-                icon,
-                size: 28,
-                color: AppColors.gold,
-              ),
+              child: Icon(icon, size: 28, color: AppColors.gold),
             ),
             const SizedBox(height: 12),
             Text(
@@ -63,9 +59,7 @@ class CategoryCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               '$count ${count == 1 ? 'imóvel' : 'imóveis'}',
-              style: AppTextStyles.bodyTiny.copyWith(
-                color: AppColors.gray400,
-              ),
+              style: AppTextStyles.bodyTiny.copyWith(color: AppColors.gray400),
               textAlign: TextAlign.center,
             ),
           ],

@@ -29,11 +29,7 @@ class FeatureChip extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icon != null) ...[
-            Icon(
-              icon,
-              size: 14,
-              color: foregroundColor ?? AppColors.gray500,
-            ),
+            Icon(icon, size: 14, color: foregroundColor ?? AppColors.gray500),
             const SizedBox(width: 4),
           ],
           Text(

@@ -68,17 +68,12 @@ class AvatarWidget extends StatelessWidget {
             ? Border.all(color: borderColor!, width: 2)
             : null,
       ),
-      child: ClipOval(
-        child: _buildContent(),
-      ),
+      child: ClipOval(child: _buildContent()),
     );
 
     final stack = Stack(
       clipBehavior: Clip.none,
-      children: [
-        avatar,
-        if (showOnlineIndicator) _buildOnlineIndicator(),
-      ],
+      children: [avatar, if (showOnlineIndicator) _buildOnlineIndicator()],
     );
 
     if (onTap != null) {
@@ -130,10 +125,7 @@ class AvatarWidget extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.success,
           shape: BoxShape.circle,
-          border: Border.all(
-            color: AppColors.white,
-            width: _onlineBorderWidth,
-          ),
+          border: Border.all(color: AppColors.white, width: _onlineBorderWidth),
         ),
       ),
     );

@@ -46,7 +46,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
           content: const Text('Aceite os termos de uso para continuar'),
           backgroundColor: AppColors.warning,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
         ),
       );
       return;
@@ -69,7 +71,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
           content: Text(auth.error!),
           backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
         ),
       );
     }
@@ -97,7 +101,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) return 'Insira a sua senha';
     if (value.length < 8) return 'Mínimo de 8 caracteres';
-    if (!value.contains(RegExp(r'[A-Z]'))) return 'Inclua pelo menos uma letra maiúscula';
+    if (!value.contains(RegExp(r'[A-Z]')))
+      return 'Inclua pelo menos uma letra maiúscula';
     if (!value.contains(RegExp(r'[0-9]'))) return 'Inclua pelo menos um número';
     return null;
   }

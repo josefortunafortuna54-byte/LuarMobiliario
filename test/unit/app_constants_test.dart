@@ -251,7 +251,10 @@ void main() {
       });
 
       test('matches email with underscore and percent', () {
-        expect('user_name%test@test.com', matches(RegExp(AppConstants.emailRegex)));
+        expect(
+          'user_name%test@test.com',
+          matches(RegExp(AppConstants.emailRegex)),
+        );
       });
 
       test('rejects email without @', () {
@@ -267,7 +270,10 @@ void main() {
       });
 
       test('rejects email with spaces', () {
-        expect('user @test.com', isNot(matches(RegExp(AppConstants.emailRegex))));
+        expect(
+          'user @test.com',
+          isNot(matches(RegExp(AppConstants.emailRegex))),
+        );
       });
 
       test('rejects empty string', () {

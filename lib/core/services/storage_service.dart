@@ -19,9 +19,13 @@ class StorageService {
     try {
       final fileExtension = path.extension(file.path).replaceAll('.', '');
       final fileName = '${_uuid.v4()}.$fileExtension';
-      final uploadPath = customPath != null ? '$customPath/$fileName' : fileName;
+      final uploadPath = customPath != null
+          ? '$customPath/$fileName'
+          : fileName;
 
-      final response = await _client.storage.from(bucket).upload(
+      final response = await _client.storage
+          .from(bucket)
+          .upload(
             uploadPath,
             file,
             fileOptions: const FileOptions(upsert: true),
@@ -72,10 +76,7 @@ class StorageService {
     }
   }
 
-  String getPublicUrl({
-    required String bucket,
-    required String path,
-  }) {
+  String getPublicUrl({required String bucket, required String path}) {
     try {
       return _client.storage.from(bucket).getPublicUrl(path);
     } catch (e) {

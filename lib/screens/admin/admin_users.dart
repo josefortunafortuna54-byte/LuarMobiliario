@@ -47,9 +47,11 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
       _filteredUsers = List.from(_allUsers);
     } else {
       _filteredUsers = _allUsers
-          .where((u) =>
-              u.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-              u.email.toLowerCase().contains(_searchQuery.toLowerCase()))
+          .where(
+            (u) =>
+                u.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+                u.email.toLowerCase().contains(_searchQuery.toLowerCase()),
+          )
           .toList();
     }
   }
@@ -80,22 +82,23 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                     ),
                   )
                 : _filteredUsers.isEmpty
-                    ? _buildEmptyState()
-                    : RefreshIndicator(
-                        onRefresh: _loadUsers,
-                        color: AppColors.gold,
-                        child: ListView.separated(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
-                          itemCount: _filteredUsers.length,
-                          separatorBuilder: (_, __) =>
-                              const SizedBox(height: 8),
-                          itemBuilder: (context, index) {
-                            final user = _filteredUsers[index];
-                            return _buildUserTile(user);
-                          },
-                        ),
+                ? _buildEmptyState()
+                : RefreshIndicator(
+                    onRefresh: _loadUsers,
+                    color: AppColors.gold,
+                    child: ListView.separated(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
                       ),
+                      itemCount: _filteredUsers.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 8),
+                      itemBuilder: (context, index) {
+                        final user = _filteredUsers[index];
+                        return _buildUserTile(user);
+                      },
+                    ),
+                  ),
           ),
         ],
       ),
@@ -122,9 +125,16 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
           ),
           prefixIcon: const Padding(
             padding: EdgeInsets.only(left: 14, right: 10),
-            child: Icon(Icons.search_rounded, size: 22, color: AppColors.gray400),
+            child: Icon(
+              Icons.search_rounded,
+              size: 22,
+              color: AppColors.gray400,
+            ),
           ),
-          prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
+          prefixIconConstraints: const BoxConstraints(
+            minWidth: 0,
+            minHeight: 0,
+          ),
           suffixIcon: _searchQuery.isNotEmpty
               ? GestureDetector(
                   onTap: () {
@@ -136,14 +146,20 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                   },
                   child: const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 4),
-                    child: Icon(Icons.close_rounded, size: 18, color: AppColors.gray400),
+                    child: Icon(
+                      Icons.close_rounded,
+                      size: 18,
+                      color: AppColors.gray400,
+                    ),
                   ),
                 )
               : null,
           filled: true,
           fillColor: AppColors.gray50,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 14,
+            vertical: 14,
+          ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
@@ -168,9 +184,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
         children: [
           Text(
             '${_filteredUsers.length} utilizador${_filteredUsers.length != 1 ? 'es' : ''}',
-            style: AppTextStyles.bodySmall.copyWith(
-              color: AppColors.gray500,
-            ),
+            style: AppTextStyles.bodySmall.copyWith(color: AppColors.gray500),
           ),
         ],
       ),
@@ -259,10 +273,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
       ),
       child: Text(
         label,
-        style: AppTextStyles.labelSmall.copyWith(
-          color: color,
-          fontSize: 9,
-        ),
+        style: AppTextStyles.labelSmall.copyWith(color: color, fontSize: 9),
       ),
     );
   }
@@ -447,10 +458,7 @@ class _UserDetailSheet extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  value,
-                  style: AppTextStyles.bodyMediumBold,
-                ),
+                Text(value, style: AppTextStyles.bodyMediumBold),
               ],
             ),
           ),

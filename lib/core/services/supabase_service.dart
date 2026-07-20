@@ -18,9 +18,7 @@ class SupabaseService {
 
   static Future<void> initialize() async {
     if (!EnvConfig.isConfigured) {
-      throw StateError(
-        'Supabase configuration missing. Check your .env file.',
-      );
+      throw StateError('Supabase configuration missing. Check your .env file.');
     }
 
     await Supabase.initialize(

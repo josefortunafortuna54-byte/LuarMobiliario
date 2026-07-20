@@ -172,10 +172,7 @@ class PropertyProvider extends ChangeNotifier {
       final data = property.toJson();
       data['updated_at'] = DateTime.now().toIso8601String();
 
-      await _client
-          .from('properties')
-          .update(data)
-          .eq('id', property.id);
+      await _client.from('properties').update(data).eq('id', property.id);
 
       final index = _properties.indexWhere((p) => p.id == property.id);
       if (index != -1) {
@@ -237,7 +234,9 @@ class PropertyProvider extends ChangeNotifier {
           .from('properties')
           .select()
           .eq('is_available', true)
-          .or('title.ilike.%$searchQuery%,description.ilike.%$searchQuery%,address.ilike.%$searchQuery%,city.ilike.%$searchQuery%,municipality.ilike.%$searchQuery%,neighborhood.ilike.%$searchQuery%')
+          .or(
+            'title.ilike.%$searchQuery%,description.ilike.%$searchQuery%,address.ilike.%$searchQuery%,city.ilike.%$searchQuery%,municipality.ilike.%$searchQuery%,neighborhood.ilike.%$searchQuery%',
+          )
           .order('created_at', ascending: false)
           .limit(AppConstants.defaultPageSize);
 

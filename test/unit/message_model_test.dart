@@ -68,10 +68,7 @@ void main() {
 
   group('toJson', () {
     test('serializes all fields correctly', () {
-      final m = createSubject(
-        isRead: false,
-        createdAt: DateTime(2025, 1, 1),
-      );
+      final m = createSubject(isRead: false, createdAt: DateTime(2025, 1, 1));
 
       final json = m.toJson();
 

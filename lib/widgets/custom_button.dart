@@ -37,9 +37,7 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final child = isLoading
-        ? _buildLoading()
-        : _buildContent();
+    final child = isLoading ? _buildLoading() : _buildContent();
 
     final button = switch (variant) {
       CustomButtonVariant.primary => _buildPrimary(child),
@@ -64,11 +62,7 @@ class CustomButton extends StatelessWidget {
 
     content.add(
       Flexible(
-        child: Text(
-          text,
-          style: _textStyle,
-          overflow: TextOverflow.ellipsis,
-        ),
+        child: Text(text, style: _textStyle, overflow: TextOverflow.ellipsis),
       ),
     );
 
@@ -179,29 +173,38 @@ class CustomButton extends StatelessWidget {
   };
 
   EdgeInsets get _padding => switch (size) {
-    CustomButtonSize.small =>
-      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-    CustomButtonSize.medium =>
-      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-    CustomButtonSize.large =>
-      const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+    CustomButtonSize.small => const EdgeInsets.symmetric(
+      horizontal: 16,
+      vertical: 8,
+    ),
+    CustomButtonSize.medium => const EdgeInsets.symmetric(
+      horizontal: 24,
+      vertical: 12,
+    ),
+    CustomButtonSize.large => const EdgeInsets.symmetric(
+      horizontal: 32,
+      vertical: 16,
+    ),
   };
 
   TextStyle get _textStyle => switch (size) {
     CustomButtonSize.small => AppTextStyles.buttonSmall.copyWith(
-      color: variant == CustomButtonVariant.primary ||
+      color:
+          variant == CustomButtonVariant.primary ||
               variant == CustomButtonVariant.secondary
           ? AppColors.white
           : AppColors.navy,
     ),
     CustomButtonSize.medium => AppTextStyles.buttonMedium.copyWith(
-      color: variant == CustomButtonVariant.primary ||
+      color:
+          variant == CustomButtonVariant.primary ||
               variant == CustomButtonVariant.secondary
           ? AppColors.white
           : AppColors.navy,
     ),
     CustomButtonSize.large => AppTextStyles.buttonLarge.copyWith(
-      color: variant == CustomButtonVariant.primary ||
+      color:
+          variant == CustomButtonVariant.primary ||
               variant == CustomButtonVariant.secondary
           ? AppColors.white
           : AppColors.navy,
@@ -221,7 +224,8 @@ class CustomButton extends StatelessWidget {
   };
 
   Color? get _iconColor => switch (variant) {
-    CustomButtonVariant.primary || CustomButtonVariant.secondary => AppColors.white,
+    CustomButtonVariant.primary ||
+    CustomButtonVariant.secondary => AppColors.white,
     _ => AppColors.navy,
   };
 }

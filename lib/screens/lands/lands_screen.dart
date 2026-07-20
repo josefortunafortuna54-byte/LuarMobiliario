@@ -197,7 +197,10 @@ class _LandsScreenState extends State<LandsScreen> {
               onTap: () => _onFilterSelected(index),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   color: isSelected ? AppColors.navy : Colors.transparent,
                   borderRadius: BorderRadius.circular(20),
@@ -295,8 +298,9 @@ class _LandsScreenState extends State<LandsScreen> {
                       label,
                       style: AppTextStyles.bodySmall.copyWith(
                         color: isSelected ? AppColors.navy : AppColors.gray700,
-                        fontWeight:
-                            isSelected ? FontWeight.w700 : FontWeight.w500,
+                        fontWeight: isSelected
+                            ? FontWeight.w700
+                            : FontWeight.w500,
                       ),
                     ),
                   ),
@@ -364,8 +368,12 @@ class _LandsScreenState extends State<LandsScreen> {
             ElevatedButton.icon(
               onPressed: _loadLands,
               icon: const Icon(Icons.refresh_rounded, size: 18),
-              label: Text('Tentar novamente',
-                  style: AppTextStyles.buttonMedium.copyWith(color: AppColors.white)),
+              label: Text(
+                'Tentar novamente',
+                style: AppTextStyles.buttonMedium.copyWith(
+                  color: AppColors.white,
+                ),
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.navy,
                 foregroundColor: AppColors.white,
@@ -435,27 +443,23 @@ class _LandsScreenState extends State<LandsScreen> {
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
               ),
-              delegate: SliverChildBuilderDelegate(
-                (_, index) {
-                  final land = lands[index];
-                  return LandCard(
-                    imageUrl:
-                        land.images.isNotEmpty ? land.images.first : '',
-                    title: land.title,
-                    location: '${land.neighborhood}, ${land.city}',
-                    area: land.area,
-                    price: land.price,
-                    badgeLabel: _landTypeLabel(land.type),
-                    features: land.features,
-                    onTap: () => Navigator.pushNamed(
-                      context,
-                      AppRoutes.landDetail,
-                      arguments: land.id,
-                    ),
-                  );
-                },
-                childCount: lands.length,
-              ),
+              delegate: SliverChildBuilderDelegate((_, index) {
+                final land = lands[index];
+                return LandCard(
+                  imageUrl: land.images.isNotEmpty ? land.images.first : '',
+                  title: land.title,
+                  location: '${land.neighborhood}, ${land.city}',
+                  area: land.area,
+                  price: land.price,
+                  badgeLabel: _landTypeLabel(land.type),
+                  features: land.features,
+                  onTap: () => Navigator.pushNamed(
+                    context,
+                    AppRoutes.landDetail,
+                    arguments: land.id,
+                  ),
+                );
+              }, childCount: lands.length),
             ),
           ),
           if (provider.isLoading && provider.lands.isNotEmpty)

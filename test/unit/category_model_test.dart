@@ -63,10 +63,7 @@ void main() {
         CategoryModel.fromJson({'type': 'property'}).type,
         CategoryType.property,
       );
-      expect(
-        CategoryModel.fromJson({'type': 'land'}).type,
-        CategoryType.land,
-      );
+      expect(CategoryModel.fromJson({'type': 'land'}).type, CategoryType.land);
     });
 
     test('defaults string fields to empty when null', () {
@@ -94,10 +91,7 @@ void main() {
 
   group('toJson', () {
     test('serializes all fields correctly', () {
-      final c = createSubject(
-        type: CategoryType.land,
-        count: 42,
-      );
+      final c = createSubject(type: CategoryType.land, count: 42);
 
       final json = c.toJson();
 

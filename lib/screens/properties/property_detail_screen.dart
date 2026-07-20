@@ -29,8 +29,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final propertyId =
-          ModalRoute.of(context)?.settings.arguments as String?;
+      final propertyId = ModalRoute.of(context)?.settings.arguments as String?;
       if (propertyId != null) {
         context.read<PropertyProvider>().selectProperty(propertyId);
       }
@@ -44,7 +43,10 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
         if (provider.isLoading) {
           return const Scaffold(
             backgroundColor: AppColors.white,
-            body: LoadingWidget(isFullScreen: true, message: 'Carregando imóvel...'),
+            body: LoadingWidget(
+              isFullScreen: true,
+              message: 'Carregando imóvel...',
+            ),
           );
         }
 
@@ -54,17 +56,26 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
             appBar: AppBar(
               backgroundColor: AppColors.navy,
               foregroundColor: AppColors.white,
-              title: Text('Erro', style: AppTextStyles.h5.copyWith(color: AppColors.white)),
+              title: Text(
+                'Erro',
+                style: AppTextStyles.h5.copyWith(color: AppColors.white),
+              ),
             ),
             body: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.error_outline, size: 64, color: AppColors.error),
+                  const Icon(
+                    Icons.error_outline,
+                    size: 64,
+                    color: AppColors.error,
+                  ),
                   const SizedBox(height: 16),
                   Text(
                     provider.error ?? 'Imóvel não encontrado',
-                    style: AppTextStyles.bodyMedium.copyWith(color: AppColors.gray600),
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.gray600,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 20),
@@ -76,8 +87,12 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    child: Text('Voltar',
-                        style: AppTextStyles.buttonMedium.copyWith(color: AppColors.white)),
+                    child: Text(
+                      'Voltar',
+                      style: AppTextStyles.buttonMedium.copyWith(
+                        color: AppColors.white,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -93,13 +108,14 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
 
   Widget _buildDetailContent(PropertyModel property) {
     final isRent = property.transactionType == TransactionType.rent;
-    final location = '${property.neighborhood}, ${property.city}, ${property.municipality}';
+    final location =
+        '${property.neighborhood}, ${property.city}, ${property.municipality}';
 
     return Scaffold(
       backgroundColor: AppColors.offWhite,
       body: CustomScrollView(
         slivers: [
-                _buildAppBar(property, location),
+          _buildAppBar(property, location),
           SliverToBoxAdapter(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -166,7 +182,9 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                 }
               : null,
           icon: Icon(
-            _isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+            _isFavorite
+                ? Icons.favorite_rounded
+                : Icons.favorite_border_rounded,
             color: _isFavorite ? AppColors.gold : AppColors.white,
           ),
         ),
@@ -273,7 +291,11 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
     );
   }
 
-  Widget _buildTitlePriceSection(PropertyModel property, bool isRent, String location) {
+  Widget _buildTitlePriceSection(
+    PropertyModel property,
+    bool isRent,
+    String location,
+  ) {
     return Container(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -295,7 +317,11 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
           const SizedBox(height: 8),
           Row(
             children: [
-              const Icon(Icons.location_on_outlined, size: 18, color: AppColors.gold),
+              const Icon(
+                Icons.location_on_outlined,
+                size: 18,
+                color: AppColors.gold,
+              ),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
@@ -540,10 +566,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
             ),
             child: Row(
               children: [
-                AvatarWidget(
-                  name: property.agentName,
-                  size: AvatarSize.large,
-                ),
+                AvatarWidget(name: property.agentName, size: AvatarSize.large),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
@@ -624,7 +647,9 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                 icon: const Icon(Icons.calendar_month_rounded, size: 20),
                 label: Text(
                   'Agendar Visita',
-                  style: AppTextStyles.buttonLarge.copyWith(color: AppColors.white),
+                  style: AppTextStyles.buttonLarge.copyWith(
+                    color: AppColors.white,
+                  ),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.gold,
@@ -652,15 +677,18 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                           'https://wa.me/${property.agentPhone}?text=$message',
                         );
                         if (await canLaunchUrl(uri)) {
-                          await launchUrl(uri,
-                              mode: LaunchMode.externalApplication);
+                          await launchUrl(
+                            uri,
+                            mode: LaunchMode.externalApplication,
+                          );
                         }
                       },
                       icon: const Icon(Icons.chat_rounded, size: 18),
                       label: Text(
                         'WhatsApp',
-                        style: AppTextStyles.buttonMedium
-                            .copyWith(color: AppColors.white),
+                        style: AppTextStyles.buttonMedium.copyWith(
+                          color: AppColors.white,
+                        ),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.whatsapp,
@@ -679,8 +707,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                     height: 48,
                     child: OutlinedButton.icon(
                       onPressed: () async {
-                        final uri =
-                            Uri.parse('tel:${property.agentPhone}');
+                        final uri = Uri.parse('tel:${property.agentPhone}');
                         if (await canLaunchUrl(uri)) {
                           await launchUrl(uri);
                         }
@@ -688,13 +715,16 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                       icon: const Icon(Icons.phone_rounded, size: 18),
                       label: Text(
                         'Ligar',
-                        style: AppTextStyles.buttonMedium
-                            .copyWith(color: AppColors.navy),
+                        style: AppTextStyles.buttonMedium.copyWith(
+                          color: AppColors.navy,
+                        ),
                       ),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.navy,
                         side: const BorderSide(
-                            color: AppColors.navy, width: 1.5),
+                          color: AppColors.navy,
+                          width: 1.5,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),

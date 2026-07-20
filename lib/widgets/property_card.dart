@@ -38,10 +38,9 @@ class PropertyCard extends StatelessWidget {
   String get _badgeLabel =>
       listingType == PropertyListingType.venda ? 'Venda' : 'Arrendamento';
 
-  Color get _badgeColor =>
-      listingType == PropertyListingType.venda
-          ? AppColors.gold
-          : AppColors.navyLight;
+  Color get _badgeColor => listingType == PropertyListingType.venda
+      ? AppColors.gold
+      : AppColors.navyLight;
 
   String _formatPrice(double value) {
     final parts = value.toStringAsFixed(0).split('.');
@@ -84,10 +83,7 @@ class PropertyCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildImage(height: 220),
-            _buildContent(),
-          ],
+          children: [_buildImage(height: 220), _buildContent()],
         ),
       ),
     );
@@ -169,9 +165,7 @@ class PropertyCard extends StatelessWidget {
             ),
             child: Text(
               _badgeLabel,
-              style: AppTextStyles.labelMedium.copyWith(
-                color: AppColors.white,
-              ),
+              style: AppTextStyles.labelMedium.copyWith(color: AppColors.white),
             ),
           ),
         ),
@@ -323,8 +317,7 @@ class PropertyCard extends StatelessWidget {
 
   Widget _buildFeaturesRow({bool compact = false}) {
     final iconSize = compact ? 14.0 : 16.0;
-    final textSize =
-        compact ? AppTextStyles.bodyTiny : AppTextStyles.bodySmall;
+    final textSize = compact ? AppTextStyles.bodyTiny : AppTextStyles.bodySmall;
     final spacing = compact ? 6.0 : 8.0;
 
     final features = <Widget>[];
@@ -388,10 +381,7 @@ class _FeatureItem extends StatelessWidget {
       children: [
         Icon(icon, size: iconSize, color: AppColors.gray400),
         const SizedBox(width: 4),
-        Text(
-          text,
-          style: textStyle.copyWith(color: AppColors.gray600),
-        ),
+        Text(text, style: textStyle.copyWith(color: AppColors.gray600)),
       ],
     );
   }

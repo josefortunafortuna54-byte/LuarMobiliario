@@ -15,19 +15,25 @@ class BookingProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
 
-  List<BookingModel> get upcomingBookings => _bookings
-      .where((b) =>
-          b.status == BookingStatus.pending ||
-          b.status == BookingStatus.confirmed)
-      .toList()
-    ..sort((a, b) => a.date.compareTo(b.date));
+  List<BookingModel> get upcomingBookings =>
+      _bookings
+          .where(
+            (b) =>
+                b.status == BookingStatus.pending ||
+                b.status == BookingStatus.confirmed,
+          )
+          .toList()
+        ..sort((a, b) => a.date.compareTo(b.date));
 
-  List<BookingModel> get historyBookings => _bookings
-      .where((b) =>
-          b.status == BookingStatus.cancelled ||
-          b.status == BookingStatus.completed)
-      .toList()
-    ..sort((a, b) => b.date.compareTo(a.date));
+  List<BookingModel> get historyBookings =>
+      _bookings
+          .where(
+            (b) =>
+                b.status == BookingStatus.cancelled ||
+                b.status == BookingStatus.completed,
+          )
+          .toList()
+        ..sort((a, b) => b.date.compareTo(a.date));
 
   Future<void> loadBookings(String userId) async {
     _isLoading = true;

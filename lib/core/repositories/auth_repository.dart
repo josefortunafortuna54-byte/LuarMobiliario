@@ -9,12 +9,11 @@ class AuthRepository {
       final user = _client.auth.currentUser;
       if (user == null) return null;
 
-      final response =
-          await _client
-              .from('users')
-              .select()
-              .eq('id', user.id)
-              .maybeSingle();
+      final response = await _client
+          .from('users')
+          .select()
+          .eq('id', user.id)
+          .maybeSingle();
 
       if (response == null) return null;
       return UserModel.fromJson(response);
@@ -36,13 +35,12 @@ class AuthRepository {
     if (phone != null) updates['phone'] = phone;
     if (avatarUrl != null) updates['avatar_url'] = avatarUrl;
 
-    final response =
-        await _client
-            .from('users')
-            .update(updates)
-            .eq('id', userId)
-            .select()
-            .single();
+    final response = await _client
+        .from('users')
+        .update(updates)
+        .eq('id', userId)
+        .select()
+        .single();
 
     return UserModel.fromJson(response);
   }

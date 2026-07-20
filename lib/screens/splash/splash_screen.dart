@@ -44,15 +44,13 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
 
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.3, 0.8, curve: Curves.easeOut),
-      ),
-    );
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _controller,
+            curve: const Interval(0.3, 0.8, curve: Curves.easeOut),
+          ),
+        );
 
     _controller.forward();
 
@@ -62,8 +60,7 @@ class _SplashScreenState extends State<SplashScreen>
   void _navigate() {
     if (!mounted) return;
     final auth = context.read<AuthProvider>();
-    final route =
-        auth.isAuthenticated ? AppRoutes.home : AppRoutes.login;
+    final route = auth.isAuthenticated ? AppRoutes.home : AppRoutes.login;
     Navigator.of(context).pushReplacementNamed(route);
   }
 

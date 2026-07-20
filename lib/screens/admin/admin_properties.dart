@@ -38,10 +38,14 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
       _filteredProperties = properties;
     } else {
       _filteredProperties = properties
-          .where((p) =>
-              p.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-              p.city.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-              p.municipality.toLowerCase().contains(_searchQuery.toLowerCase()))
+          .where(
+            (p) =>
+                p.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+                p.city.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+                p.municipality.toLowerCase().contains(
+                  _searchQuery.toLowerCase(),
+                ),
+          )
           .toList();
     }
   }
@@ -71,16 +75,18 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
             onPressed: () => Navigator.pop(ctx, false),
             child: Text(
               'Cancelar',
-              style:
-                  AppTextStyles.buttonMedium.copyWith(color: AppColors.gray600),
+              style: AppTextStyles.buttonMedium.copyWith(
+                color: AppColors.gray600,
+              ),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             child: Text(
               'Remover',
-              style:
-                  AppTextStyles.buttonMedium.copyWith(color: AppColors.error),
+              style: AppTextStyles.buttonMedium.copyWith(
+                color: AppColors.error,
+              ),
             ),
           ),
         ],
@@ -133,7 +139,9 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
                   color: AppColors.gold,
                   child: ListView.separated(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 12),
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     itemCount: _filteredProperties.length,
                     separatorBuilder: (_, __) => const SizedBox(height: 12),
                     itemBuilder: (context, index) {
@@ -174,9 +182,16 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
           ),
           prefixIcon: const Padding(
             padding: EdgeInsets.only(left: 14, right: 10),
-            child: Icon(Icons.search_rounded, size: 22, color: AppColors.gray400),
+            child: Icon(
+              Icons.search_rounded,
+              size: 22,
+              color: AppColors.gray400,
+            ),
           ),
-          prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
+          prefixIconConstraints: const BoxConstraints(
+            minWidth: 0,
+            minHeight: 0,
+          ),
           suffixIcon: _searchQuery.isNotEmpty
               ? GestureDetector(
                   onTap: () {
@@ -185,14 +200,20 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
                   },
                   child: const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 4),
-                    child: Icon(Icons.close_rounded, size: 18, color: AppColors.gray400),
+                    child: Icon(
+                      Icons.close_rounded,
+                      size: 18,
+                      color: AppColors.gray400,
+                    ),
                   ),
                 )
               : null,
           filled: true,
           fillColor: AppColors.gray50,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 14,
+            vertical: 14,
+          ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
@@ -211,8 +232,7 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
   }
 
   Widget _buildPropertyTile(PropertyModel property) {
-    final imageUrl =
-        property.images.isNotEmpty ? property.images.first : '';
+    final imageUrl = property.images.isNotEmpty ? property.images.first : '';
     final location = [
       property.neighborhood,
       property.municipality,
@@ -398,9 +418,7 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
             const SizedBox(height: 8),
             Text(
               'Nenhum imóvel encontrado para "$_searchQuery"',
-              style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.gray500,
-              ),
+              style: AppTextStyles.bodySmall.copyWith(color: AppColors.gray500),
               textAlign: TextAlign.center,
             ),
           ],

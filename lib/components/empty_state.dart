@@ -45,11 +45,7 @@ class EmptyState extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-            Text(
-              title,
-              style: AppTextStyles.h5,
-              textAlign: TextAlign.center,
-            ),
+            Text(title, style: AppTextStyles.h5, textAlign: TextAlign.center),
             const SizedBox(height: 8),
             Text(
               subtitle,
@@ -65,8 +61,10 @@ class EmptyState extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.gold,
                   foregroundColor: AppColors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 14,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),

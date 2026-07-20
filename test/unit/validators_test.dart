@@ -103,7 +103,11 @@ void main() {
 
     test('uses custom message when provided', () {
       expect(
-        Validators.maxLength('Texto longo demais', 3, customMessage: 'Muito longo'),
+        Validators.maxLength(
+          'Texto longo demais',
+          3,
+          customMessage: 'Muito longo',
+        ),
         'Muito longo',
       );
     });

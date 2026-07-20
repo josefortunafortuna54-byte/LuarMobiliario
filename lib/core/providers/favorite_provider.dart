@@ -83,11 +83,7 @@ class FavoriteProvider extends ChangeNotifier {
     }
   }
 
-  bool isFavorite(
-    String userId, {
-    String? propertyId,
-    String? landId,
-  }) {
+  bool isFavorite(String userId, {String? propertyId, String? landId}) {
     return _favorites.any(
       (f) =>
           f.userId == userId &&

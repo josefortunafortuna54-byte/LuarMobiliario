@@ -18,10 +18,7 @@ class PropertyRepository {
     int? offset,
   }) async {
     try {
-      var query = _client
-          .from(_table)
-          .select()
-          .eq('is_available', true);
+      var query = _client.from(_table).select().eq('is_available', true);
 
       if (type != null) query = query.eq('type', type);
       if (transactionType != null) {
@@ -50,8 +47,7 @@ class PropertyRepository {
   }
 
   Future<PropertyModel> getPropertyById(String id) async {
-    final response =
-        await _client.from(_table).select().eq('id', id).single();
+    final response = await _client.from(_table).select().eq('id', id).single();
 
     return PropertyModel.fromJson(response);
   }
@@ -77,8 +73,7 @@ class PropertyRepository {
   Future<PropertyModel> createProperty(PropertyModel property) async {
     final data = property.toJson()..remove('id');
 
-    final response =
-        await _client.from(_table).insert(data).select().single();
+    final response = await _client.from(_table).insert(data).select().single();
 
     return PropertyModel.fromJson(response);
   }
@@ -87,13 +82,12 @@ class PropertyRepository {
     final data = property.toJson()
       ..['updated_at'] = DateTime.now().toIso8601String();
 
-    final response =
-        await _client
-            .from(_table)
-            .update(data)
-            .eq('id', property.id)
-            .select()
-            .single();
+    final response = await _client
+        .from(_table)
+        .update(data)
+        .eq('id', property.id)
+        .select()
+        .single();
 
     return PropertyModel.fromJson(response);
   }
@@ -108,7 +102,9 @@ class PropertyRepository {
           .from(_table)
           .select()
           .eq('is_available', true)
-          .or('title.ilike.%$query%,description.ilike.%$query%,address.ilike.%$query%,city.ilike.%$query%,neighborhood.ilike.%$query%')
+          .or(
+            'title.ilike.%$query%,description.ilike.%$query%,address.ilike.%$query%,city.ilike.%$query%,neighborhood.ilike.%$query%',
+          )
           .order('created_at', ascending: false)
           .limit(50);
 

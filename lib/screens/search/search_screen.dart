@@ -66,7 +66,8 @@ class _SearchScreenState extends State<SearchScreen> {
         actions: [
           Consumer<SearchProvider>(
             builder: (_, provider, __) {
-              if (provider.activeFilterCount == 0) return const SizedBox.shrink();
+              if (provider.activeFilterCount == 0)
+                return const SizedBox.shrink();
               return TextButton(
                 onPressed: () {
                   provider.clearFilters();
@@ -110,9 +111,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   children: [
                     if (provider.activeFilterCount > 0)
                       _buildActiveFilters(provider),
-                    Expanded(
-                      child: _buildResults(provider),
-                    ),
+                    Expanded(child: _buildResults(provider)),
                   ],
                 );
               },
@@ -127,65 +126,85 @@ class _SearchScreenState extends State<SearchScreen> {
     final chips = <_FilterChipData>[];
 
     if (provider.query.isNotEmpty) {
-      chips.add(_FilterChipData('"{provider.query}"', () {
-        provider.setFilter(query: '');
-        _searchController.clear();
-        provider.search();
-      }));
+      chips.add(
+        _FilterChipData('"{provider.query}"', () {
+          provider.setFilter(query: '');
+          _searchController.clear();
+          provider.search();
+        }),
+      );
     }
     if (provider.transactionType != null) {
-      chips.add(_FilterChipData(
-        provider.transactionType == 'sale' ? 'Venda' : 'Aluguel',
-        () => _removeFilter(provider, 'transactionType'),
-      ));
+      chips.add(
+        _FilterChipData(
+          provider.transactionType == 'sale' ? 'Venda' : 'Aluguel',
+          () => _removeFilter(provider, 'transactionType'),
+        ),
+      );
     }
     if (provider.propertyType != null) {
-      chips.add(_FilterChipData(provider.propertyType!, () {
-        provider.setFilter(propertyType: null);
-        provider.search();
-      }));
+      chips.add(
+        _FilterChipData(provider.propertyType!, () {
+          provider.setFilter(propertyType: null);
+          provider.search();
+        }),
+      );
     }
     if (provider.landType != null) {
-      chips.add(_FilterChipData(provider.landType!, () {
-        provider.setFilter(landType: null);
-        provider.search();
-      }));
+      chips.add(
+        _FilterChipData(provider.landType!, () {
+          provider.setFilter(landType: null);
+          provider.search();
+        }),
+      );
     }
     if (provider.city != null) {
-      chips.add(_FilterChipData(provider.city!, () {
-        provider.setFilter(city: null);
-        provider.search();
-      }));
+      chips.add(
+        _FilterChipData(provider.city!, () {
+          provider.setFilter(city: null);
+          provider.search();
+        }),
+      );
     }
     if (provider.minPrice != null) {
-      chips.add(_FilterChipData(
-        'Min: AOA ${provider.minPrice!.toStringAsFixed(0)}',
-        () => _removeFilter(provider, 'minPrice'),
-      ));
+      chips.add(
+        _FilterChipData(
+          'Min: AOA ${provider.minPrice!.toStringAsFixed(0)}',
+          () => _removeFilter(provider, 'minPrice'),
+        ),
+      );
     }
     if (provider.maxPrice != null) {
-      chips.add(_FilterChipData(
-        'Max: AOA ${provider.maxPrice!.toStringAsFixed(0)}',
-        () => _removeFilter(provider, 'maxPrice'),
-      ));
+      chips.add(
+        _FilterChipData(
+          'Max: AOA ${provider.maxPrice!.toStringAsFixed(0)}',
+          () => _removeFilter(provider, 'maxPrice'),
+        ),
+      );
     }
     if (provider.bedrooms != null) {
-      chips.add(_FilterChipData(
-        '${provider.bedrooms} quartos',
-        () => _removeFilter(provider, 'bedrooms'),
-      ));
+      chips.add(
+        _FilterChipData(
+          '${provider.bedrooms} quartos',
+          () => _removeFilter(provider, 'bedrooms'),
+        ),
+      );
     }
     if (provider.bathrooms != null) {
-      chips.add(_FilterChipData(
-        '${provider.bathrooms} WC',
-        () => _removeFilter(provider, 'bathrooms'),
-      ));
+      chips.add(
+        _FilterChipData(
+          '${provider.bathrooms} WC',
+          () => _removeFilter(provider, 'bathrooms'),
+        ),
+      );
     }
     if (provider.garage != null) {
-      chips.add(_FilterChipData(
-        '${provider.garage} garagem',
-        () => _removeFilter(provider, 'garage'),
-      ));
+      chips.add(
+        _FilterChipData(
+          '${provider.garage} garagem',
+          () => _removeFilter(provider, 'garage'),
+        ),
+      );
     }
 
     return Container(
@@ -206,7 +225,11 @@ class _SearchScreenState extends State<SearchScreen> {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              deleteIcon: const Icon(Icons.close, size: 16, color: AppColors.navy),
+              deleteIcon: const Icon(
+                Icons.close,
+                size: 16,
+                color: AppColors.navy,
+              ),
               onDeleted: chip.onRemove,
               backgroundColor: AppColors.goldLight.withValues(alpha: 0.25),
               side: BorderSide(color: AppColors.gold.withValues(alpha: 0.4)),
@@ -325,26 +348,28 @@ class _SearchScreenState extends State<SearchScreen> {
             style: AppTextStyles.h6.copyWith(color: AppColors.navy),
           ),
           const SizedBox(height: 12),
-          ...properties.map((p) => Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: PropertyCard(
-              imageUrl: p.images.isNotEmpty ? p.images.first : '',
-              title: p.title,
-              location: '${p.neighborhood}, ${p.city}',
-              price: p.price,
-              listingType: p.transactionType == TransactionType.sale
-                  ? PropertyListingType.venda
-                  : PropertyListingType.arrendamento,
-              bedrooms: p.bedrooms,
-              bathrooms: p.bathrooms,
-              area: p.area,
-              onTap: () => Navigator.pushNamed(
-                context,
-                AppRoutes.propertyDetail,
-                arguments: p.id,
+          ...properties.map(
+            (p) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: PropertyCard(
+                imageUrl: p.images.isNotEmpty ? p.images.first : '',
+                title: p.title,
+                location: '${p.neighborhood}, ${p.city}',
+                price: p.price,
+                listingType: p.transactionType == TransactionType.sale
+                    ? PropertyListingType.venda
+                    : PropertyListingType.arrendamento,
+                bedrooms: p.bedrooms,
+                bathrooms: p.bathrooms,
+                area: p.area,
+                onTap: () => Navigator.pushNamed(
+                  context,
+                  AppRoutes.propertyDetail,
+                  arguments: p.id,
+                ),
               ),
             ),
-          )),
+          ),
         ],
         if (lands.isNotEmpty) ...[
           Text(
@@ -352,26 +377,27 @@ class _SearchScreenState extends State<SearchScreen> {
             style: AppTextStyles.h6.copyWith(color: AppColors.navy),
           ),
           const SizedBox(height: 12),
-          ...lands.map((l) => Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: LandCard(
-              imageUrl: l.images.isNotEmpty ? l.images.first : '',
-              title: l.title,
-              location: '${l.neighborhood}, ${l.city}',
-              area: l.area,
-              price: l.price,
-              badgeLabel: l.type.name.toUpperCase(),
-              features: l.features,
-              onTap: () => Navigator.pushNamed(
-                context,
-                AppRoutes.landDetail,
-                arguments: l.id,
+          ...lands.map(
+            (l) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: LandCard(
+                imageUrl: l.images.isNotEmpty ? l.images.first : '',
+                title: l.title,
+                location: '${l.neighborhood}, ${l.city}',
+                area: l.area,
+                price: l.price,
+                badgeLabel: l.type.name.toUpperCase(),
+                features: l.features,
+                onTap: () => Navigator.pushNamed(
+                  context,
+                  AppRoutes.landDetail,
+                  arguments: l.id,
+                ),
               ),
             ),
-          )),
+          ),
         ],
-        if (properties.isEmpty && lands.isEmpty)
-          _buildEmptyState(),
+        if (properties.isEmpty && lands.isEmpty) _buildEmptyState(),
       ],
     );
   }
@@ -494,8 +520,9 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
                         : null,
                     onSelected: (i) {
                       setState(() {
-                        _selectedBedrooms =
-                            _selectedBedrooms == i + 1 ? null : i + 1;
+                        _selectedBedrooms = _selectedBedrooms == i + 1
+                            ? null
+                            : i + 1;
                       });
                     },
                   ),
@@ -509,8 +536,9 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
                         : null,
                     onSelected: (i) {
                       setState(() {
-                        _selectedBathrooms =
-                            _selectedBathrooms == i + 1 ? null : i + 1;
+                        _selectedBathrooms = _selectedBathrooms == i + 1
+                            ? null
+                            : i + 1;
                       });
                     },
                   ),
@@ -524,8 +552,9 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
                         : null,
                     onSelected: (i) {
                       setState(() {
-                        _selectedGarage =
-                            _selectedGarage == i + 1 ? null : i + 1;
+                        _selectedGarage = _selectedGarage == i + 1
+                            ? null
+                            : i + 1;
                       });
                     },
                   ),
@@ -612,8 +641,7 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
         return GestureDetector(
           onTap: () {
             setState(() {
-              _selectedTransactionType =
-                  isSelected ? null : types[i];
+              _selectedTransactionType = isSelected ? null : types[i];
             });
           },
           child: AnimatedContainer(
@@ -678,8 +706,22 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
   }
 
   Widget _buildLandTypeChips() {
-    final types = ['urban', 'agricultural', 'industrial', 'commercial', 'lot', 'farm'];
-    final labels = ['Urbano', 'Agrícola', 'Industrial', 'Comercial', 'Lote', 'Fazenda'];
+    final types = [
+      'urban',
+      'agricultural',
+      'industrial',
+      'commercial',
+      'lot',
+      'farm',
+    ];
+    final labels = [
+      'Urbano',
+      'Agrícola',
+      'Industrial',
+      'Comercial',
+      'Lote',
+      'Fazenda',
+    ];
 
     return Wrap(
       spacing: 8,
@@ -760,8 +802,14 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(minLabel, style: AppTextStyles.bodySmall.copyWith(color: AppColors.gray600)),
-            Text(maxLabel, style: AppTextStyles.bodySmall.copyWith(color: AppColors.gray600)),
+            Text(
+              minLabel,
+              style: AppTextStyles.bodySmall.copyWith(color: AppColors.gray600),
+            ),
+            Text(
+              maxLabel,
+              style: AppTextStyles.bodySmall.copyWith(color: AppColors.gray600),
+            ),
           ],
         ),
         RangeSlider(
@@ -795,8 +843,14 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(minLabel, style: AppTextStyles.bodySmall.copyWith(color: AppColors.gray600)),
-            Text(maxLabel, style: AppTextStyles.bodySmall.copyWith(color: AppColors.gray600)),
+            Text(
+              minLabel,
+              style: AppTextStyles.bodySmall.copyWith(color: AppColors.gray600),
+            ),
+            Text(
+              maxLabel,
+              style: AppTextStyles.bodySmall.copyWith(color: AppColors.gray600),
+            ),
           ],
         ),
         RangeSlider(

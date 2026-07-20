@@ -85,10 +85,12 @@ class AuthService {
     String? avatarUrl,
   }) async {
     try {
-      final response = await _auth.updateUser(UserAttributes(
-        data: name != null ? {'name': name} : null,
-        phone: phone,
-      ));
+      final response = await _auth.updateUser(
+        UserAttributes(
+          data: name != null ? {'name': name} : null,
+          phone: phone,
+        ),
+      );
 
       if (currentUser != null) {
         final dbUpdates = <String, dynamic>{

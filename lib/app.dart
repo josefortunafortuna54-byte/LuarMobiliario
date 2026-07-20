@@ -96,8 +96,10 @@ class LuarCompanyApp extends StatelessWidget {
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
           fillColor: AppColors.white,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 16,
+          ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppConstants.radiusMd),
             borderSide: const BorderSide(color: AppColors.gray200),
@@ -114,10 +116,7 @@ class LuarCompanyApp extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppConstants.radiusMd),
             borderSide: const BorderSide(color: AppColors.error),
           ),
-          hintStyle: GoogleFonts.dmSans(
-            fontSize: 14,
-            color: AppColors.gray400,
-          ),
+          hintStyle: GoogleFonts.dmSans(fontSize: 14, color: AppColors.gray400),
         ),
         cardTheme: CardThemeData(
           color: AppColors.white,

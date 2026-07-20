@@ -45,10 +45,7 @@ class PriceTag extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.baseline,
       textBaseline: TextBaseline.alphabetic,
       children: [
-        Text(
-          '$currency$formattedPrice',
-          style: _textStyle,
-        ),
+        Text('$currency$formattedPrice', style: _textStyle),
         if (isRent) ...[
           const SizedBox(width: 2),
           Text(

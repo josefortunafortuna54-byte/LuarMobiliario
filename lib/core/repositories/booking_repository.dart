@@ -40,8 +40,7 @@ class BookingRepository {
   Future<BookingModel> createBooking(BookingModel booking) async {
     final data = booking.toJson()..remove('id');
 
-    final response =
-        await _client.from(_table).insert(data).select().single();
+    final response = await _client.from(_table).insert(data).select().single();
 
     return BookingModel.fromJson(response);
   }
@@ -50,13 +49,12 @@ class BookingRepository {
     String id,
     BookingStatus status,
   ) async {
-    final response =
-        await _client
-            .from(_table)
-            .update({'status': status.name})
-            .eq('id', id)
-            .select()
-            .single();
+    final response = await _client
+        .from(_table)
+        .update({'status': status.name})
+        .eq('id', id)
+        .select()
+        .single();
 
     return BookingModel.fromJson(response);
   }

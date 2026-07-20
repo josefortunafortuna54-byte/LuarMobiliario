@@ -38,8 +38,8 @@ String formatPhone(String phone) {
   final local = digits.length >= 12
       ? digits.substring(digits.length - 9)
       : digits.length >= 9
-          ? digits.substring(digits.length - 9)
-          : digits;
+      ? digits.substring(digits.length - 9)
+      : digits;
 
   final p1 = local.substring(0, 3);
   final p2 = local.substring(3, 6);

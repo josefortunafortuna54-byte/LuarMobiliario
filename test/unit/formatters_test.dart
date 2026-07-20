@@ -36,24 +36,15 @@ void main() {
 
   group('formatDateTime', () {
     test('formats date and time with leading zeros', () {
-      expect(
-        formatDateTime(DateTime(2025, 3, 5, 9, 30)),
-        '05/03/2025 09:30',
-      );
+      expect(formatDateTime(DateTime(2025, 3, 5, 9, 30)), '05/03/2025 09:30');
     });
 
     test('formats midnight correctly', () {
-      expect(
-        formatDateTime(DateTime(2025, 12, 31, 0, 0)),
-        '31/12/2025 00:00',
-      );
+      expect(formatDateTime(DateTime(2025, 12, 31, 0, 0)), '31/12/2025 00:00');
     });
 
     test('formats end of day correctly', () {
-      expect(
-        formatDateTime(DateTime(2025, 6, 15, 23, 59)),
-        '15/06/2025 23:59',
-      );
+      expect(formatDateTime(DateTime(2025, 6, 15, 23, 59)), '15/06/2025 23:59');
     });
   });
 

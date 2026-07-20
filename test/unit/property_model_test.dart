@@ -154,16 +154,33 @@ void main() {
     });
 
     test('defaults to sale when transaction_type is null', () {
-      final p = PropertyModel.fromJson(<String, dynamic>{'transaction_type': null});
+      final p = PropertyModel.fromJson(<String, dynamic>{
+        'transaction_type': null,
+      });
       expect(p.transactionType, TransactionType.sale);
     });
 
     test('handles all property type strings', () {
-      expect(PropertyModel.fromJson({'type': 'house'}).type, PropertyType.house);
-      expect(PropertyModel.fromJson({'type': 'apartment'}).type, PropertyType.apartment);
-      expect(PropertyModel.fromJson({'type': 'office'}).type, PropertyType.office);
-      expect(PropertyModel.fromJson({'type': 'warehouse'}).type, PropertyType.warehouse);
-      expect(PropertyModel.fromJson({'type': 'condo'}).type, PropertyType.condo);
+      expect(
+        PropertyModel.fromJson({'type': 'house'}).type,
+        PropertyType.house,
+      );
+      expect(
+        PropertyModel.fromJson({'type': 'apartment'}).type,
+        PropertyType.apartment,
+      );
+      expect(
+        PropertyModel.fromJson({'type': 'office'}).type,
+        PropertyType.office,
+      );
+      expect(
+        PropertyModel.fromJson({'type': 'warehouse'}).type,
+        PropertyType.warehouse,
+      );
+      expect(
+        PropertyModel.fromJson({'type': 'condo'}).type,
+        PropertyType.condo,
+      );
       expect(PropertyModel.fromJson({'type': 'shop'}).type, PropertyType.shop);
     });
 

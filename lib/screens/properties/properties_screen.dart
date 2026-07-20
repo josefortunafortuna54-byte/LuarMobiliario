@@ -169,7 +169,10 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
               onTap: () => _onFilterSelected(index),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   color: isSelected ? AppColors.navy : Colors.transparent,
                   borderRadius: BorderRadius.circular(20),
@@ -279,8 +282,12 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
             ElevatedButton.icon(
               onPressed: _loadProperties,
               icon: const Icon(Icons.refresh_rounded, size: 18),
-              label: Text('Tentar novamente',
-                  style: AppTextStyles.buttonMedium.copyWith(color: AppColors.white)),
+              label: Text(
+                'Tentar novamente',
+                style: AppTextStyles.buttonMedium.copyWith(
+                  color: AppColors.white,
+                ),
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.navy,
                 foregroundColor: AppColors.white,
@@ -353,30 +360,28 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
               ),
-              delegate: SliverChildBuilderDelegate(
-                (_, index) {
-                  final property = properties[index];
-                  return PropertyCard(
-                    imageUrl:
-                        property.images.isNotEmpty ? property.images.first : '',
-                    title: property.title,
-                    location: '${property.neighborhood}, ${property.city}',
-                    price: property.price,
-                    listingType: property.transactionType == TransactionType.sale
-                        ? PropertyListingType.venda
-                        : PropertyListingType.arrendamento,
-                    bedrooms: property.bedrooms,
-                    bathrooms: property.bathrooms,
-                    area: property.area,
-                    onTap: () => Navigator.pushNamed(
-                      context,
-                      AppRoutes.propertyDetail,
-                      arguments: property.id,
-                    ),
-                  );
-                },
-                childCount: properties.length,
-              ),
+              delegate: SliverChildBuilderDelegate((_, index) {
+                final property = properties[index];
+                return PropertyCard(
+                  imageUrl: property.images.isNotEmpty
+                      ? property.images.first
+                      : '',
+                  title: property.title,
+                  location: '${property.neighborhood}, ${property.city}',
+                  price: property.price,
+                  listingType: property.transactionType == TransactionType.sale
+                      ? PropertyListingType.venda
+                      : PropertyListingType.arrendamento,
+                  bedrooms: property.bedrooms,
+                  bathrooms: property.bathrooms,
+                  area: property.area,
+                  onTap: () => Navigator.pushNamed(
+                    context,
+                    AppRoutes.propertyDetail,
+                    arguments: property.id,
+                  ),
+                );
+              }, childCount: properties.length),
             ),
           ),
           if (provider.isLoading && provider.properties.isNotEmpty)

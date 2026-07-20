@@ -17,10 +17,7 @@ class LandRepository {
     int? offset,
   }) async {
     try {
-      var query = _client
-          .from(_table)
-          .select()
-          .eq('is_available', true);
+      var query = _client.from(_table).select().eq('is_available', true);
 
       if (type != null) query = query.eq('type', type);
       if (transactionType != null) {
@@ -48,8 +45,7 @@ class LandRepository {
   }
 
   Future<LandModel> getLandById(String id) async {
-    final response =
-        await _client.from(_table).select().eq('id', id).single();
+    final response = await _client.from(_table).select().eq('id', id).single();
 
     return LandModel.fromJson(response);
   }
@@ -75,8 +71,7 @@ class LandRepository {
   Future<LandModel> createLand(LandModel land) async {
     final data = land.toJson()..remove('id');
 
-    final response =
-        await _client.from(_table).insert(data).select().single();
+    final response = await _client.from(_table).insert(data).select().single();
 
     return LandModel.fromJson(response);
   }
@@ -85,13 +80,12 @@ class LandRepository {
     final data = land.toJson()
       ..['updated_at'] = DateTime.now().toIso8601String();
 
-    final response =
-        await _client
-            .from(_table)
-            .update(data)
-            .eq('id', land.id)
-            .select()
-            .single();
+    final response = await _client
+        .from(_table)
+        .update(data)
+        .eq('id', land.id)
+        .select()
+        .single();
 
     return LandModel.fromJson(response);
   }
@@ -106,7 +100,9 @@ class LandRepository {
           .from(_table)
           .select()
           .eq('is_available', true)
-          .or('title.ilike.%$query%,description.ilike.%$query%,address.ilike.%$query%,city.ilike.%$query%,neighborhood.ilike.%$query%')
+          .or(
+            'title.ilike.%$query%,description.ilike.%$query%,address.ilike.%$query%,city.ilike.%$query%,neighborhood.ilike.%$query%',
+          )
           .order('created_at', ascending: false)
           .limit(50);
 

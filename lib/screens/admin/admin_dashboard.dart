@@ -62,16 +62,11 @@ class AdminDashboard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Bem-vindo, Admin',
-            style: AppTextStyles.h4White,
-          ),
+          Text('Bem-vindo, Admin', style: AppTextStyles.h4White),
           const SizedBox(height: 6),
           Text(
             'Gestão completa da sua imobiliária',
-            style: AppTextStyles.bodySmall.copyWith(
-              color: AppColors.gray400,
-            ),
+            style: AppTextStyles.bodySmall.copyWith(color: AppColors.gray400),
           ),
         ],
       ),
@@ -158,16 +153,11 @@ class AdminDashboard extends StatelessWidget {
             child: Icon(icon, size: 20, color: color),
           ),
           const SizedBox(height: 10),
-          Text(
-            value,
-            style: AppTextStyles.h4.copyWith(color: color),
-          ),
+          Text(value, style: AppTextStyles.h4.copyWith(color: color)),
           const SizedBox(height: 2),
           Text(
             title,
-            style: AppTextStyles.bodyTiny.copyWith(
-              color: AppColors.gray500,
-            ),
+            style: AppTextStyles.bodyTiny.copyWith(color: AppColors.gray500),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -367,10 +357,7 @@ class AdminDashboard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  activity.title,
-                  style: AppTextStyles.bodySmallBold,
-                ),
+                Text(activity.title, style: AppTextStyles.bodySmallBold),
                 const SizedBox(height: 2),
                 Text(
                   activity.subtitle,
@@ -385,9 +372,7 @@ class AdminDashboard extends StatelessWidget {
           ),
           Text(
             activity.time,
-            style: AppTextStyles.bodyTiny.copyWith(
-              color: AppColors.gray400,
-            ),
+            style: AppTextStyles.bodyTiny.copyWith(color: AppColors.gray400),
           ),
         ],
       ),

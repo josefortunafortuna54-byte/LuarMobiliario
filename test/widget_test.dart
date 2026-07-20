@@ -4,14 +4,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:luar_company/app.dart';
 
 void main() {
-  testWidgets('LuarCompanyApp renders MaterialApp', (WidgetTester tester) async {
+  testWidgets('LuarCompanyApp renders MaterialApp', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(const LuarCompanyApp());
     await tester.pumpAndSettle();
 
     expect(find.byType(MaterialApp), findsOneWidget);
   });
 
-  testWidgets('app title matches AppConstants.appName', (WidgetTester tester) async {
+  testWidgets('app title matches AppConstants.appName', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(const LuarCompanyApp());
     await tester.pumpAndSettle();
 

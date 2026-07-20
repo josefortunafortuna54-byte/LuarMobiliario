@@ -7,7 +7,7 @@ import java.util.Properties
 
 android {
     namespace = "com.luarcompany.luar_company"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 35
     ndkVersion = flutter.ndkVersion
 
     compileOptions {

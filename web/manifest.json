@@ -1,11 +1,11 @@
 {
-    "name": "luar_company",
-    "short_name": "luar_company",
+    "name": "Luar Mobiliario",
+    "short_name": "Luar Mobiliario",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#0F1B2D",
+    "theme_color": "#0F1B2D",
+    "description": "Plataforma imobiliária premium para Angola",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

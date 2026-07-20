@@ -3,8 +3,8 @@ import 'package:luar_company/core/constants/app_constants.dart';
 
 void main() {
   group('AppInfo', () {
-    test('appName is Luar Company Imobiliária', () {
-      expect(AppConstants.appName, 'Luar Company Imobiliária');
+    test('appName is Luar Mobiliario', () {
+      expect(AppConstants.appName, 'Luar Mobiliario');
     });
 
     test('appTagline', () {

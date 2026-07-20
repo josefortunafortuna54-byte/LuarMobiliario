@@ -1,11 +1,12 @@
 import 'package:flutter/foundation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../constants/app_constants.dart';
 import '../models/land_model.dart';
 import '../services/supabase_service.dart';
 
 class LandProvider extends ChangeNotifier {
-  final _client = SupabaseService.client;
+  SupabaseClient get _client => SupabaseService.client;
 
   List<LandModel> _lands = [];
   List<LandModel> _featuredLands = [];

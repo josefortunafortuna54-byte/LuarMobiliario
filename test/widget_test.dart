@@ -13,7 +13,7 @@ void main() {
 
     expect(find.byType(MaterialApp), findsOneWidget);
     final materialApp = tester.widget<MaterialApp>(find.byType(MaterialApp));
-    expect(materialApp.title, 'Luar Company Imobiliária');
+    expect(materialApp.title, 'Luar Mobiliario');
   });
 
   testWidgets('debug banner is disabled', (WidgetTester tester) async {

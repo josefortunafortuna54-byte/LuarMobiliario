@@ -153,12 +153,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         width: 72,
         height: 72,
         decoration: BoxDecoration(
-          color: AppColors.navyDark,
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-            color: AppColors.gold.withValues(alpha: 0.3),
-            width: 1,
-          ),
           boxShadow: [
             BoxShadow(
               color: AppColors.navy.withValues(alpha: 0.15),
@@ -167,14 +162,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ],
         ),
-        child: Center(
-          child: Text(
-            'L',
-            style: AppTextStyles.h3Gold.copyWith(
-              fontSize: 36,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
+        clipBehavior: Clip.antiAlias,
+        child: Image.asset(
+          'logo.png',
+          fit: BoxFit.cover,
         ),
       ),
     );

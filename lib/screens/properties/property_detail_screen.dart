@@ -166,7 +166,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
               await Share.share(
                 '${property.title} - AOA ${property.price.toStringAsFixed(0)}\n'
                 '📍 $location\n'
-                '🔗 Ver em Luar Company',
+                '🔗 Ver em Luar Mobiliario',
               );
             }
           },

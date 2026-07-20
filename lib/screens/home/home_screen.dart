@@ -103,22 +103,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: AppColors.navyDark,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: AppColors.gold.withValues(alpha: 0.3),
-                    width: 1,
-                  ),
                 ),
-                child: Center(
-                  child: Text(
-                    'L',
-                    style: AppTextStyles.bodyMediumBold.copyWith(
-                      color: AppColors.gold,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
+                clipBehavior: Clip.antiAlias,
+                child: Image.asset(
+                  'logo.png',
+                  fit: BoxFit.cover,
                 ),
               ),
               const Spacer(),

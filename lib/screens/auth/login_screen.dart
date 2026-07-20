@@ -114,12 +114,7 @@ class _LoginScreenState extends State<LoginScreen> {
         width: 80,
         height: 80,
         decoration: BoxDecoration(
-          color: AppColors.navyDark,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: AppColors.gold.withValues(alpha: 0.3),
-            width: 1,
-          ),
           boxShadow: [
             BoxShadow(
               color: AppColors.navy.withValues(alpha: 0.15),
@@ -128,14 +123,10 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ],
         ),
-        child: Center(
-          child: Text(
-            'L',
-            style: AppTextStyles.h3Gold.copyWith(
-              fontSize: 40,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
+        clipBehavior: Clip.antiAlias,
+        child: Image.asset(
+          'logo.png',
+          fit: BoxFit.cover,
         ),
       ),
     );

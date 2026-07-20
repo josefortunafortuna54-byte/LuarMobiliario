@@ -1,11 +1,12 @@
 import 'package:flutter/foundation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../constants/app_constants.dart';
 import '../models/property_model.dart';
 import '../services/supabase_service.dart';
 
 class PropertyProvider extends ChangeNotifier {
-  final _client = SupabaseService.client;
+  SupabaseClient get _client => SupabaseService.client;
 
   List<PropertyModel> _properties = [];
   List<PropertyModel> _featuredProperties = [];

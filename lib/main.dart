@@ -15,14 +15,18 @@ import 'core/services/supabase_service.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await dotenv.load();
+  try {
+    await dotenv.load();
+  } catch (_) {}
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
 
-  await SupabaseService.initialize();
+  try {
+    await SupabaseService.initialize();
+  } catch (_) {}
 
   runApp(
     MultiProvider(

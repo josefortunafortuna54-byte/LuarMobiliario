@@ -100,7 +100,7 @@ class _SplashScreenState extends State<SplashScreen>
                     child: Column(
                       children: [
                         Text(
-                          'Luar Company',
+                          'Luar Mobiliario',
                           style: AppTextStyles.h2White.copyWith(
                             letterSpacing: 2,
                             fontWeight: FontWeight.w700,
@@ -156,12 +156,7 @@ class _SplashScreenState extends State<SplashScreen>
       width: 120,
       height: 120,
       decoration: BoxDecoration(
-        color: AppColors.navyDark,
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(
-          color: AppColors.gold.withValues(alpha: 0.3),
-          width: 1.5,
-        ),
         boxShadow: [
           BoxShadow(
             color: AppColors.gold.withValues(alpha: 0.2),
@@ -175,14 +170,10 @@ class _SplashScreenState extends State<SplashScreen>
           ),
         ],
       ),
-      child: Center(
-        child: Text(
-          'L',
-          style: AppTextStyles.h1Gold.copyWith(
-            fontSize: 64,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
+      clipBehavior: Clip.antiAlias,
+      child: Image.asset(
+        'logo.png',
+        fit: BoxFit.cover,
       ),
     );
   }

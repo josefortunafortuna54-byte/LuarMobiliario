@@ -203,9 +203,9 @@ void main() {
     });
 
     test('uses DateTime.now() for missing dates', () {
-      final before = DateTime.now();
+      final before = DateTime.now().subtract(const Duration(milliseconds: 10));
       final l = LandModel.fromJson(<String, dynamic>{});
-      final after = DateTime.now();
+      final after = DateTime.now().add(const Duration(milliseconds: 10));
 
       expect(l.createdAt.isAfter(before), isTrue);
       expect(l.createdAt.isBefore(after), isTrue);

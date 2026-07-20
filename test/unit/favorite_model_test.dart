@@ -48,9 +48,9 @@ void main() {
     });
 
     test('uses DateTime.now() for missing date', () {
-      final before = DateTime.now();
+      final before = DateTime.now().subtract(const Duration(milliseconds: 10));
       final f = FavoriteModel.fromJson(<String, dynamic>{});
-      final after = DateTime.now();
+      final after = DateTime.now().add(const Duration(milliseconds: 10));
 
       expect(f.createdAt.isAfter(before), isTrue);
       expect(f.createdAt.isBefore(after), isTrue);

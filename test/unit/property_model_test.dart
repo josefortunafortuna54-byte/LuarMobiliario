@@ -226,9 +226,9 @@ void main() {
     });
 
     test('uses DateTime.now() for missing dates', () {
-      final before = DateTime.now();
+      final before = DateTime.now().subtract(const Duration(milliseconds: 10));
       final p = PropertyModel.fromJson(<String, dynamic>{});
-      final after = DateTime.now();
+      final after = DateTime.now().add(const Duration(milliseconds: 10));
 
       expect(p.createdAt.isAfter(before), isTrue);
       expect(p.createdAt.isBefore(after), isTrue);

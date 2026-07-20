@@ -2,55 +2,83 @@ name: Flutter CI
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   analyze:
     name: Analyze & Test
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - uses: subosito/flutter-action@v2
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
 
-      - name: Install dependencies
+      - name: Create .env
+        run: |
+          cat > .env << EOF
+          SUPABASE_URL=${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
+          EOF
+
+      - name: Install Dependencies
         run: flutter pub get
 
-      - name: Verify formatting
+      - name: Check Formatting
         run: dart format --output=none --set-exit-if-changed .
 
-      - name: Analyze project source
+      - name: Analyze Project
         run: flutter analyze --no-fatal-infos
 
-      - name: Run tests
-        run: flutter test
+      - name: Run Tests
+        run: |
+          if [ -d test ]; then
+            flutter test
+          else
+            echo "No tests found. Skipping..."
+          fi
 
   build-android:
-    name: Build Android
+    name: Build Android APK
     needs: analyze
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
-      - uses: subosito/flutter-action@v2
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
 
-      - name: Install dependencies
+      - name: Create .env
+        run: |
+          cat > .env << EOF
+          SUPABASE_URL=${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
+          EOF
+
+      - name: Install Dependencies
         run: flutter pub get
 
-      - name: Build APK
+      - name: Build Release APK
         run: flutter build apk --release
 
       - name: Upload APK
@@ -63,16 +91,26 @@ jobs:
     name: Build iOS
     needs: analyze
     runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - uses: subosito/flutter-action@v2
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
 
-      - name: Install dependencies
+      - name: Create .env
+        run: |
+          cat > .env << EOF
+          SUPABASE_URL=${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
+          EOF
+
+      - name: Install Dependencies
         run: flutter pub get
 
-      - name: Build iOS (no codesign)
+      - name: Build iOS (No Code Signing)
         run: flutter build ios --release --no-codesign

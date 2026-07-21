@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/constants/app_text_styles.dart';
-import '../../core/providers/auth_provider.dart';
 import '../../core/utils/routes.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -59,9 +57,7 @@ class _SplashScreenState extends State<SplashScreen>
 
   void _navigate() {
     if (!mounted) return;
-    final auth = context.read<AuthProvider>();
-    final route = auth.isAuthenticated ? AppRoutes.home : AppRoutes.login;
-    Navigator.of(context).pushReplacementNamed(route);
+    Navigator.of(context).pushReplacementNamed(AppRoutes.home);
   }
 
   @override

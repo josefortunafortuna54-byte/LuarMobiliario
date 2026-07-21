@@ -199,64 +199,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildDivider() {
-    return Row(
-      children: [
-        const Expanded(child: Divider(color: AppColors.gray200, thickness: 1)),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Text(
-            'ou',
-            style: AppTextStyles.bodySmall.copyWith(color: AppColors.gray400),
-          ),
-        ),
-        const Expanded(child: Divider(color: AppColors.gray200, thickness: 1)),
-      ],
-    );
-  }
-
-  Widget _buildSocialLogin() {
-    return OutlinedButton(
-      onPressed: () {},
-      style: OutlinedButton.styleFrom(
-        side: const BorderSide(color: AppColors.gray200, width: 1.5),
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 22,
-            height: 22,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(4),
-              color: AppColors.gray100,
-            ),
-            child: const Center(
-              child: Text(
-                'G',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.gray600,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Text(
-            'Entrar com Google',
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.gray700,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildPartnerLink() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,

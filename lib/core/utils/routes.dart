@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../screens/splash/splash_screen.dart';
 import '../../screens/auth/login_screen.dart';
 import '../../screens/auth/register_screen.dart';
+import '../../screens/auth/partner_register_screen.dart';
 import '../../screens/home/home_screen.dart';
 import '../../screens/search/search_screen.dart';
 import '../../screens/properties/properties_screen.dart';
@@ -21,6 +22,7 @@ abstract final class AppRoutes {
   static const String splash = '/';
   static const String login = '/login';
   static const String register = '/register';
+  static const String partnerRegister = '/partner-register';
   static const String home = '/home';
   static const String search = '/search';
   static const String properties = '/properties';
@@ -64,6 +66,9 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
 
     case AppRoutes.register:
       return _buildRoute(const RegisterScreen(), settings);
+
+    case AppRoutes.partnerRegister:
+      return _buildRoute(const PartnerRegisterScreen(), settings);
 
     case AppRoutes.home:
       return _buildRoute(const HomeScreen(), settings);

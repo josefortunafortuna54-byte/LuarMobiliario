@@ -87,6 +87,53 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> signUpPartner({
+    required String email,
+    required String password,
+    required String name,
+    required String phone,
+    required String companyName,
+    required String nif,
+    required String businessType,
+    required String address,
+    required String whatsapp,
+    required String license,
+  }) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      await _authService.signUpPartner(
+        email: email,
+        password: password,
+        name: name,
+        phone: phone,
+        companyName: companyName,
+        nif: nif,
+        businessType: businessType,
+        address: address,
+        whatsapp: whatsapp,
+        license: license,
+      );
+      final user = await _authService.getCurrentUser();
+      _user = user;
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } on AuthException catch (e) {
+      _error = e.message;
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
   Future<void> signOut() async {
     _isLoading = true;
     _error = null;

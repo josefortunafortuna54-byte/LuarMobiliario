@@ -31,6 +31,7 @@ abstract final class AppConstants {
 
   // ── Database Tables ─────────────────────────────────────────────────
   static const String usersTable = 'users';
+  static const String partnersTable = 'partners';
   static const String notificationsTable = 'notifications';
   static const String propertiesTable = 'properties';
   static const String landsTable = 'lands';

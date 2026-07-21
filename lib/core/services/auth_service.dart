@@ -61,6 +61,57 @@ class AuthService {
     }
   }
 
+  Future<AuthResponse> signUpPartner({
+    required String email,
+    required String password,
+    required String name,
+    required String phone,
+    required String companyName,
+    required String nif,
+    required String businessType,
+    required String address,
+    required String whatsapp,
+    required String license,
+  }) async {
+    try {
+      final response = await _auth.signUp(
+        email: email,
+        password: password,
+        data: {'name': name},
+      );
+
+      if (response.user != null) {
+        await _client.from(AppConstants.usersTable).upsert({
+          'id': response.user!.id,
+          'email': email,
+          'name': name,
+          'phone': phone,
+          'role': UserRole.agent.name,
+          'created_at': DateTime.now().toIso8601String(),
+          'updated_at': DateTime.now().toIso8601String(),
+        });
+
+        await _client.from(AppConstants.partnersTable).upsert({
+          'user_id': response.user!.id,
+          'company_name': companyName,
+          'nif': nif,
+          'business_type': businessType,
+          'address': address,
+          'whatsapp': whatsapp,
+          'license': license,
+          'created_at': DateTime.now().toIso8601String(),
+          'updated_at': DateTime.now().toIso8601String(),
+        });
+      }
+
+      return response;
+    } on AuthException catch (e) {
+      throw AuthException(e.message);
+    } catch (e) {
+      throw Exception('Failed to sign up partner: $e');
+    }
+  }
+
   Future<void> signOut() async {
     try {
       await _auth.signOut();

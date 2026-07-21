@@ -97,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 24),
                   _buildSocialLogin(),
                   const SizedBox(height: 32),
-                  _buildRegisterLink(),
+                  _buildPartnerLink(),
                   const SizedBox(height: 40),
                 ],
               );
@@ -261,20 +261,20 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildRegisterLink() {
+  Widget _buildPartnerLink() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          'Não tem conta? ',
+          'Quer ser parceiro? ',
           style: AppTextStyles.bodyMedium.copyWith(color: AppColors.gray500),
         ),
         GestureDetector(
           onTap: () {
-            Navigator.of(context).pushNamed(AppRoutes.register);
+            Navigator.of(context).pushNamed(AppRoutes.partnerRegister);
           },
           child: Text(
-            'Criar conta',
+            'Cadastre-se',
             style: AppTextStyles.bodyMediumBold.copyWith(color: AppColors.gold),
           ),
         ),

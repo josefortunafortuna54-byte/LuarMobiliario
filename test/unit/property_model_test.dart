@@ -284,9 +284,9 @@ void main() {
       expect(json['updated_at'], '2025-06-15T00:00:00.000');
     });
 
-    test('does not include images key', () {
+    test('includes images key', () {
       final json = createSubject().toJson();
-      expect(json.containsKey('images'), isFalse);
+      expect(json.containsKey('images'), isTrue);
     });
 
     test('uses snake_case keys', () {
@@ -301,9 +301,9 @@ void main() {
       expect(json.containsKey('updated_at'), isTrue);
     });
 
-    test('has 24 keys (images excluded from serialization)', () {
+    test('has 25 keys', () {
       final json = createSubject().toJson();
-      expect(json.length, 24);
+      expect(json.length, 25);
     });
   });
 

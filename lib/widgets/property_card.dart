@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../core/constants/app_colors.dart';
 import '../core/constants/app_text_styles.dart';
+import '../core/utils/formatters.dart';
 
 enum PropertyListingType { venda, arrendamento }
 
@@ -41,16 +42,6 @@ class PropertyCard extends StatelessWidget {
   Color get _badgeColor => listingType == PropertyListingType.venda
       ? AppColors.gold
       : AppColors.navyLight;
-
-  String _formatPrice(double value) {
-    final parts = value.toStringAsFixed(0).split('.');
-    final buffer = StringBuffer();
-    for (var i = 0; i < parts[0].length; i++) {
-      if (i > 0 && (parts[0].length - i) % 3 == 0) buffer.write('.');
-      buffer.write(parts[0][i]);
-    }
-    return 'AOA ${buffer.toString()}';
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -213,7 +204,7 @@ class PropertyCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  _formatPrice(price),
+                  formatPriceCurrency(price),
                   style: AppTextStyles.priceMedium,
                 ),
               ),
@@ -284,7 +275,7 @@ class PropertyCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  _formatPrice(price),
+                  formatPriceCurrency(price),
                   style: AppTextStyles.priceSmall,
                 ),
               ),

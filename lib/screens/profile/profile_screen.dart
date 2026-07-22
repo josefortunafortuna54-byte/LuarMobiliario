@@ -5,6 +5,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/providers/auth_provider.dart';
+import '../../core/utils/routes.dart';
 import '../../widgets/avatar_widget.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -138,26 +139,30 @@ class ProfileScreen extends StatelessWidget {
 
   Widget _buildMenuSection(BuildContext context) {
     final menuItems = [
-      _MenuItem(icon: Icons.home_outlined, title: 'Meus Imóveis', route: null),
+      _MenuItem(
+        icon: Icons.edit_outlined,
+        title: 'Editar Perfil',
+        route: AppRoutes.editProfile,
+      ),
+      _MenuItem(
+        icon: Icons.home_outlined,
+        title: 'Meus Imóveis',
+        route: AppRoutes.adminProperties,
+      ),
       _MenuItem(
         icon: Icons.favorite_border_rounded,
         title: 'Favoritos',
-        route: null,
+        route: AppRoutes.favorites,
       ),
       _MenuItem(
         icon: Icons.calendar_today_outlined,
         title: 'Agendamentos',
-        route: null,
+        route: AppRoutes.bookings,
       ),
       _MenuItem(
         icon: Icons.chat_bubble_outline_rounded,
         title: 'Mensagens',
-        route: null,
-      ),
-      _MenuItem(
-        icon: Icons.settings_outlined,
-        title: 'Configurações',
-        route: null,
+        route: AppRoutes.messages,
       ),
       _MenuItem(
         icon: Icons.logout_rounded,
@@ -194,6 +199,8 @@ class ProfileScreen extends StatelessWidget {
                   onTap: () {
                     if (item.isDestructive) {
                       _showSignOutDialog(context);
+                    } else if (item.route != null) {
+                      Navigator.of(context).pushNamed(item.route!);
                     }
                   },
                   highlightColor: AppColors.gold.withValues(alpha: 0.05),

@@ -149,22 +149,25 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildCategoriesSection() {
     final categories = [
-      _CategoryData(icon: Icons.home_outlined, title: 'Casas', count: 0),
+      _CategoryData(icon: Icons.home_outlined, title: 'Casas', count: 0, filterType: 'house'),
       _CategoryData(
         icon: Icons.apartment_rounded,
         title: 'Apartamentos',
         count: 0,
+        filterType: 'apartment',
       ),
-      _CategoryData(icon: Icons.landscape_rounded, title: 'Terrenos', count: 0),
+      _CategoryData(icon: Icons.landscape_rounded, title: 'Terrenos', count: 0, filterType: null),
       _CategoryData(
         icon: Icons.agriculture_rounded,
         title: 'Fazendas',
         count: 0,
+        filterType: null,
       ),
       _CategoryData(
         icon: Icons.warehouse_outlined,
         title: 'Armazéns',
         count: 0,
+        filterType: 'warehouse',
       ),
     ];
 
@@ -206,6 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   icon: cat.icon,
                   title: cat.title,
                   count: cat.count,
+                  filterType: cat.filterType,
                 );
               },
             ),
@@ -219,9 +223,12 @@ class _HomeScreenState extends State<HomeScreen> {
     required IconData icon,
     required String title,
     required int count,
+    String? filterType,
   }) {
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+        Navigator.of(context).pushNamed(AppRoutes.properties, arguments: filterType);
+      },
       child: Container(
         width: 100,
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
@@ -282,7 +289,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   Text('Imóveis em Destaque', style: AppTextStyles.h5),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(AppRoutes.properties);
+                    },
                     child: Text(
                       'Ver todos',
                       style: AppTextStyles.bodySmall.copyWith(
@@ -381,7 +390,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   Text('Terrenos em Destaque', style: AppTextStyles.h5),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(AppRoutes.lands);
+                    },
                     child: Text(
                       'Ver todos',
                       style: AppTextStyles.bodySmall.copyWith(
@@ -448,7 +459,9 @@ class _HomeScreenState extends State<HomeScreen> {
       price: land.price,
       badgeLabel: badgeLabel,
       features: land.features.take(3).toList(),
-      onTap: () {},
+      onTap: () {
+        Navigator.of(context).pushNamed(AppRoutes.landDetail, arguments: land.id);
+      },
     );
   }
 
@@ -714,11 +727,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildBottomNav() {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppColors.navy,
         boxShadow: [
           BoxShadow(
-            color: AppColors.navy.withValues(alpha: 0.06),
-            blurRadius: 20,
+            color: AppColors.black.withValues(alpha: 0.15),
+            blurRadius: 16,
             offset: const Offset(0, -4),
           ),
         ],
@@ -769,14 +782,24 @@ class _HomeScreenState extends State<HomeScreen> {
     final isSelected = _currentBottomNav == index;
 
     return GestureDetector(
-      onTap: () => setState(() => _currentBottomNav = index),
+      onTap: () {
+        if (index == 1) {
+          Navigator.of(context).pushNamed(AppRoutes.search);
+        } else if (index == 2) {
+          Navigator.of(context).pushNamed(AppRoutes.favorites);
+        } else if (index == 3) {
+          Navigator.of(context).pushNamed(AppRoutes.profile);
+        } else {
+          setState(() => _currentBottomNav = index);
+        }
+      },
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.gold.withValues(alpha: 0.1)
+              ? AppColors.gold.withValues(alpha: 0.12)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
         ),
@@ -807,11 +830,13 @@ class _CategoryData {
   final IconData icon;
   final String title;
   final int count;
+  final String? filterType;
 
   const _CategoryData({
     required this.icon,
     required this.title,
     required this.count,
+    this.filterType,
   });
 }
 

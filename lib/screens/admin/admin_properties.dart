@@ -5,6 +5,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/models/property_model.dart';
 import '../../core/providers/property_provider.dart';
+import '../../core/utils/routes.dart';
 import '../../widgets/loading_widget.dart';
 
 class AdminPropertiesScreen extends StatefulWidget {
@@ -156,7 +157,7 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () => Navigator.pushNamed(context, AppRoutes.propertyForm),
         backgroundColor: AppColors.gold,
         elevation: 6,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -329,7 +330,7 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
           Column(
             children: [
               IconButton(
-                onPressed: () {},
+                onPressed: () => Navigator.pushNamed(context, AppRoutes.propertyForm, arguments: property),
                 icon: const Icon(
                   Icons.edit_outlined,
                   size: 20,

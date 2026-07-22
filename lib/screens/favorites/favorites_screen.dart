@@ -7,6 +7,7 @@ import '../../core/models/property_model.dart';
 import '../../core/models/land_model.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/providers/favorite_provider.dart';
+import '../../core/utils/routes.dart';
 import '../../widgets/loading_widget.dart';
 import '../../widgets/property_card.dart';
 import '../../widgets/land_card.dart';
@@ -156,8 +157,12 @@ class _FavoritesScreenState extends State<FavoritesScreen>
                 bedrooms: property.bedrooms,
                 bathrooms: property.bathrooms,
                 area: property.area,
-                onTap: () {},
-                onDetailsTap: () {},
+                onTap: () {
+                  Navigator.of(context).pushNamed(AppRoutes.propertyDetail, arguments: property.id);
+                },
+                onDetailsTap: () {
+                  Navigator.of(context).pushNamed(AppRoutes.propertyDetail, arguments: property.id);
+                },
               );
             },
           );
@@ -207,7 +212,9 @@ class _FavoritesScreenState extends State<FavoritesScreen>
                 price: land.price,
                 badgeLabel: land.type.name.toUpperCase(),
                 features: land.features,
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(context).pushNamed(AppRoutes.landDetail, arguments: land.id);
+                },
               );
             },
           );

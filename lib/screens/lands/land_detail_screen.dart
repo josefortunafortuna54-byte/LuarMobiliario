@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/constants/app_colors.dart';
@@ -157,8 +158,14 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
       centerTitle: true,
       actions: [
         IconButton(
-          onPressed: () async {
-            await _ShareHelper.shareLand(land, location);
+          onPressed: () {
+            SharePlus.instance.share(
+              ShareParams(
+                text: '${land.title} - AOA ${land.price.toStringAsFixed(0)}\n'
+                    'Localização: $location\n'
+                    'Ver em Luar Mobiliario',
+              ),
+            );
           },
           icon: const Icon(Icons.share_outlined, color: AppColors.white),
         ),
@@ -754,11 +761,5 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
       LandType.lot => 'Lote',
       LandType.farm => 'Fazenda',
     };
-  }
-}
-
-class _ShareHelper {
-  static Future<void> shareLand(LandModel land, String location) async {
-    // Production: use share_plus package
   }
 }

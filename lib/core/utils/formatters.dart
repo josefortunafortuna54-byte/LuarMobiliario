@@ -53,3 +53,19 @@ String truncateText(String text, int maxLength) {
   if (text.length <= maxLength) return text;
   return '${text.substring(0, maxLength).trimRight()}...';
 }
+
+String formatPriceRaw(double value) {
+  final text = value.toStringAsFixed(0);
+  final buffer = StringBuffer();
+  var count = 0;
+  for (var i = text.length - 1; i >= 0; i--) {
+    if (count > 0 && count % 3 == 0) buffer.write('.');
+    buffer.write(text[i]);
+    count++;
+  }
+  return buffer.toString().split('').reversed.join();
+}
+
+String formatPriceCurrency(double value) {
+  return 'AOA ${formatPriceRaw(value)}';
+}

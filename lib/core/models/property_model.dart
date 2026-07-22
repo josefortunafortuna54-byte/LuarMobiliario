@@ -137,6 +137,7 @@ class PropertyModel {
       'neighborhood': neighborhood,
       'latitude': latitude,
       'longitude': longitude,
+      'images': images,
       'features': features,
       'agent_id': agentId,
       'agent_name': agentName,

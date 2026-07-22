@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../core/constants/app_colors.dart';
 import '../core/constants/app_text_styles.dart';
+import '../core/utils/formatters.dart';
 
 class LandCard extends StatelessWidget {
   const LandCard({
@@ -24,16 +25,6 @@ class LandCard extends StatelessWidget {
   final String badgeLabel;
   final List<String> features;
   final VoidCallback? onTap;
-
-  String _formatPrice(double value) {
-    final parts = value.toStringAsFixed(0).split('.');
-    final buffer = StringBuffer();
-    for (var i = 0; i < parts[0].length; i++) {
-      if (i > 0 && (parts[0].length - i) % 3 == 0) buffer.write('.');
-      buffer.write(parts[0][i]);
-    }
-    return 'AOA ${buffer.toString()}';
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -206,7 +197,7 @@ class LandCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  _formatPrice(price),
+                  formatPriceCurrency(price),
                   style: AppTextStyles.priceMedium,
                 ),
               ),

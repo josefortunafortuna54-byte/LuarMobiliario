@@ -17,6 +17,11 @@ import '../../screens/bookings/bookings_screen.dart';
 import '../../screens/admin/admin_dashboard.dart';
 import '../../screens/admin/admin_properties.dart';
 import '../../screens/admin/admin_users.dart';
+import '../../screens/auth/forgot_password_screen.dart';
+import '../../screens/messages/chat_screen.dart';
+import '../../screens/properties/property_form_screen.dart';
+import '../../screens/lands/land_form_screen.dart';
+import '../../screens/profile/edit_profile_screen.dart';
 
 abstract final class AppRoutes {
   static const String splash = '/';
@@ -36,6 +41,11 @@ abstract final class AppRoutes {
   static const String adminDashboard = '/admin/dashboard';
   static const String adminProperties = '/admin/properties';
   static const String adminUsers = '/admin/users';
+  static const String forgotPassword = '/forgot-password';
+  static const String chat = '/chat';
+  static const String propertyForm = '/property-form';
+  static const String landForm = '/land-form';
+  static const String editProfile = '/edit-profile';
 }
 
 Route<dynamic> onGenerateRoute(RouteSettings settings) {
@@ -102,6 +112,21 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
 
     case AppRoutes.adminUsers:
       return _buildRoute(const AdminUsersScreen(), settings);
+
+    case AppRoutes.forgotPassword:
+      return _buildRoute(const ForgotPasswordScreen(), settings);
+
+    case AppRoutes.chat:
+      return _buildRoute(const ChatScreen(), settings, arguments: settings.arguments);
+
+    case AppRoutes.propertyForm:
+      return _buildRoute(const PropertyFormScreen(), settings, arguments: settings.arguments);
+
+    case AppRoutes.landForm:
+      return _buildRoute(const LandFormScreen(), settings, arguments: settings.arguments);
+
+    case AppRoutes.editProfile:
+      return _buildRoute(const EditProfileScreen(), settings);
 
     default:
       return _buildRoute(const SplashScreen(), settings);

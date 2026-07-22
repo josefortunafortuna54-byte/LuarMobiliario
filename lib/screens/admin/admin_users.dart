@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/models/user_model.dart';
+import '../../core/providers/admin_provider.dart';
 import '../../widgets/avatar_widget.dart';
 
 class AdminUsersScreen extends StatefulWidget {
@@ -33,10 +35,11 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
 
   Future<void> _loadUsers() async {
     setState(() => _isLoading = true);
-    await Future.delayed(const Duration(milliseconds: 600));
+    final admin = context.read<AdminProvider>();
+    await admin.loadUsers();
     if (!mounted) return;
     setState(() {
-      _allUsers = _mockUsers;
+      _allUsers = admin.allUsers;
       _filterUsers();
       _isLoading = false;
     });
@@ -467,66 +470,3 @@ class _UserDetailSheet extends StatelessWidget {
     );
   }
 }
-
-final List<UserModel> _mockUsers = [
-  UserModel(
-    id: '1',
-    name: 'Carlos Mendes',
-    email: 'carlos.mendes@email.com',
-    phone: '+244 923 000 001',
-    avatarUrl: '',
-    role: UserRole.client,
-    createdAt: DateTime(2024, 3, 15),
-    updatedAt: DateTime(2024, 3, 15),
-  ),
-  UserModel(
-    id: '2',
-    name: 'Ana Ferreira',
-    email: 'ana.ferreira@email.com',
-    phone: '+244 923 000 002',
-    avatarUrl: '',
-    role: UserRole.agent,
-    createdAt: DateTime(2024, 1, 10),
-    updatedAt: DateTime(2024, 1, 10),
-  ),
-  UserModel(
-    id: '3',
-    name: 'Pedro Santos',
-    email: 'pedro.santos@email.com',
-    phone: '+244 923 000 003',
-    avatarUrl: '',
-    role: UserRole.client,
-    createdAt: DateTime(2024, 5, 22),
-    updatedAt: DateTime(2024, 5, 22),
-  ),
-  UserModel(
-    id: '4',
-    name: 'Maria João',
-    email: 'maria.joao@email.com',
-    phone: '+244 923 000 004',
-    avatarUrl: '',
-    role: UserRole.admin,
-    createdAt: DateTime(2023, 12, 1),
-    updatedAt: DateTime(2024, 6, 10),
-  ),
-  UserModel(
-    id: '5',
-    name: 'Ricardo Almeida',
-    email: 'ricardo.almeida@email.com',
-    phone: '+244 923 000 005',
-    avatarUrl: '',
-    role: UserRole.client,
-    createdAt: DateTime(2024, 2, 8),
-    updatedAt: DateTime(2024, 2, 8),
-  ),
-  UserModel(
-    id: '6',
-    name: 'Sofia Costa',
-    email: 'sofia.costa@email.com',
-    phone: '+244 923 000 006',
-    avatarUrl: '',
-    role: UserRole.agent,
-    createdAt: DateTime(2024, 4, 3),
-    updatedAt: DateTime(2024, 4, 3),
-  ),
-];

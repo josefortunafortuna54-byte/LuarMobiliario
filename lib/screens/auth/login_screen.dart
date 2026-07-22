@@ -187,7 +187,9 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildForgotPassword() {
     return Center(
       child: GestureDetector(
-        onTap: () {},
+        onTap: () {
+          Navigator.of(context).pushNamed(AppRoutes.forgotPassword);
+        },
         child: Text(
           'Esqueceu a senha?',
           style: AppTextStyles.bodySmall.copyWith(

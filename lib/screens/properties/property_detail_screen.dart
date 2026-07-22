@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/constants/app_colors.dart';
@@ -161,14 +162,14 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
       centerTitle: true,
       actions: [
         IconButton(
-          onPressed: () async {
-            if (property.images.isNotEmpty) {
-              await Share.share(
-                '${property.title} - AOA ${property.price.toStringAsFixed(0)}\n'
-                '📍 $location\n'
-                '🔗 Ver em Luar Mobiliario',
-              );
-            }
+          onPressed: () {
+            SharePlus.instance.share(
+              ShareParams(
+                text: '${property.title} - AOA ${property.price.toStringAsFixed(0)}\n'
+                    'Localização: $location\n'
+                    'Ver em Luar Mobiliario',
+              ),
+            );
           },
           icon: const Icon(Icons.share_outlined, color: AppColors.white),
         ),
@@ -738,12 +739,5 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
         ),
       ),
     );
-  }
-}
-
-// Placeholder for share functionality
-class Share {
-  static Future<void> share(String text) async {
-    // Uses url_launcher or share_plus in production
   }
 }

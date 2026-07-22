@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 import 'app.dart';
 import 'core/providers/auth_provider.dart';
 import 'core/providers/booking_provider.dart';
+import 'core/providers/message_provider.dart';
+import 'core/providers/admin_provider.dart';
 import 'core/providers/favorite_provider.dart';
 import 'core/providers/land_provider.dart';
 import 'core/providers/property_provider.dart';
@@ -37,6 +39,8 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => SearchProvider()),
         ChangeNotifierProvider(create: (_) => FavoriteProvider()),
         ChangeNotifierProvider(create: (_) => BookingProvider()),
+        ChangeNotifierProvider(create: (_) => MessageProvider()),
+        ChangeNotifierProvider(create: (_) => AdminProvider()),
       ],
       child: const LuarCompanyApp(),
     ),

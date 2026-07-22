@@ -80,7 +80,9 @@ jobs:
         run: flutter pub get
 
       - name: Build APK
-        timeout-minutes: 20
+        timeout-minutes: 30
+        env:
+          GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2"
         run: flutter build apk --release --no-tree-shake-icons
 
       - name: Upload APK

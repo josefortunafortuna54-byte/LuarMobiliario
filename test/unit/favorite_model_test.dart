@@ -39,12 +39,12 @@ void main() {
       expect(f.createdAt, DateTime(2025, 2, 1, 10, 0));
     });
 
-    test('defaults string fields to empty when null', () {
+    test('defaults string fields to empty/null when null', () {
       final f = FavoriteModel.fromJson(<String, dynamic>{});
       expect(f.id, '');
       expect(f.userId, '');
-      expect(f.propertyId, '');
-      expect(f.landId, '');
+      expect(f.propertyId, isNull);
+      expect(f.landId, isNull);
     });
 
     test('uses DateTime.now() for missing date', () {

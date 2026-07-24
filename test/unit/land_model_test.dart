@@ -188,7 +188,7 @@ void main() {
       expect(l.isAvailable, true);
     });
 
-    test('defaults string fields to empty when null', () {
+    test('defaults string fields to empty/null when null', () {
       final l = LandModel.fromJson(<String, dynamic>{});
       expect(l.id, '');
       expect(l.title, '');
@@ -197,7 +197,7 @@ void main() {
       expect(l.city, '');
       expect(l.municipality, '');
       expect(l.neighborhood, '');
-      expect(l.agentId, '');
+      expect(l.agentId, isNull);
       expect(l.agentName, '');
       expect(l.agentPhone, '');
     });

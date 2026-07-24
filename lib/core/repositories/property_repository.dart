@@ -72,10 +72,21 @@ class PropertyRepository {
 
   Future<PropertyModel> createProperty(PropertyModel property) async {
     final data = property.toJson()..remove('id');
+    data.remove('images');
 
     final response = await _client.from(_table).insert(data).select().single();
 
-    return PropertyModel.fromJson(response);
+    final newProperty = PropertyModel.fromJson(response);
+
+    final imageUrls = property.images;
+    if (imageUrls.isNotEmpty) {
+      final imageRecords = imageUrls
+          .map((url) => {'property_id': newProperty.id, 'image_url': url})
+          .toList();
+      await _client.from('property_images').insert(imageRecords);
+    }
+
+    return newProperty.copyWith(images: imageUrls);
   }
 
   Future<PropertyModel> updateProperty(PropertyModel property) async {

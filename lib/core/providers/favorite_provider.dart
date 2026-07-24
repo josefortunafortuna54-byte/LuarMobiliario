@@ -94,8 +94,8 @@ class FavoriteProvider extends ChangeNotifier {
 
   Future<List<PropertyModel>> getFavoriteProperties() async {
     final propertyIds = _favorites
-        .where((f) => f.propertyId.isNotEmpty)
-        .map((f) => f.propertyId)
+        .where((f) => f.propertyId != null && f.propertyId!.isNotEmpty)
+        .map((f) => f.propertyId!)
         .toList();
 
     if (propertyIds.isEmpty) return [];
@@ -116,8 +116,8 @@ class FavoriteProvider extends ChangeNotifier {
 
   Future<List<LandModel>> getFavoriteLands() async {
     final landIds = _favorites
-        .where((f) => f.landId.isNotEmpty)
-        .map((f) => f.landId)
+        .where((f) => f.landId != null && f.landId!.isNotEmpty)
+        .map((f) => f.landId!)
         .toList();
 
     if (landIds.isEmpty) return [];

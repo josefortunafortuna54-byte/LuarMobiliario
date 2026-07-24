@@ -65,10 +65,6 @@ void main() {
       expect(AppConstants.documentBucket, 'documents');
     });
 
-    test('avatarsBucket equals avatarBucket', () {
-      expect(AppConstants.avatarsBucket, AppConstants.avatarBucket);
-    });
-
     test('productsBucket', () {
       expect(AppConstants.productsBucket, 'products');
     });

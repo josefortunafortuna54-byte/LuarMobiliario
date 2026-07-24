@@ -220,7 +220,7 @@ void main() {
       expect(p.city, '');
       expect(p.municipality, '');
       expect(p.neighborhood, '');
-      expect(p.agentId, '');
+      expect(p.agentId, isNull);
       expect(p.agentName, '');
       expect(p.agentPhone, '');
     });

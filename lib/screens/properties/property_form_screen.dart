@@ -117,6 +117,16 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
   Future<void> _handleSubmit() async {
     if (!_formKey.currentState!.validate()) return;
 
+    if (!_isEditing && _selectedImages.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Adicione pelo menos uma imagem'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+
     setState(() => _isSubmitting = true);
 
     try {
@@ -132,7 +142,16 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
             bucket: AppConstants.propertyImagesBucket,
           );
           allImages.add(url);
-        } catch (_) {}
+        } catch (e) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Erro ao enviar imagem: $e'),
+                backgroundColor: AppColors.error,
+              ),
+            );
+          }
+        }
       }
 
       final user = auth.user;
@@ -155,7 +174,7 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
         longitude: _existingProperty?.longitude ?? 13.2891,
         images: allImages,
         features: _existingProperty?.features ?? [],
-        agentId: user?.id ?? '',
+        agentId: user?.id,
         agentName: user?.name ?? '',
         agentPhone: user?.phone ?? '',
         isFeatured: _existingProperty?.isFeatured ?? false,

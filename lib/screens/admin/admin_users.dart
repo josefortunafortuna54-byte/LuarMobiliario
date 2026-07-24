@@ -5,6 +5,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/models/user_model.dart';
 import '../../core/providers/admin_provider.dart';
+import '../../core/providers/auth_provider.dart';
 import '../../widgets/avatar_widget.dart';
 
 class AdminUsersScreen extends StatefulWidget {
@@ -24,6 +25,19 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final user = context.read<AuthProvider>().user;
+      if (user?.role != UserRole.admin && mounted) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Acesso restrito a administradores'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+        return;
+      }
+    });
     _loadUsers();
   }
 

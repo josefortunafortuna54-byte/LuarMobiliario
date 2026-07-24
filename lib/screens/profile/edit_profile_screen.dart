@@ -18,6 +18,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
   late TextEditingController _phoneController;
+  late TextEditingController _emailController;
 
   @override
   void initState() {
@@ -25,12 +26,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final user = context.read<AuthProvider>().user;
     _nameController = TextEditingController(text: user?.name ?? '');
     _phoneController = TextEditingController(text: user?.phone ?? '');
+    _emailController = TextEditingController(text: user?.email ?? '');
   }
 
   @override
   void dispose() {
     _nameController.dispose();
     _phoneController.dispose();
+    _emailController.dispose();
     super.dispose();
   }
 
@@ -108,7 +111,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   CustomInput(
                     label: 'E-mail',
                     prefixIcon: Icons.email_outlined,
-                    controller: TextEditingController(text: auth.user?.email ?? ''),
+                    controller: _emailController,
                     enabled: false,
                   ),
                   const SizedBox(height: 32),

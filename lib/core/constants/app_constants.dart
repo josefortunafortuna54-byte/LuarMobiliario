@@ -26,7 +26,6 @@ abstract final class AppConstants {
   static const String propertyImagesBucket = 'property-images';
   static const String avatarBucket = 'avatars';
   static const String documentBucket = 'documents';
-  static const String avatarsBucket = 'avatars';
   static const String productsBucket = 'products';
 
   // ── Database Tables ─────────────────────────────────────────────────

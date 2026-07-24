@@ -130,36 +130,34 @@ class AuthService {
     }
   }
 
-  Future<UserResponse> updateProfile({
+  Future<void> updateProfile({
     String? name,
     String? phone,
     String? avatarUrl,
   }) async {
     try {
-      final response = await _auth.updateUser(
-        UserAttributes(
-          data: name != null ? {'name': name} : null,
-          phone: phone,
-        ),
-      );
+      final userAttributes = <String, dynamic>{};
+      if (name != null) userAttributes['name'] = name;
 
-      if (currentUser != null) {
-        final dbUpdates = <String, dynamic>{
-          'updated_at': DateTime.now().toIso8601String(),
-          if (name != null) 'name': name,
-          if (phone != null) 'phone': phone,
-          if (avatarUrl != null) 'avatar_url': avatarUrl,
-        };
-
-        await _client
-            .from(AppConstants.usersTable)
-            .update(dbUpdates)
-            .eq('id', currentUser!.id);
+      if (userAttributes.isNotEmpty) {
+        await _auth.updateUser(
+          UserAttributes(data: userAttributes),
+        );
       }
+    } catch (_) {}
 
-      return response;
-    } catch (e) {
-      throw Exception('Failed to update profile: $e');
+    if (currentUser != null) {
+      final dbUpdates = <String, dynamic>{
+        'updated_at': DateTime.now().toIso8601String(),
+        if (name != null) 'name': name,
+        if (phone != null) 'phone': phone,
+        if (avatarUrl != null) 'avatar_url': avatarUrl,
+      };
+
+      await _client
+          .from(AppConstants.usersTable)
+          .update(dbUpdates)
+          .eq('id', currentUser!.id);
     }
   }
 

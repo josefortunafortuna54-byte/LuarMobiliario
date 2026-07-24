@@ -39,7 +39,7 @@ class PropertyModel {
   final double longitude;
   final List<String> images;
   final List<String> features;
-  final String agentId;
+  final String? agentId;
   final String agentName;
   final String agentPhone;
   final bool isFeatured;
@@ -66,7 +66,7 @@ class PropertyModel {
     required this.longitude,
     required this.images,
     required this.features,
-    required this.agentId,
+    this.agentId,
     required this.agentName,
     required this.agentPhone,
     required this.isFeatured,
@@ -105,7 +105,7 @@ class PropertyModel {
               ?.map((e) => e as String)
               .toList() ??
           [],
-      agentId: json['agent_id'] as String? ?? '',
+      agentId: json['agent_id'] as String?,
       agentName: json['agent_name'] as String? ?? '',
       agentPhone: json['agent_phone'] as String? ?? '',
       isFeatured: json['is_featured'] as bool? ?? false,

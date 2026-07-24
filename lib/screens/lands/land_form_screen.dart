@@ -99,6 +99,17 @@ class _LandFormScreenState extends State<LandFormScreen> {
 
   Future<void> _handleSubmit() async {
     if (!_formKey.currentState!.validate()) return;
+
+    if (!_isEditing && _selectedImages.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Adicione pelo menos uma imagem'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+
     setState(() => _isSubmitting = true);
 
     try {
@@ -113,7 +124,16 @@ class _LandFormScreenState extends State<LandFormScreen> {
             bucket: AppConstants.propertyImagesBucket,
           );
           allImages.add(url);
-        } catch (_) {}
+        } catch (e) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Erro ao enviar imagem: $e'),
+                backgroundColor: AppColors.error,
+              ),
+            );
+          }
+        }
       }
 
       final user = auth.user;
@@ -133,7 +153,7 @@ class _LandFormScreenState extends State<LandFormScreen> {
         longitude: _existingLand?.longitude ?? 13.2891,
         images: allImages,
         features: _existingLand?.features ?? [],
-        agentId: user?.id ?? '',
+        agentId: user?.id,
         agentName: user?.name ?? '',
         agentPhone: user?.phone ?? '',
         isFeatured: _existingLand?.isFeatured ?? false,

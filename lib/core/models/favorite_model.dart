@@ -1,15 +1,15 @@
 class FavoriteModel {
   final String id;
   final String userId;
-  final String propertyId;
-  final String landId;
+  final String? propertyId;
+  final String? landId;
   final DateTime createdAt;
 
   const FavoriteModel({
     required this.id,
     required this.userId,
-    required this.propertyId,
-    required this.landId,
+    this.propertyId,
+    this.landId,
     required this.createdAt,
   });
 
@@ -17,8 +17,8 @@ class FavoriteModel {
     return FavoriteModel(
       id: json['id'] as String? ?? '',
       userId: json['user_id'] as String? ?? '',
-      propertyId: json['property_id'] as String? ?? '',
-      landId: json['land_id'] as String? ?? '',
+      propertyId: json['property_id'] as String?,
+      landId: json['land_id'] as String?,
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'] as String)
           : DateTime.now(),

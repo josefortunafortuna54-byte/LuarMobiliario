@@ -23,6 +23,17 @@ class LandProvider extends ChangeNotifier {
   String? get error => _error;
   bool get hasMore => _hasMore;
 
+  List<String> _extractImageUrls(dynamic imagesData) {
+    if (imagesData == null) return [];
+    try {
+      return (imagesData as List)
+          .map((img) => (img as Map<String, dynamic>)['image_url'] as String)
+          .toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
   Future<void> loadLands({Map<String, dynamic>? filters}) async {
     _isLoading = true;
     _error = null;
@@ -34,7 +45,7 @@ class LandProvider extends ChangeNotifier {
       final from = 0;
       final to = AppConstants.defaultPageSize - 1;
 
-      var query = _client.from('lands').select().eq('is_available', true);
+      var query = _client.from('lands').select('*, land_images(image_url)').eq('is_available', true);
 
       if (filters != null) {
         for (final entry in filters.entries) {
@@ -67,9 +78,11 @@ class LandProvider extends ChangeNotifier {
           .order('created_at', ascending: false)
           .range(from, to);
 
-      _lands = (response as List)
-          .map((json) => LandModel.fromJson(json as Map<String, dynamic>))
-          .toList();
+      _lands = (response as List).map((json) {
+        final j = json as Map<String, dynamic>;
+        final images = _extractImageUrls(j.remove('land_images'));
+        return LandModel.fromJson(j).copyWith(images: images);
+      }).toList();
 
       _hasMore = _lands.length >= AppConstants.defaultPageSize;
       _currentPage = 1;
@@ -92,7 +105,7 @@ class LandProvider extends ChangeNotifier {
       final from = _currentPage * AppConstants.defaultPageSize;
       final to = from + AppConstants.defaultPageSize - 1;
 
-      var query = _client.from('lands').select().eq('is_available', true);
+      var query = _client.from('lands').select('*, land_images(image_url)').eq('is_available', true);
 
       if (filters != null) {
         for (final entry in filters.entries) {
@@ -125,9 +138,11 @@ class LandProvider extends ChangeNotifier {
           .order('created_at', ascending: false)
           .range(from, to);
 
-      final newLands = (response as List)
-          .map((json) => LandModel.fromJson(json as Map<String, dynamic>))
-          .toList();
+      final newLands = (response as List).map((json) {
+        final j = json as Map<String, dynamic>;
+        final images = _extractImageUrls(j.remove('land_images'));
+        return LandModel.fromJson(j).copyWith(images: images);
+      }).toList();
 
       _lands.addAll(newLands);
       _hasMore = newLands.length >= AppConstants.defaultPageSize;
@@ -148,15 +163,17 @@ class LandProvider extends ChangeNotifier {
     try {
       final response = await _client
           .from('lands')
-          .select()
+          .select('*, land_images(image_url)')
           .eq('is_featured', true)
           .eq('is_available', true)
           .order('created_at', ascending: false)
           .limit(10);
 
-      _featuredLands = (response as List)
-          .map((json) => LandModel.fromJson(json as Map<String, dynamic>))
-          .toList();
+      _featuredLands = (response as List).map((json) {
+        final j = json as Map<String, dynamic>;
+        final images = _extractImageUrls(j.remove('land_images'));
+        return LandModel.fromJson(j).copyWith(images: images);
+      }).toList();
     } catch (e) {
       _error = e.toString();
     } finally {
@@ -173,11 +190,13 @@ class LandProvider extends ChangeNotifier {
     try {
       final response = await _client
           .from('lands')
-          .select()
+          .select('*, land_images(image_url)')
           .eq('id', id)
           .single();
 
-      _selectedLand = LandModel.fromJson(response);
+      final j = response;
+      final images = _extractImageUrls(j.remove('land_images'));
+      _selectedLand = LandModel.fromJson(j).copyWith(images: images);
     } catch (e) {
       _error = e.toString();
     } finally {
@@ -194,6 +213,7 @@ class LandProvider extends ChangeNotifier {
     try {
       final data = land.toJson();
       data.remove('id');
+      final imageUrls = List<String>.from(data.remove('images') ?? []);
       data['created_at'] = DateTime.now().toIso8601String();
       data['updated_at'] = DateTime.now().toIso8601String();
 
@@ -204,7 +224,18 @@ class LandProvider extends ChangeNotifier {
           .single();
 
       final newLand = LandModel.fromJson(response);
-      _lands.insert(0, newLand);
+
+      if (imageUrls.isNotEmpty) {
+        final imageRecords = imageUrls
+            .map((url) => {'land_id': newLand.id, 'image_url': url})
+            .toList();
+        await _client.from('land_images').insert(imageRecords);
+      }
+
+      _lands.insert(
+        0,
+        newLand.copyWith(images: imageUrls),
+      );
       _isLoading = false;
       notifyListeners();
       return true;
@@ -223,17 +254,27 @@ class LandProvider extends ChangeNotifier {
 
     try {
       final data = land.toJson();
+      final imageUrls = List<String>.from(data.remove('images') ?? []);
       data['updated_at'] = DateTime.now().toIso8601String();
 
       await _client.from('lands').update(data).eq('id', land.id);
 
+      await _client.from('land_images').delete().eq('land_id', land.id);
+      if (imageUrls.isNotEmpty) {
+        final imageRecords = imageUrls
+            .map((url) => {'land_id': land.id, 'image_url': url})
+            .toList();
+        await _client.from('land_images').insert(imageRecords);
+      }
+
+      final updated = land.copyWith(images: imageUrls);
       final index = _lands.indexWhere((l) => l.id == land.id);
       if (index != -1) {
-        _lands[index] = land;
+        _lands[index] = updated;
       }
 
       if (_selectedLand?.id == land.id) {
-        _selectedLand = land;
+        _selectedLand = updated;
       }
 
       _isLoading = false;
@@ -253,6 +294,8 @@ class LandProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
+      await _client.from('land_images').delete().eq('land_id', id);
+
       await _client.from('lands').update({'is_available': false}).eq('id', id);
 
       _lands.removeWhere((l) => l.id == id);
@@ -282,7 +325,7 @@ class LandProvider extends ChangeNotifier {
     try {
       final response = await _client
           .from('lands')
-          .select()
+          .select('*, land_images(image_url)')
           .eq('is_available', true)
           .or(
             'title.ilike.%$searchQuery%,description.ilike.%$searchQuery%,address.ilike.%$searchQuery%,city.ilike.%$searchQuery%,municipality.ilike.%$searchQuery%,neighborhood.ilike.%$searchQuery%',
@@ -290,9 +333,11 @@ class LandProvider extends ChangeNotifier {
           .order('created_at', ascending: false)
           .limit(AppConstants.defaultPageSize);
 
-      _lands = (response as List)
-          .map((json) => LandModel.fromJson(json as Map<String, dynamic>))
-          .toList();
+      _lands = (response as List).map((json) {
+        final j = json as Map<String, dynamic>;
+        final images = _extractImageUrls(j.remove('land_images'));
+        return LandModel.fromJson(j).copyWith(images: images);
+      }).toList();
 
       _hasMore = _lands.length >= AppConstants.defaultPageSize;
       _currentPage = 1;

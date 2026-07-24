@@ -94,6 +94,8 @@ class MessageProvider extends ChangeNotifier {
   }
 
   Future<void> sendMessage(String senderId, String receiverId, String content) async {
+    if (content.trim().isEmpty) return;
+
     try {
       final response = await _client
           .from('messages')

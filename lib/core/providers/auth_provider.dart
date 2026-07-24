@@ -166,9 +166,8 @@ class AuthProvider extends ChangeNotifier {
         avatarUrl: avatarUrl,
       );
 
-      if (_user != null) {
-        _user = _user!.copyWith(name: name, phone: phone, avatarUrl: avatarUrl);
-      }
+      final user = await _authService.getCurrentUser();
+      _user = user;
 
       _isLoading = false;
       notifyListeners();

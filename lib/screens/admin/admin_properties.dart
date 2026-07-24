@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/models/property_model.dart';
+import '../../core/models/user_model.dart';
+import '../../core/providers/auth_provider.dart';
 import '../../core/providers/property_provider.dart';
 import '../../core/utils/routes.dart';
 import '../../widgets/loading_widget.dart';
@@ -24,6 +26,18 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      final user = context.read<AuthProvider>().user;
+      final isAgentOrAdmin = user?.role == UserRole.agent || user?.role == UserRole.admin;
+      if (!isAgentOrAdmin && mounted) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Acesso restrito a agentes e administradores'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+        return;
+      }
       context.read<PropertyProvider>().loadProperties();
     });
   }

@@ -5,6 +5,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/providers/auth_provider.dart';
+import '../../core/models/user_model.dart';
 import '../../core/utils/routes.dart';
 import '../../widgets/avatar_widget.dart';
 
@@ -65,13 +66,14 @@ class ProfileScreen extends StatelessWidget {
       body: Consumer<AuthProvider>(
         builder: (context, auth, _) {
           final user = auth.user;
+          final isAgentOrAdmin = user?.role == UserRole.agent || user?.role == UserRole.admin;
 
           return SingleChildScrollView(
             child: Column(
               children: [
                 _buildProfileHeader(user),
                 const SizedBox(height: 8),
-                _buildMenuSection(context),
+                _buildMenuSection(context, isAgentOrAdmin: isAgentOrAdmin),
                 const SizedBox(height: 32),
                 _buildVersionInfo(),
                 const SizedBox(height: 32),
@@ -137,18 +139,19 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuSection(BuildContext context) {
+  Widget _buildMenuSection(BuildContext context, {required bool isAgentOrAdmin}) {
     final menuItems = [
       _MenuItem(
         icon: Icons.edit_outlined,
         title: 'Editar Perfil',
         route: AppRoutes.editProfile,
       ),
-      _MenuItem(
-        icon: Icons.home_outlined,
-        title: 'Meus Imóveis',
-        route: AppRoutes.adminProperties,
-      ),
+      if (isAgentOrAdmin)
+        _MenuItem(
+          icon: Icons.home_outlined,
+          title: 'Meus Imóveis',
+          route: AppRoutes.adminProperties,
+        ),
       _MenuItem(
         icon: Icons.favorite_border_rounded,
         title: 'Favoritos',

@@ -5,6 +5,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/providers/auth_provider.dart';
+import '../../core/utils/responsive.dart';
 import '../../core/utils/routes.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_input.dart';
@@ -21,6 +22,17 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _adminVerified = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args = ModalRoute.of(context)?.settings.arguments;
+    if (args is String && args.isNotEmpty && _emailController.text.isEmpty) {
+      _emailController.text = args;
+      _adminVerified = true;
+    }
+  }
 
   @override
   void dispose() {
@@ -72,34 +84,73 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final padding = Responsive.horizontalPadding(context);
+
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Consumer<AuthProvider>(
-            builder: (context, auth, _) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(height: 60),
-                  _buildLogo(),
-                  const SizedBox(height: 48),
-                  _buildHeader(),
-                  const SizedBox(height: 32),
-                  _buildForm(auth),
-                  const SizedBox(height: 24),
-                  _buildLoginButton(auth),
-                  const SizedBox(height: 16),
-                  _buildForgotPassword(),
-                  const SizedBox(height: 32),
-                  _buildPartnerLink(),
-                  const SizedBox(height: 40),
-                ],
-              );
-            },
+        child: Center(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: padding),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: Responsive.contentMaxWidth(context),
+              ),
+              child: Consumer<AuthProvider>(
+                builder: (context, auth, _) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SizedBox(height: 60),
+                      _buildLogo(),
+                      const SizedBox(height: 48),
+                      _buildHeader(),
+                      if (_adminVerified) ...[
+                        const SizedBox(height: 16),
+                        _buildAdminVerifiedBadge(),
+                      ],
+                      const SizedBox(height: 32),
+                      _buildForm(auth),
+                      const SizedBox(height: 24),
+                      _buildLoginButton(auth),
+                      const SizedBox(height: 16),
+                      _buildForgotPassword(),
+                      const SizedBox(height: 32),
+                      _buildPartnerLink(),
+                      const SizedBox(height: 40),
+                    ],
+                  );
+                },
+              ),
+            ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildAdminVerifiedBadge() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.success.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.success.withValues(alpha: 0.2)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.verified_rounded, size: 20, color: AppColors.success),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Email verificado como administrador',
+              style: AppTextStyles.bodySmall.copyWith(
+                color: AppColors.success,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

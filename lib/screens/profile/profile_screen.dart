@@ -6,6 +6,7 @@ import '../../core/constants/app_constants.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/models/user_model.dart';
+import '../../core/utils/responsive.dart';
 import '../../core/utils/routes.dart';
 import '../../widgets/avatar_widget.dart';
 
@@ -51,6 +52,9 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final padding = Responsive.horizontalPadding(context);
+    final isDesktop = Responsive.isDesktop(context);
+
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: AppBar(
@@ -68,16 +72,23 @@ class ProfileScreen extends StatelessWidget {
           final user = auth.user;
           final isAgentOrAdmin = user?.role == UserRole.agent || user?.role == UserRole.admin;
 
-          return SingleChildScrollView(
-            child: Column(
-              children: [
-                _buildProfileHeader(user),
-                const SizedBox(height: 8),
-                _buildMenuSection(context, isAgentOrAdmin: isAgentOrAdmin),
-                const SizedBox(height: 32),
-                _buildVersionInfo(),
-                const SizedBox(height: 32),
-              ],
+          return Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: Responsive.contentMaxWidth(context),
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    _buildProfileHeader(user, isDesktop),
+                    const SizedBox(height: 8),
+                    _buildMenuSection(context, isAgentOrAdmin: isAgentOrAdmin, padding: padding),
+                    const SizedBox(height: 32),
+                    _buildVersionInfo(),
+                    const SizedBox(height: 32),
+                  ],
+                ),
+              ),
             ),
           );
         },
@@ -85,10 +96,12 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileHeader(dynamic user) {
+  Widget _buildProfileHeader(dynamic user, bool isDesktop) {
+    final avatarSize = isDesktop ? 100.0 : 80.0;
+
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 40),
+      padding: EdgeInsets.symmetric(vertical: isDesktop ? 48 : 40),
       decoration: const BoxDecoration(
         gradient: AppColors.heroGradient,
         borderRadius: BorderRadius.only(
@@ -139,7 +152,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuSection(BuildContext context, {required bool isAgentOrAdmin}) {
+  Widget _buildMenuSection(BuildContext context, {required bool isAgentOrAdmin, double padding = 16}) {
     final menuItems = [
       _MenuItem(
         icon: Icons.edit_outlined,
@@ -176,7 +189,7 @@ class ProfileScreen extends StatelessWidget {
     ];
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
+      margin: EdgeInsets.symmetric(horizontal: padding),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(16),

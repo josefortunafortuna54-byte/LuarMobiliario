@@ -57,7 +57,7 @@ class _SplashScreenState extends State<SplashScreen>
 
   void _navigate() {
     if (!mounted) return;
-    Navigator.of(context).pushReplacementNamed(AppRoutes.home);
+    Navigator.of(context).pushReplacementNamed(AppRoutes.welcome);
   }
 
   @override

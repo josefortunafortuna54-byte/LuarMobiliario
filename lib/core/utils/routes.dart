@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../screens/splash/splash_screen.dart';
+import '../../screens/welcome/welcome_screen.dart';
 import '../../screens/auth/login_screen.dart';
+import '../../screens/auth/admin_login_screen.dart';
 import '../../screens/auth/register_screen.dart';
 import '../../screens/auth/partner_register_screen.dart';
 import '../../screens/home/home_screen.dart';
@@ -25,7 +27,9 @@ import '../../screens/profile/edit_profile_screen.dart';
 
 abstract final class AppRoutes {
   static const String splash = '/';
+  static const String welcome = '/welcome';
   static const String login = '/login';
+  static const String adminLogin = '/admin-login';
   static const String register = '/register';
   static const String partnerRegister = '/partner-register';
   static const String home = '/home';
@@ -71,8 +75,14 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     case AppRoutes.splash:
       return _buildRoute(const SplashScreen(), settings);
 
+    case AppRoutes.welcome:
+      return _buildRoute(const WelcomeScreen(), settings);
+
     case AppRoutes.login:
       return _buildRoute(const LoginScreen(), settings);
+
+    case AppRoutes.adminLogin:
+      return _buildRoute(const AdminLoginScreen(), settings);
 
     case AppRoutes.register:
       return _buildRoute(const RegisterScreen(), settings);
@@ -129,7 +139,7 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
       return _buildRoute(const EditProfileScreen(), settings);
 
     default:
-      return _buildRoute(const SplashScreen(), settings);
+      return _buildRoute(const WelcomeScreen(), settings);
   }
 }
 

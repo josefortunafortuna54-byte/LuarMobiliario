@@ -9,6 +9,7 @@ import '../../core/models/land_model.dart';
 import '../../core/models/property_model.dart';
 import '../../core/providers/land_provider.dart';
 import '../../core/providers/property_provider.dart';
+import '../../core/utils/responsive.dart';
 import '../../core/utils/routes.dart';
 import '../../widgets/land_card.dart';
 import '../../widgets/property_card.dart';
@@ -51,6 +52,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final padding = Responsive.horizontalPadding(context);
+    final isDesktop = Responsive.isDesktop(context);
+    final isTablet = Responsive.isTablet(context);
+
     return Scaffold(
       backgroundColor: AppColors.offWhite,
       body: SafeArea(
@@ -63,30 +68,37 @@ class _HomeScreenState extends State<HomeScreen> {
             physics: const AlwaysScrollableScrollPhysics(
               parent: BouncingScrollPhysics(),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeroBanner(),
-                _buildCategoriesSection(),
-                _buildFeaturedPropertiesSection(),
-                _buildFeaturedLandsSection(),
-                _buildServicesSection(),
-                _buildWhyChooseUsSection(),
-                const SizedBox(height: 24),
-              ],
+            child: Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: Responsive.contentMaxWidth(context),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildHeroBanner(padding),
+                    _buildCategoriesSection(padding, isDesktop),
+                    _buildFeaturedPropertiesSection(padding, isDesktop),
+                    _buildFeaturedLandsSection(padding, isDesktop),
+                    _buildServicesSection(padding, isDesktop),
+                    _buildWhyChooseUsSection(padding),
+                    const SizedBox(height: 24),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
       ),
       floatingActionButton: _buildWhatsAppFAB(),
-      bottomNavigationBar: _buildBottomNav(),
+      bottomNavigationBar: isDesktop ? null : _buildBottomNav(),
     );
   }
 
-  Widget _buildHeroBanner() {
+  Widget _buildHeroBanner(double padding) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(24, 28, 24, 32),
+      padding: EdgeInsets.fromLTRB(padding, 28, padding, 32),
       decoration: const BoxDecoration(
         gradient: AppColors.heroGradient,
         borderRadius: BorderRadius.only(
@@ -129,7 +141,10 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 28),
           Text(
             'Encontre o seu\nimóvel ideal',
-            style: AppTextStyles.h2White.copyWith(fontSize: 32, height: 1.15),
+            style: AppTextStyles.h2White.copyWith(
+              fontSize: Responsive.fontSize(context, 32),
+              height: 1.15,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
@@ -147,7 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildCategoriesSection() {
+  Widget _buildCategoriesSection(double padding, bool isDesktop) {
     final categories = [
       _CategoryData(icon: Icons.home_outlined, title: 'Casas', count: 0, filterType: 'house'),
       _CategoryData(
@@ -172,12 +187,12 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
 
     return Padding(
-      padding: const EdgeInsets.only(top: 28),
+      padding: EdgeInsets.only(top: 28),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: EdgeInsets.symmetric(horizontal: padding),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -196,24 +211,47 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          SizedBox(
-            height: 120,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              itemCount: categories.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
-              itemBuilder: (context, index) {
-                final cat = categories[index];
-                return _buildCategoryItem(
-                  icon: cat.icon,
-                  title: cat.title,
-                  count: cat.count,
-                  filterType: cat.filterType,
-                );
-              },
+          if (isDesktop)
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: padding),
+              child: Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: categories
+                    .map((cat) => SizedBox(
+                          width: 120,
+                          child: _buildCategoryItem(
+                            icon: cat.icon,
+                            title: cat.title,
+                            count: cat.count,
+                            filterType: cat.filterType,
+                          ),
+                        ))
+                    .toList(),
+              ),
+            )
+          else
+            SizedBox(
+              height: 120,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                padding: EdgeInsets.symmetric(horizontal: padding),
+                itemCount: categories.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 12),
+                itemBuilder: (context, index) {
+                  final cat = categories[index];
+                  return SizedBox(
+                    width: 100,
+                    child: _buildCategoryItem(
+                      icon: cat.icon,
+                      title: cat.title,
+                      count: cat.count,
+                      filterType: cat.filterType,
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
         ],
       ),
     );
@@ -272,7 +310,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildFeaturedPropertiesSection() {
+  Widget _buildFeaturedPropertiesSection(double padding, bool isDesktop) {
     return Consumer<PropertyProvider>(
       builder: (context, propertyProvider, _) {
         final featured = propertyProvider.featuredProperties;
@@ -283,7 +321,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             const SizedBox(height: 32),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: EdgeInsets.symmetric(horizontal: padding),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -318,13 +356,29 @@ class _HomeScreenState extends State<HomeScreen> {
               _buildEmptyState(
                 icon: Icons.apartment_rounded,
                 message: 'Nenhum imóvel em destaque no momento',
+                padding: padding,
+              )
+            else if (isDesktop)
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: padding),
+                child: Wrap(
+                  spacing: 16,
+                  runSpacing: 16,
+                  children: featured
+                      .take(4)
+                      .map((property) => SizedBox(
+                            width: 280,
+                            child: _buildPropertyCard(property),
+                          ))
+                      .toList(),
+                ),
               )
             else
               SizedBox(
                 height: 280,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  padding: EdgeInsets.symmetric(horizontal: padding),
                   itemCount: featured.length,
                   separatorBuilder: (_, __) => const SizedBox(width: 16),
                   itemBuilder: (context, index) {
@@ -373,7 +427,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildFeaturedLandsSection() {
+  Widget _buildFeaturedLandsSection(double padding, bool isDesktop) {
     return Consumer<LandProvider>(
       builder: (context, landProvider, _) {
         final featured = landProvider.featuredLands;
@@ -384,7 +438,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             const SizedBox(height: 32),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: EdgeInsets.symmetric(horizontal: padding),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -419,13 +473,29 @@ class _HomeScreenState extends State<HomeScreen> {
               _buildEmptyState(
                 icon: Icons.landscape_rounded,
                 message: 'Nenhum terreno em destaque no momento',
+                padding: padding,
+              )
+            else if (isDesktop)
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: padding),
+                child: Wrap(
+                  spacing: 16,
+                  runSpacing: 16,
+                  children: featured
+                      .take(4)
+                      .map((land) => SizedBox(
+                            width: 280,
+                            child: _buildLandCard(land),
+                          ))
+                      .toList(),
+                ),
               )
             else
               SizedBox(
                 height: 280,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  padding: EdgeInsets.symmetric(horizontal: padding),
                   itemCount: featured.length,
                   separatorBuilder: (_, __) => const SizedBox(width: 16),
                   itemBuilder: (context, index) {
@@ -476,7 +546,7 @@ class _HomeScreenState extends State<HomeScreen> {
     };
   }
 
-  Widget _buildServicesSection() {
+  Widget _buildServicesSection(double padding, bool isDesktop) {
     final services = [
       _ServiceData(
         icon: Icons.shopping_cart_outlined,
@@ -505,23 +575,41 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         const SizedBox(height: 32),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: EdgeInsets.symmetric(horizontal: padding),
           child: Text('Serviços', style: AppTextStyles.h5),
         ),
         const SizedBox(height: 16),
-        SizedBox(
-          height: 160,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            itemCount: services.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 12),
-            itemBuilder: (context, index) {
-              final service = services[index];
-              return _buildServiceCard(service);
-            },
+        if (isDesktop)
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: padding),
+            child: Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: services
+                  .map((service) => SizedBox(
+                        width: 150,
+                        child: _buildServiceCard(service),
+                      ))
+                  .toList(),
+            ),
+          )
+        else
+          SizedBox(
+            height: 160,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.symmetric(horizontal: padding),
+              itemCount: services.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 12),
+              itemBuilder: (context, index) {
+                final service = services[index];
+                return SizedBox(
+                  width: 150,
+                  child: _buildServiceCard(service),
+                );
+              },
+            ),
           ),
-        ),
       ],
     );
   }
@@ -576,7 +664,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildWhyChooseUsSection() {
+  Widget _buildWhyChooseUsSection(double padding) {
     final benefits = [
       _BenefitData(
         icon: Icons.workspace_premium_outlined,
@@ -606,7 +694,7 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         const SizedBox(height: 32),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: EdgeInsets.symmetric(horizontal: padding),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -622,14 +710,14 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         const SizedBox(height: 20),
-        ...benefits.map((benefit) => _buildBenefitItem(benefit)),
+        ...benefits.map((benefit) => _buildBenefitItem(benefit, padding)),
       ],
     );
   }
 
-  Widget _buildBenefitItem(_BenefitData benefit) {
+  Widget _buildBenefitItem(_BenefitData benefit, double padding) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+      padding: EdgeInsets.symmetric(horizontal: padding, vertical: 8),
       child: Container(
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
@@ -687,10 +775,14 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildEmptyState({required IconData icon, required String message}) {
+  Widget _buildEmptyState({
+    required IconData icon,
+    required String message,
+    double padding = 24,
+  }) {
     return Container(
       height: 140,
-      margin: const EdgeInsets.symmetric(horizontal: 24),
+      margin: EdgeInsets.symmetric(horizontal: padding),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(16),

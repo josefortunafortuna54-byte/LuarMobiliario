@@ -5,6 +5,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/providers/auth_provider.dart';
+import '../../core/utils/responsive.dart';
 import '../../core/utils/routes.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_input.dart';
@@ -115,32 +116,41 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final padding = Responsive.horizontalPadding(context);
+
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Consumer<AuthProvider>(
-            builder: (context, auth, _) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(height: 40),
-                  _buildLogo(),
-                  const SizedBox(height: 36),
-                  _buildHeader(),
-                  const SizedBox(height: 28),
-                  _buildForm(auth),
-                  const SizedBox(height: 8),
-                  _buildTermsCheckbox(),
-                  const SizedBox(height: 24),
-                  _buildRegisterButton(auth),
-                  const SizedBox(height: 24),
-                  _buildLoginLink(),
-                  const SizedBox(height: 40),
-                ],
-              );
-            },
+        child: Center(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: padding),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: Responsive.contentMaxWidth(context),
+              ),
+              child: Consumer<AuthProvider>(
+                builder: (context, auth, _) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SizedBox(height: 40),
+                      _buildLogo(),
+                      const SizedBox(height: 36),
+                      _buildHeader(),
+                      const SizedBox(height: 28),
+                      _buildForm(auth),
+                      const SizedBox(height: 8),
+                      _buildTermsCheckbox(),
+                      const SizedBox(height: 24),
+                      _buildRegisterButton(auth),
+                      const SizedBox(height: 24),
+                      _buildLoginLink(),
+                      const SizedBox(height: 40),
+                    ],
+                  );
+                },
+              ),
+            ),
           ),
         ),
       ),

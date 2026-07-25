@@ -54,7 +54,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final padding = Responsive.horizontalPadding(context);
     final isDesktop = Responsive.isDesktop(context);
-    final isTablet = Responsive.isTablet(context);
 
     return Scaffold(
       backgroundColor: AppColors.offWhite,

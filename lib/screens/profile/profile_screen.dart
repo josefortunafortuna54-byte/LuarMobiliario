@@ -97,7 +97,6 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget _buildProfileHeader(dynamic user, bool isDesktop) {
-    final avatarSize = isDesktop ? 100.0 : 80.0;
 
     return Container(
       width: double.infinity,

@@ -1,39 +1,35 @@
 -- Migration 006: Reforçar RLS admin-only na tabela users
--- Garante que só admins podem alterar função/remover utilizadores
 
--- Remover TODAS as policies existentes na tabela users (nomes variam entre PT/EN)
-DO $$ DECLARE
-  pol record;
-BEGIN
-  FOR pol IN SELECT policyname FROM pg_policies WHERE tablename = 'users' AND schemaname = 'public'
-  LOOP
-    EXECUTE format('DROP POLICY IF EXISTS %I ON users', pol.policyname);
-  END LOOP;
-END $$;
+-- Drop agressivo: todas as variantes possíveis de nomes de policies
+DROP POLICY IF EXISTS "Users read for anon" ON users;
+DROP POLICY IF EXISTS "Users all for authenticated" ON users;
+DROP POLICY IF EXISTS "Users: public read" ON users;
+DROP POLICY IF EXISTS "Users: update own profile" ON users;
+DROP POLICY IF EXISTS "Users: admin full access" ON users;
+DROP POLICY IF EXISTS "Users: admin insert" ON users;
+DROP POLICY IF EXISTS "Users: leitura publica" ON users;
+DROP POLICY IF EXISTS "Utilizadores: leitura publica" ON users;
+DROP POLICY IF EXISTS "Utilizadores: update proprio perfil" ON users;
+DROP POLICY IF EXISTS "Utilizadores: admin acesso total" ON users;
+DROP POLICY IF EXISTS "Utilizadores: admin full access" ON users;
 
--- Função helper para obter role do utilizador atual
+-- Função helper
 CREATE OR REPLACE FUNCTION public.get_user_role()
 RETURNS user_role AS $$
   SELECT role FROM public.users WHERE id = auth.uid();
 $$ LANGUAGE sql SECURITY DEFINER STABLE;
 
--- ════════════════════════════════════════════════════════════════════
--- POLICIES RESTRITIVAS
--- ════════════════════════════════════════════════════════════════════
-
--- 1. Leitura pública (perfis de agentes, etc.)
+-- Policies
 CREATE POLICY "Users: public read" ON users
   FOR SELECT USING (true);
 
--- 2. Utilizadores só podem editar o PRÓPRIO perfil
 CREATE POLICY "Users: update own profile" ON users
   FOR UPDATE USING (auth.uid() = id);
 
--- 3. Admins têm acesso TOTAL a todos os utilizadores
 CREATE POLICY "Users: admin full access" ON users
   FOR ALL USING (public.get_user_role() = 'admin');
 
--- 4. Trigger: impedir que não-admins alterem o campo role
+-- Trigger
 CREATE OR REPLACE FUNCTION prevent_role_change()
 RETURNS TRIGGER AS $$
 BEGIN

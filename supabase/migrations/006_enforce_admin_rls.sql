@@ -1,17 +1,15 @@
 -- Migration 006: Reforçar RLS admin-only na tabela users
 
--- Drop agressivo: todas as variantes possíveis de nomes de policies
-DROP POLICY IF EXISTS "Users read for anon" ON users;
-DROP POLICY IF EXISTS "Users all for authenticated" ON users;
-DROP POLICY IF EXISTS "Users: public read" ON users;
-DROP POLICY IF EXISTS "Users: update own profile" ON users;
-DROP POLICY IF EXISTS "Users: admin full access" ON users;
-DROP POLICY IF EXISTS "Users: admin insert" ON users;
-DROP POLICY IF EXISTS "Users: leitura publica" ON users;
-DROP POLICY IF EXISTS "Utilizadores: leitura publica" ON users;
-DROP POLICY IF EXISTS "Utilizadores: update proprio perfil" ON users;
-DROP POLICY IF EXISTS "Utilizadores: admin acesso total" ON users;
-DROP POLICY IF EXISTS "Utilizadores: admin full access" ON users;
+-- Drop dinâmico via DO block (garante execução antes do CREATE)
+DO $$
+DECLARE
+  r RECORD;
+BEGIN
+  FOR r IN (SELECT policyname FROM pg_policies WHERE tablename = 'users' AND schemaname = 'public')
+  LOOP
+    EXECUTE 'DROP POLICY IF EXISTS "' || r.policyname || '" ON users';
+  END LOOP;
+END $$;
 
 -- Função helper
 CREATE OR REPLACE FUNCTION public.get_user_role()

@@ -68,4 +68,35 @@ class AdminProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<bool> updateUserRole(String userId, UserRole newRole) async {
+    try {
+      await _client.from('users').update({'role': newRole.name}).eq('id', userId);
+
+      final index = _allUsers.indexWhere((u) => u.id == userId);
+      if (index != -1) {
+        _allUsers[index] = _allUsers[index].copyWith(role: newRole);
+        notifyListeners();
+      }
+      return true;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> deleteUser(String userId) async {
+    try {
+      await _client.auth.admin.deleteUser(userId);
+      _allUsers.removeWhere((u) => u.id == userId);
+      _totalUsers = _allUsers.length;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
 }

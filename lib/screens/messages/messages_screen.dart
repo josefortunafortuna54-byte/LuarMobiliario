@@ -44,6 +44,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isGuest = context.watch<AuthProvider>().user == null;
+
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: AppBar(
@@ -56,50 +58,115 @@ class _MessagesScreenState extends State<MessagesScreen> {
         ),
         iconTheme: const IconThemeData(color: AppColors.gold),
       ),
-      body: Consumer<MessageProvider>(
-        builder: (context, provider, _) {
-          if (provider.isLoading && provider.conversations.isEmpty) {
-            return const Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.gold),
-              ),
-            );
-          }
+      body: isGuest ? _buildGuestState() : _buildAuthenticatedBody(),
+    );
+  }
 
-          if (provider.conversations.isEmpty) {
-            return const EmptyState(
-              icon: Icons.chat_bubble_outline_rounded,
-              title: 'Sem mensagens',
-              subtitle: 'Suas conversas com corretores e vendedores aparecerão aqui.',
-            );
-          }
-
-          return RefreshIndicator(
-            onRefresh: () {
-              final userId = context.read<AuthProvider>().user?.id;
-              if (userId != null) {
-                return provider.loadConversations(userId);
-              }
-              return Future.value();
-            },
-            color: AppColors.gold,
-            child: ListView.separated(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              itemCount: provider.conversations.length,
-              separatorBuilder: (_, __) => Divider(
-                height: 1,
-                indent: 80,
-                endIndent: 16,
-                color: AppColors.gray100,
-              ),
-              itemBuilder: (context, index) {
-                final conv = provider.conversations[index];
-                final hasUnread = (conv['unreadCount'] ?? 0) > 0;
-                return _buildConversationTile(conv, hasUnread);
-              },
+  Widget _buildAuthenticatedBody() {
+    return Consumer<MessageProvider>(
+      builder: (context, provider, _) {
+        if (provider.isLoading && provider.conversations.isEmpty) {
+          return const Center(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(AppColors.gold),
             ),
           );
-        },
+        }
+
+        if (provider.conversations.isEmpty) {
+          return const EmptyState(
+            icon: Icons.chat_bubble_outline_rounded,
+            title: 'Sem mensagens',
+            subtitle: 'Suas conversas com corretores e vendedores aparecerão aqui.',
+          );
+        }
+
+        return RefreshIndicator(
+          onRefresh: () {
+            final userId = context.read<AuthProvider>().user?.id;
+            if (userId != null) {
+              return provider.loadConversations(userId);
+            }
+            return Future.value();
+          },
+          color: AppColors.gold,
+          child: ListView.separated(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            itemCount: provider.conversations.length,
+            separatorBuilder: (_, __) => Divider(
+              height: 1,
+              indent: 80,
+              endIndent: 16,
+              color: AppColors.gray100,
+            ),
+            itemBuilder: (context, index) {
+              final conv = provider.conversations[index];
+              final hasUnread = (conv['unreadCount'] ?? 0) > 0;
+              return _buildConversationTile(conv, hasUnread);
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildGuestState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 48),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.gold.withValues(alpha: 0.08),
+                border: Border.all(
+                  color: AppColors.gold.withValues(alpha: 0.2),
+                  width: 1.5,
+                ),
+              ),
+              child: Icon(
+                Icons.chat_bubble_outline_rounded,
+                size: 48,
+                color: AppColors.gold.withValues(alpha: 0.6),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Crie uma conta',
+              style: AppTextStyles.h5,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Registre-se para conversar com corretores e vendedores.',
+              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.gray500),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pushNamed(AppRoutes.register);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.gold,
+                  foregroundColor: AppColors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+                child: Text(
+                  'Criar Conta',
+                  style: AppTextStyles.buttonMedium.copyWith(color: AppColors.white),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -26,25 +26,30 @@ jobs:
         with:
           flutter-version: "3.44.1"
           channel: stable
+          cache: true
 
       - name: Create .env file
         run: |
-          cat > .env <<EOF
-          SUPABASE_URL=${{ secrets.SUPABASE_URL }}
-          SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
-          FCM_SENDER_ID=${{ secrets.FCM_SENDER_ID }}
-          FCM_PROJECT_ID=${{ secrets.FCM_PROJECT_ID }}
-          EOF
+          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" > .env
+          echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> .env
+          echo "FCM_SENDER_ID=${{ secrets.FCM_SENDER_ID }}" >> .env
+          echo "FCM_PROJECT_ID=${{ secrets.FCM_PROJECT_ID }}" >> .env
 
       - name: Flutter pub get
         run: flutter pub get
 
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos
+
       - name: Build APK
-        run: flutter build apk --release
+        timeout-minutes: 30
+        env:
+          GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs=-Xmx4g"
+        run: flutter build apk --release --no-tree-shake-icons
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: luar-company-apk
+          name: luar-mobiliario-apk-${{ github.run_number }}
           path: build/app/outputs/flutter-apk/app-release.apk
           if-no-files-found: error

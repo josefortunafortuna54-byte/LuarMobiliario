@@ -10,6 +10,8 @@ import '../../core/models/land_model.dart';
 import '../../core/providers/land_provider.dart';
 import '../../core/providers/favorite_provider.dart';
 import '../../core/providers/auth_provider.dart';
+import '../../core/utils/routes.dart';
+import '../../screens/bookings/booking_bottom_sheet.dart';
 import '../../widgets/loading_widget.dart';
 import '../../widgets/avatar_widget.dart';
 import '../../widgets/feature_chip.dart';
@@ -539,7 +541,9 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${land.latitude.toStringAsFixed(4)}, ${land.longitude.toStringAsFixed(4)}',
+                  (land.latitude != 0.0 || land.longitude != 0.0)
+                      ? '${land.latitude.toStringAsFixed(4)}, ${land.longitude.toStringAsFixed(4)}'
+                      : 'Coordenadas indisponíveis',
                   style: AppTextStyles.bodyTiny.copyWith(
                     color: AppColors.gray400,
                   ),
@@ -620,6 +624,32 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
                     ),
                   ),
                 ),
+                if (land.agentId != null) ...[
+                  const SizedBox(width: 8),
+                  IconButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(
+                        AppRoutes.chat,
+                        arguments: {
+                          'partnerId': land.agentId!,
+                          'partnerName': land.agentName,
+                        },
+                      );
+                    },
+                    icon: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColors.gold,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.chat_rounded,
+                        size: 20,
+                        color: AppColors.white,
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
@@ -643,18 +673,16 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
               width: double.infinity,
               height: 52,
               child: ElevatedButton.icon(
-                onPressed: () async {
-                  final message = Uri.encodeComponent(
-                    'Olá! Tenho interesse no terreno "${land.title}" '
-                    'no valor de AOA ${land.price.toStringAsFixed(0)}. '
-                    'Gostaria de agendar uma visita.',
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (_) => BookingBottomSheet(
+                      propertyId: land.id,
+                      propertyTitle: land.title,
+                    ),
                   );
-                  final uri = Uri.parse(
-                    'https://wa.me/${AppConstants.whatsappNumber}?text=$message',
-                  );
-                  if (await canLaunchUrl(uri)) {
-                    await launchUrl(uri, mode: LaunchMode.externalApplication);
-                  }
                 },
                 icon: const Icon(Icons.calendar_month_rounded, size: 20),
                 label: Text(

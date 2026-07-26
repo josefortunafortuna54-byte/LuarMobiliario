@@ -2,7 +2,7 @@ name: luar_company
 description: "Plataforma imobiliária premium para Angola"
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 1.0.0
 
 environment:
   sdk: ^3.12.1

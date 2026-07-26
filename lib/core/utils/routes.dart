@@ -19,6 +19,7 @@ import '../../screens/bookings/bookings_screen.dart';
 import '../../screens/admin/admin_dashboard.dart';
 import '../../screens/admin/admin_properties.dart';
 import '../../screens/admin/admin_users.dart';
+import '../../screens/admin/admin_lands.dart';
 import '../../screens/auth/forgot_password_screen.dart';
 import '../../screens/messages/chat_screen.dart';
 import '../../screens/properties/property_form_screen.dart';
@@ -44,6 +45,7 @@ abstract final class AppRoutes {
   static const String bookings = '/bookings';
   static const String adminDashboard = '/admin/dashboard';
   static const String adminProperties = '/admin/properties';
+  static const String adminLands = '/admin/lands';
   static const String adminUsers = '/admin/users';
   static const String forgotPassword = '/forgot-password';
   static const String chat = '/chat';
@@ -119,6 +121,9 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
 
     case AppRoutes.adminProperties:
       return _buildRoute(const AdminPropertiesScreen(), settings);
+
+    case AppRoutes.adminLands:
+      return _buildRoute(const AdminLandsScreen(), settings);
 
     case AppRoutes.adminUsers:
       return _buildRoute(const AdminUsersScreen(), settings);

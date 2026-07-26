@@ -25,6 +25,7 @@ class _LandFormScreenState extends State<LandFormScreen> {
   final _imagePicker = ImagePicker();
   List<XFile> _selectedImages = [];
   List<String> _existingImages = [];
+  List<String> _selectedFeatures = [];
   bool _isSubmitting = false;
 
   late TextEditingController _titleController;
@@ -69,6 +70,7 @@ class _LandFormScreenState extends State<LandFormScreen> {
           _selectedType = land.type.name;
           _selectedTransaction = land.transactionType.name;
           _existingImages = List.from(land.images);
+          _selectedFeatures = List.from(land.features);
         });
       }
     });
@@ -152,7 +154,7 @@ class _LandFormScreenState extends State<LandFormScreen> {
         latitude: _existingLand?.latitude ?? -8.8390,
         longitude: _existingLand?.longitude ?? 13.2891,
         images: allImages,
-        features: _existingLand?.features ?? [],
+        features: _selectedFeatures,
         agentId: user?.id,
         agentName: user?.name ?? '',
         agentPhone: user?.phone ?? '',
@@ -264,6 +266,10 @@ class _LandFormScreenState extends State<LandFormScreen> {
                         )),
                       ],
                     ),
+                    const SizedBox(height: 24),
+                    Text('Características', style: AppTextStyles.h6),
+                    const SizedBox(height: 12),
+                    _buildFeaturesChips(),
                     const SizedBox(height: 24),
                     Text('Localização', style: AppTextStyles.h6),
                     const SizedBox(height: 16),
@@ -396,7 +402,7 @@ class _LandFormScreenState extends State<LandFormScreen> {
 
   Widget _buildTypeDropdown() {
     return DropdownButtonFormField<String>(
-      initialValue: _selectedType,
+      value: _selectedType,
       decoration: InputDecoration(
         labelText: 'Tipo',
         labelStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.gray500),
@@ -422,7 +428,7 @@ class _LandFormScreenState extends State<LandFormScreen> {
 
   Widget _buildTransactionDropdown() {
     return DropdownButtonFormField<String>(
-      initialValue: _selectedTransaction,
+      value: _selectedTransaction,
       decoration: InputDecoration(
         labelText: 'Transação',
         labelStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.gray500),
@@ -439,6 +445,49 @@ class _LandFormScreenState extends State<LandFormScreen> {
         DropdownMenuItem(value: 'rent', child: Text('Arrendamento')),
       ],
       onChanged: (v) => setState(() => _selectedTransaction = v ?? 'sale'),
+    );
+  }
+
+  Widget _buildFeaturesChips() {
+    const availableFeatures = [
+      'Cercado', 'Água', 'Eletricidade', 'Estrada Acessível',
+      'Close à Praia', 'Vista Panorâmica', 'Flat', 'Inclinação Suave',
+      'Solo Fértil', 'Árvore Frutífera', 'Poço', 'Tanque de Água',
+    ];
+
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: availableFeatures.map((feature) {
+        final isSelected = _selectedFeatures.contains(feature);
+        return FilterChip(
+          label: Text(
+            feature,
+            style: AppTextStyles.bodySmall.copyWith(
+              color: isSelected ? AppColors.white : AppColors.gray700,
+            ),
+          ),
+          selected: isSelected,
+          selectedColor: AppColors.gold,
+          backgroundColor: AppColors.gray50,
+          checkmarkColor: AppColors.white,
+          side: BorderSide(
+            color: isSelected ? AppColors.gold : AppColors.gray200,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          onSelected: (selected) {
+            setState(() {
+              if (selected) {
+                _selectedFeatures.add(feature);
+              } else {
+                _selectedFeatures.remove(feature);
+              }
+            });
+          },
+        );
+      }).toList(),
     );
   }
 }

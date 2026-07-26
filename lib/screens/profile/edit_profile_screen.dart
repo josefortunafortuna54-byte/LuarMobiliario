@@ -1,8 +1,12 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/constants/app_constants.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/providers/auth_provider.dart';
+import '../../core/services/storage_service.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_input.dart';
 import '../../widgets/avatar_widget.dart';
@@ -16,9 +20,11 @@ class EditProfileScreen extends StatefulWidget {
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _imagePicker = ImagePicker();
   late TextEditingController _nameController;
   late TextEditingController _phoneController;
   late TextEditingController _emailController;
+  String? _avatarUrl;
 
   @override
   void initState() {
@@ -27,6 +33,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _nameController = TextEditingController(text: user?.name ?? '');
     _phoneController = TextEditingController(text: user?.phone ?? '');
     _emailController = TextEditingController(text: user?.email ?? '');
+    _avatarUrl = user?.avatarUrl;
   }
 
   @override
@@ -37,6 +44,33 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.dispose();
   }
 
+  Future<void> _pickAvatar() async {
+    final picked = await _imagePicker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 512,
+      maxHeight: 512,
+      imageQuality: 80,
+    );
+    if (picked == null) return;
+
+    try {
+      final url = await StorageService().uploadImage(
+        file: File(picked.path),
+        bucket: AppConstants.avatarBucket,
+      );
+      if (mounted) setState(() => _avatarUrl = url);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao enviar avatar: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+  }
+
   Future<void> _handleSave() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -44,6 +78,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final success = await auth.updateProfile(
       name: _nameController.text.trim(),
       phone: _phoneController.text.trim(),
+      avatarUrl: _avatarUrl,
     );
 
     if (!mounted) return;
@@ -83,11 +118,34 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: Column(
                 children: [
                   const SizedBox(height: 16),
-                  AvatarWidget(
-                    imageUrl: auth.user?.avatarUrl ?? '',
-                    name: auth.user?.name ?? 'U',
-                    size: AvatarSize.large,
-                    borderColor: AppColors.gold,
+                  GestureDetector(
+                    onTap: _pickAvatar,
+                    child: Stack(
+                      children: [
+                        AvatarWidget(
+                          imageUrl: _avatarUrl ?? '',
+                          name: auth.user?.name ?? 'U',
+                          size: AvatarSize.large,
+                          borderColor: AppColors.gold,
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: AppColors.gold,
+                            ),
+                            child: const Icon(
+                              Icons.camera_alt_rounded,
+                              size: 16,
+                              color: AppColors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 32),
                   CustomInput(

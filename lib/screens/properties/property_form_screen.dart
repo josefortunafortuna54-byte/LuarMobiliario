@@ -25,6 +25,7 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
   final _imagePicker = ImagePicker();
   List<XFile> _selectedImages = [];
   List<String> _existingImages = [];
+  List<String> _selectedFeatures = [];
   bool _isSubmitting = false;
 
   late TextEditingController _titleController;
@@ -78,6 +79,7 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
           _selectedType = prop.type.name;
           _selectedTransaction = prop.transactionType.name;
           _existingImages = List.from(prop.images);
+          _selectedFeatures = List.from(prop.features);
         });
       }
     });
@@ -173,7 +175,7 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
         latitude: _existingProperty?.latitude ?? -8.8390,
         longitude: _existingProperty?.longitude ?? 13.2891,
         images: allImages,
-        features: _existingProperty?.features ?? [],
+        features: _selectedFeatures,
         agentId: user?.id,
         agentName: user?.name ?? '',
         agentPhone: user?.phone ?? '',
@@ -317,6 +319,10 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
                       ],
                     ),
                     const SizedBox(height: 24),
+                    Text('Características', style: AppTextStyles.h6),
+                    const SizedBox(height: 12),
+                    _buildFeaturesChips(),
+                    const SizedBox(height: 24),
                     Text('Localização', style: AppTextStyles.h6),
                     const SizedBox(height: 16),
                     CustomInput(
@@ -459,7 +465,7 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
 
   Widget _buildTypeDropdown() {
     return DropdownButtonFormField<String>(
-      initialValue: _selectedType,
+      value: _selectedType,
       decoration: InputDecoration(
         labelText: 'Tipo',
         labelStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.gray500),
@@ -485,7 +491,7 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
 
   Widget _buildTransactionDropdown() {
     return DropdownButtonFormField<String>(
-      initialValue: _selectedTransaction,
+      value: _selectedTransaction,
       decoration: InputDecoration(
         labelText: 'Transação',
         labelStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.gray500),
@@ -502,6 +508,50 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
         DropdownMenuItem(value: 'rent', child: Text('Arrendamento')),
       ],
       onChanged: (v) => setState(() => _selectedTransaction = v ?? 'sale'),
+    );
+  }
+
+  Widget _buildFeaturesChips() {
+    const availableFeatures = [
+      'Piscina', 'Churrasqueira', 'Ar Condicionado', 'Portão Eletrónico',
+      'Segurança 24h', 'Elevador', 'Varanda', 'Lareira',
+      'Jardim', 'Área de Serviço', 'Despensa', 'Escritório',
+      'Closet', 'Suíte', 'Varanda Gourmet', 'Condomínio Fechado',
+    ];
+
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: availableFeatures.map((feature) {
+        final isSelected = _selectedFeatures.contains(feature);
+        return FilterChip(
+          label: Text(
+            feature,
+            style: AppTextStyles.bodySmall.copyWith(
+              color: isSelected ? AppColors.white : AppColors.gray700,
+            ),
+          ),
+          selected: isSelected,
+          selectedColor: AppColors.gold,
+          backgroundColor: AppColors.gray50,
+          checkmarkColor: AppColors.white,
+          side: BorderSide(
+            color: isSelected ? AppColors.gold : AppColors.gray200,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          onSelected: (selected) {
+            setState(() {
+              if (selected) {
+                _selectedFeatures.add(feature);
+              } else {
+                _selectedFeatures.remove(feature);
+              }
+            });
+          },
+        );
+      }).toList(),
     );
   }
 }

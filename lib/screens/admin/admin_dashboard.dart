@@ -232,6 +232,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   onTap: () => Navigator.pushNamed(context, AppRoutes.adminProperties),
                 ),
               ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildActionCard(
+                  icon: Icons.landscape_rounded,
+                  title: 'Gerir\nTerrenos',
+                  onTap: () => Navigator.pushNamed(context, AppRoutes.adminLands),
+                ),
+              ),
             ],
           ),
         ],

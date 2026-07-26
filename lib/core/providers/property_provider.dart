@@ -15,6 +15,7 @@ class PropertyProvider extends ChangeNotifier {
   String? _error;
   bool _hasMore = true;
   int _currentPage = 0;
+  Map<String, dynamic>? _currentFilters;
 
   List<PropertyModel> get properties => _properties;
   List<PropertyModel> get featuredProperties => _featuredProperties;
@@ -34,21 +35,65 @@ class PropertyProvider extends ChangeNotifier {
     }
   }
 
+  PostgrestFilterBuilder<dynamic> _applyFilters(
+    PostgrestFilterBuilder<dynamic> query,
+    Map<String, dynamic>? filters,
+  ) {
+    if (filters == null) return query;
+    for (final entry in filters.entries) {
+      if (entry.value != null) {
+        switch (entry.key) {
+          case 'type':
+            query = query.eq('type', entry.value);
+          case 'transactionType':
+            query = query.eq('transaction_type', entry.value);
+          case 'city':
+            query = query.ilike('city', '%${entry.value}%');
+          case 'municipality':
+            query = query.ilike('municipality', '%${entry.value}%');
+          case 'neighborhood':
+            query = query.ilike('neighborhood', '%${entry.value}%');
+          case 'minPrice':
+            query = query.gte('price', entry.value);
+          case 'maxPrice':
+            query = query.lte('price', entry.value);
+          case 'minArea':
+            query = query.gte('area', entry.value);
+          case 'maxArea':
+            query = query.lte('area', entry.value);
+          case 'bedrooms':
+            query = query.eq('bedrooms', entry.value);
+          case 'bathrooms':
+            query = query.eq('bathrooms', entry.value);
+          case 'garage':
+            query = query.gte('garage', entry.value);
+        }
+      }
+    }
+    return query;
+  }
+
   Future<void> loadProperties({Map<String, dynamic>? filters}) async {
     _isLoading = true;
     _error = null;
     _currentPage = 0;
     _hasMore = true;
+    _currentFilters = filters;
     notifyListeners();
 
     try {
       final from = 0;
       final to = AppConstants.defaultPageSize - 1;
 
-      final response = await _client
-          .from('properties')
-          .select('*, property_images(image_url)')
-          .eq('is_available', true)
+      final query = _applyFilters(
+        _client
+            .from('properties')
+            .select('*, property_images(image_url)')
+            .eq('is_available', true),
+        filters,
+      );
+
+      final response = await query
           .order('created_at', ascending: false)
           .range(from, to);
 
@@ -79,10 +124,15 @@ class PropertyProvider extends ChangeNotifier {
       final from = _currentPage * AppConstants.defaultPageSize;
       final to = from + AppConstants.defaultPageSize - 1;
 
-      final response = await _client
-          .from('properties')
-          .select('*, property_images(image_url)')
-          .eq('is_available', true)
+      final query = _applyFilters(
+        _client
+            .from('properties')
+            .select('*, property_images(image_url)')
+            .eq('is_available', true),
+        filters ?? _currentFilters,
+      );
+
+      final response = await query
           .order('created_at', ascending: false)
           .range(from, to);
 

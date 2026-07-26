@@ -153,8 +153,12 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 24),
           SearchWidget(
             hintText: 'Pesquisar por localização, tipo...',
-            onSearch: (query) {},
-            onFilterTap: () {},
+            onSearch: (query) {
+              Navigator.of(context).pushNamed(AppRoutes.search, arguments: query);
+            },
+            onFilterTap: () {
+              Navigator.of(context).pushNamed(AppRoutes.properties);
+            },
           ),
         ],
       ),
@@ -419,6 +423,11 @@ class _HomeScreenState extends State<HomeScreen> {
       bathrooms: property.bathrooms,
       area: property.area,
       onTap: () {
+        Navigator.of(
+          context,
+        ).pushNamed(AppRoutes.propertyDetail, arguments: property.id);
+      },
+      onDetailsTap: () {
         Navigator.of(
           context,
         ).pushNamed(AppRoutes.propertyDetail, arguments: property.id);

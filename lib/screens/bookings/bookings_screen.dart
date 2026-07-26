@@ -6,6 +6,7 @@ import '../../core/constants/app_text_styles.dart';
 import '../../core/models/booking_model.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/providers/booking_provider.dart';
+import '../../core/utils/routes.dart';
 import '../../widgets/loading_widget.dart';
 
 class BookingsScreen extends StatefulWidget {
@@ -52,7 +53,7 @@ class _BookingsScreenState extends State<BookingsScreen>
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text('Cancelar Agendamento', style: AppTextStyles.h6),
         content: Text(
-          'Deseja cancelar o agendamento para "${booking.propertyId.substring(0, 8)}..."?',
+          'Deseja cancelar o agendamento para "${booking.propertyTitle.isNotEmpty ? booking.propertyTitle : booking.propertyId.substring(0, 8)}"?',
           style: AppTextStyles.bodyMedium,
         ),
         actions: [
@@ -85,6 +86,8 @@ class _BookingsScreenState extends State<BookingsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isGuest = context.watch<AuthProvider>().user == null;
+
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: AppBar(
@@ -96,37 +99,102 @@ class _BookingsScreenState extends State<BookingsScreen>
           style: AppTextStyles.h6.copyWith(color: AppColors.white),
         ),
         iconTheme: const IconThemeData(color: AppColors.gold),
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: AppColors.gold,
-          indicatorWeight: 3,
-          labelColor: AppColors.gold,
-          unselectedLabelColor: AppColors.gray400,
-          labelStyle: AppTextStyles.labelLarge,
-          unselectedLabelStyle: AppTextStyles.labelLarge,
-          tabs: const [
-            Tab(text: 'Próximas'),
-            Tab(text: 'Histórico'),
+        bottom: isGuest
+            ? null
+            : TabBar(
+                controller: _tabController,
+                indicatorColor: AppColors.gold,
+                indicatorWeight: 3,
+                labelColor: AppColors.gold,
+                unselectedLabelColor: AppColors.gray400,
+                labelStyle: AppTextStyles.labelLarge,
+                unselectedLabelStyle: AppTextStyles.labelLarge,
+                tabs: const [
+                  Tab(text: 'Próximas'),
+                  Tab(text: 'Histórico'),
+                ],
+              ),
+      ),
+      body: isGuest
+          ? _buildGuestState()
+          : Consumer<BookingProvider>(
+              builder: (context, provider, _) {
+                if (provider.isLoading) {
+                  return const Center(
+                    child: LoadingWidget(message: 'Carregando agendamentos...'),
+                  );
+                }
+
+                if (provider.error != null) {
+                  return _buildErrorState(provider.error!);
+                }
+
+                return TabBarView(
+                  controller: _tabController,
+                  children: [_buildUpcomingTab(provider), _buildHistoryTab(provider)],
+                );
+              },
+            ),
+    );
+  }
+
+  Widget _buildGuestState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 48),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.gold.withValues(alpha: 0.08),
+                border: Border.all(
+                  color: AppColors.gold.withValues(alpha: 0.2),
+                  width: 1.5,
+                ),
+              ),
+              child: Icon(
+                Icons.calendar_today_outlined,
+                size: 48,
+                color: AppColors.gold.withValues(alpha: 0.6),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Crie uma conta',
+              style: AppTextStyles.h5,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Registre-se para agendar visitas aos imóveis.',
+              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.gray500),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pushNamed(AppRoutes.register);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.gold,
+                  foregroundColor: AppColors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+                child: Text(
+                  'Criar Conta',
+                  style: AppTextStyles.buttonMedium.copyWith(color: AppColors.white),
+                ),
+              ),
+            ),
           ],
         ),
-      ),
-      body: Consumer<BookingProvider>(
-        builder: (context, provider, _) {
-          if (provider.isLoading) {
-            return const Center(
-              child: LoadingWidget(message: 'Carregando agendamentos...'),
-            );
-          }
-
-          if (provider.error != null) {
-            return _buildErrorState(provider.error!);
-          }
-
-          return TabBarView(
-            controller: _tabController,
-            children: [_buildUpcomingTab(provider), _buildHistoryTab(provider)],
-          );
-        },
       ),
     );
   }
@@ -230,7 +298,7 @@ class _BookingsScreenState extends State<BookingsScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Imóvel #${booking.propertyId.substring(0, 8)}',
+                        booking.propertyTitle.isNotEmpty ? booking.propertyTitle : 'Imóvel #${booking.propertyId.substring(0, 8)}',
                         style: AppTextStyles.bodyMediumBold,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,

@@ -15,6 +15,7 @@ class LandCard extends StatelessWidget {
     required this.badgeLabel,
     this.features = const [],
     this.onTap,
+    this.onDetailsTap,
   });
 
   final String imageUrl;
@@ -25,6 +26,7 @@ class LandCard extends StatelessWidget {
   final String badgeLabel;
   final List<String> features;
   final VoidCallback? onTap;
+  final VoidCallback? onDetailsTap;
 
   @override
   Widget build(BuildContext context) {
@@ -201,19 +203,22 @@ class LandCard extends StatelessWidget {
                   style: AppTextStyles.priceMedium,
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.navy,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  'Detalhes',
-                  style: AppTextStyles.buttonSmall.copyWith(
-                    color: AppColors.white,
+              GestureDetector(
+                onTap: onDetailsTap ?? onTap,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.navy,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    'Detalhes',
+                    style: AppTextStyles.buttonSmall.copyWith(
+                      color: AppColors.white,
+                    ),
                   ),
                 ),
               ),

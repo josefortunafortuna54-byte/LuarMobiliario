@@ -67,6 +67,8 @@ class _FavoritesScreenState extends State<FavoritesScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isGuest = context.watch<AuthProvider>().user == null;
+
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: AppBar(
@@ -78,33 +80,102 @@ class _FavoritesScreenState extends State<FavoritesScreen>
           style: AppTextStyles.h6.copyWith(color: AppColors.white),
         ),
         iconTheme: const IconThemeData(color: AppColors.gold),
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: AppColors.gold,
-          indicatorWeight: 3,
-          labelColor: AppColors.gold,
-          unselectedLabelColor: AppColors.gray400,
-          labelStyle: AppTextStyles.labelLarge,
-          unselectedLabelStyle: AppTextStyles.labelLarge,
-          tabs: const [
-            Tab(text: 'Imóveis'),
-            Tab(text: 'Terrenos'),
+        bottom: isGuest
+            ? null
+            : TabBar(
+                controller: _tabController,
+                indicatorColor: AppColors.gold,
+                indicatorWeight: 3,
+                labelColor: AppColors.gold,
+                unselectedLabelColor: AppColors.gray400,
+                labelStyle: AppTextStyles.labelLarge,
+                unselectedLabelStyle: AppTextStyles.labelLarge,
+                tabs: const [
+                  Tab(text: 'Imóveis'),
+                  Tab(text: 'Terrenos'),
+                ],
+              ),
+      ),
+      body: isGuest
+          ? _buildGuestState()
+          : Consumer<FavoriteProvider>(
+              builder: (context, provider, _) {
+                if (provider.isLoading && _isLoadingDetails) {
+                  return const Center(
+                    child: LoadingWidget(message: 'Carregando favoritos...'),
+                  );
+                }
+
+                return TabBarView(
+                  controller: _tabController,
+                  children: [_buildPropertiesTab(), _buildLandsTab()],
+                );
+              },
+            ),
+    );
+  }
+
+  Widget _buildGuestState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 48),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.gold.withValues(alpha: 0.08),
+                border: Border.all(
+                  color: AppColors.gold.withValues(alpha: 0.2),
+                  width: 1.5,
+                ),
+              ),
+              child: Icon(
+                Icons.favorite_border_rounded,
+                size: 48,
+                color: AppColors.gold.withValues(alpha: 0.6),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Crie uma conta',
+              style: AppTextStyles.h5,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Registre-se para salvar seus imóveis e terrenos favoritos.',
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.gray500,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pushNamed(AppRoutes.register);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.gold,
+                  foregroundColor: AppColors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+                child: Text(
+                  'Criar Conta',
+                  style: AppTextStyles.buttonMedium.copyWith(color: AppColors.white),
+                ),
+              ),
+            ),
           ],
         ),
-      ),
-      body: Consumer<FavoriteProvider>(
-        builder: (context, provider, _) {
-          if (provider.isLoading && _isLoadingDetails) {
-            return const Center(
-              child: LoadingWidget(message: 'Carregando favoritos...'),
-            );
-          }
-
-          return TabBarView(
-            controller: _tabController,
-            children: [_buildPropertiesTab(), _buildLandsTab()],
-          );
-        },
       ),
     );
   }

@@ -498,7 +498,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
           ),
           const SizedBox(height: 12),
           DropdownButtonFormField<UserRole>(
-            initialValue: _selectedRole,
+            value: _selectedRole,
             isExpanded: true,
             decoration: InputDecoration(
               contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),

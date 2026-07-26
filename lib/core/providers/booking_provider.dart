@@ -43,7 +43,7 @@ class BookingProvider extends ChangeNotifier {
     try {
       final response = await _client
           .from('bookings')
-          .select()
+          .select('*, properties(title)')
           .eq('user_id', userId)
           .order('created_at', ascending: false);
 

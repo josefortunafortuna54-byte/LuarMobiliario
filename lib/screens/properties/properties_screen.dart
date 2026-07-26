@@ -43,8 +43,19 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
   @override
   void initState() {
     super.initState();
+    _applyRouteArgument();
     _loadProperties();
     _scrollController.addListener(_onScroll);
+  }
+
+  void _applyRouteArgument() {
+    final filterType = ModalRoute.of(context)?.settings.arguments as String?;
+    if (filterType != null) {
+      final index = _filterKeys.indexOf(filterType);
+      if (index != -1) {
+        _selectedFilterIndex = index;
+      }
+    }
   }
 
   @override
@@ -196,39 +207,105 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
   }
 
   Widget _buildSortBar() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-      child: Row(
-        children: [
-          const Icon(Icons.sort_rounded, size: 20, color: AppColors.gray500),
-          const SizedBox(width: 6),
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                _showSortOptions = !_showSortOptions;
-              });
-            },
-            child: Row(
-              children: [
-                Text(
-                  _sortOption,
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.gray600,
-                    fontWeight: FontWeight.w600,
-                  ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+          child: Row(
+            children: [
+              const Icon(Icons.sort_rounded, size: 20, color: AppColors.gray500),
+              const SizedBox(width: 6),
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _showSortOptions = !_showSortOptions;
+                  });
+                },
+                child: Row(
+                  children: [
+                    Text(
+                      _sortOption,
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.gray600,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      _showSortOptions
+                          ? Icons.keyboard_arrow_up_rounded
+                          : Icons.keyboard_arrow_down_rounded,
+                      size: 18,
+                      color: AppColors.gray500,
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 4),
-                Icon(
-                  _showSortOptions
-                      ? Icons.keyboard_arrow_up_rounded
-                      : Icons.keyboard_arrow_down_rounded,
-                  size: 18,
-                  color: AppColors.gray500,
+              ),
+            ],
+          ),
+        ),
+        if (_showSortOptions)
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.gray200),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.navy.withValues(alpha: 0.08),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
                 ),
               ],
             ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildSortOption('Mais recentes'),
+                _buildSortOption('Menor preço'),
+                _buildSortOption('Maior preço'),
+                _buildSortOption('Maior área'),
+              ],
+            ),
           ),
-        ],
+      ],
+    );
+  }
+
+  Widget _buildSortOption(String label) {
+    final isSelected = _sortOption == label;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _sortOption = label;
+          _showSortOptions = false;
+        });
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.gold.withValues(alpha: 0.08) : null,
+        ),
+        child: Row(
+          children: [
+            Icon(
+              isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
+              size: 18,
+              color: isSelected ? AppColors.gold : AppColors.gray400,
+            ),
+            const SizedBox(width: 10),
+            Text(
+              label,
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: isSelected ? AppColors.navy : AppColors.gray600,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

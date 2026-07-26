@@ -12,6 +12,7 @@ import 'core/providers/favorite_provider.dart';
 import 'core/providers/land_provider.dart';
 import 'core/providers/property_provider.dart';
 import 'core/providers/search_provider.dart';
+import 'core/services/notification_service.dart';
 import 'core/services/supabase_service.dart';
 
 Future<void> main() async {
@@ -28,6 +29,10 @@ Future<void> main() async {
 
   try {
     await SupabaseService.initialize();
+  } catch (_) {}
+
+  try {
+    await NotificationService().initialize();
   } catch (_) {}
 
   runApp(

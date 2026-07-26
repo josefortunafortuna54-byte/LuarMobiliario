@@ -22,17 +22,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
-  bool _adminVerified = false;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final args = ModalRoute.of(context)?.settings.arguments;
-    if (args is String && args.isNotEmpty && _emailController.text.isEmpty) {
-      _emailController.text = args;
-      _adminVerified = true;
-    }
-  }
 
   @override
   void dispose() {
@@ -105,10 +94,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       _buildLogo(),
                       const SizedBox(height: 48),
                       _buildHeader(),
-                      if (_adminVerified) ...[
-                        const SizedBox(height: 16),
-                        _buildAdminVerifiedBadge(),
-                      ],
                       const SizedBox(height: 32),
                       _buildForm(auth),
                       const SizedBox(height: 24),
@@ -116,6 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 16),
                       _buildForgotPassword(),
                       const SizedBox(height: 32),
+                      _buildRegisterLink(),
                       _buildPartnerLink(),
                       const SizedBox(height: 40),
                     ],
@@ -125,32 +111,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildAdminVerifiedBadge() {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.success.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.success.withValues(alpha: 0.2)),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.verified_rounded, size: 20, color: AppColors.success),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              'Email verificado como administrador',
-              style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.success,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -249,6 +209,27 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildRegisterLink() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          'Ainda não tem conta? ',
+          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.gray500),
+        ),
+        GestureDetector(
+          onTap: () {
+            Navigator.of(context).pushNamed(AppRoutes.register);
+          },
+          child: Text(
+            'Registar',
+            style: AppTextStyles.bodyMediumBold.copyWith(color: AppColors.gold),
+          ),
+        ),
+      ],
     );
   }
 

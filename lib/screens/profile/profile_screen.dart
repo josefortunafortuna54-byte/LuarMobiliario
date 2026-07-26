@@ -70,7 +70,12 @@ class ProfileScreen extends StatelessWidget {
       body: Consumer<AuthProvider>(
         builder: (context, auth, _) {
           final user = auth.user;
-          final isAgentOrAdmin = user?.role == UserRole.agent || user?.role == UserRole.admin;
+
+          if (user == null) {
+            return _buildGuestState(context, isDesktop);
+          }
+
+          final isAgentOrAdmin = user.role == UserRole.agent || user.role == UserRole.admin;
 
           return Center(
             child: ConstrainedBox(
@@ -282,6 +287,89 @@ class ProfileScreen extends StatelessWidget {
     return Text(
       'Versão ${AppConstants.appVersion}',
       style: AppTextStyles.bodyTiny.copyWith(color: AppColors.gray400),
+    );
+  }
+
+  Widget _buildGuestState(BuildContext context, bool isDesktop) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 48),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.gold.withValues(alpha: 0.08),
+                border: Border.all(
+                  color: AppColors.gold.withValues(alpha: 0.2),
+                  width: 1.5,
+                ),
+              ),
+              child: Icon(
+                Icons.person_outline_rounded,
+                size: 48,
+                color: AppColors.gold.withValues(alpha: 0.6),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Bem-vindo!',
+              style: AppTextStyles.h4,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Crie uma conta para gerenciar seus imóveis, favoritos e agendamentos.',
+              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.gray500),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pushNamed(AppRoutes.register);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.gold,
+                  foregroundColor: AppColors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+                child: Text(
+                  'Criar Conta',
+                  style: AppTextStyles.buttonMedium.copyWith(color: AppColors.white),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: () {
+                  Navigator.of(context).pushNamed(AppRoutes.login);
+                },
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: AppColors.navy, width: 1.5),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+                child: Text(
+                  'Já tenho conta',
+                  style: AppTextStyles.buttonMedium.copyWith(color: AppColors.navy),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -20,6 +20,7 @@ class BookingModel {
   final BookingStatus status;
   final String notes;
   final DateTime createdAt;
+  final String propertyTitle;
 
   const BookingModel({
     required this.id,
@@ -32,9 +33,15 @@ class BookingModel {
     required this.status,
     required this.notes,
     required this.createdAt,
+    this.propertyTitle = '',
   });
 
   factory BookingModel.fromJson(Map<String, dynamic> json) {
+    String resolvedTitle = '';
+    if (json['properties'] != null && json['properties'] is Map) {
+      resolvedTitle = (json['properties'] as Map)['title'] as String? ?? '';
+    }
+
     return BookingModel(
       id: json['id'] as String? ?? '',
       propertyId: json['property_id'] as String? ?? '',
@@ -50,6 +57,7 @@ class BookingModel {
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'] as String)
           : DateTime.now(),
+      propertyTitle: resolvedTitle,
     );
   }
 
@@ -79,6 +87,7 @@ class BookingModel {
     BookingStatus? status,
     String? notes,
     DateTime? createdAt,
+    String? propertyTitle,
   }) {
     return BookingModel(
       id: id ?? this.id,
@@ -91,6 +100,7 @@ class BookingModel {
       status: status ?? this.status,
       notes: notes ?? this.notes,
       createdAt: createdAt ?? this.createdAt,
+      propertyTitle: propertyTitle ?? this.propertyTitle,
     );
   }
 }

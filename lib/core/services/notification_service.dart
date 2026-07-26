@@ -1,10 +1,6 @@
-import 'dart:convert';
-
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../config/env_config.dart';
 import '../constants/app_constants.dart';
 import 'supabase_service.dart';
 
@@ -30,17 +26,15 @@ class NotificationService {
         FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
         FirebaseMessaging.onMessageOpenedApp.listen(_handleBackgroundMessage);
       }
-    } catch (e) {
-      throw Exception('Failed to initialize notifications: $e');
-    }
+    } catch (_) {}
   }
 
   Future<String?> getToken() async {
     try {
       final token = await _messaging.getToken();
       return token;
-    } catch (e) {
-      throw Exception('Failed to get FCM token: $e');
+    } catch (_) {
+      return null;
     }
   }
 
@@ -56,9 +50,7 @@ class NotificationService {
         'fcm_token': token,
         'updated_at': DateTime.now().toIso8601String(),
       });
-    } catch (e) {
-      throw Exception('Failed to save token to database: $e');
-    }
+    } catch (_) {}
   }
 
   Future<void> sendNotification({
@@ -67,50 +59,12 @@ class NotificationService {
     required String userId,
   }) async {
     try {
-      final response = await _client
-          .from(AppConstants.notificationsTable)
-          .select('fcm_token')
-          .eq('user_id', userId)
-          .single();
-
-      final fcmToken = response['fcm_token'] as String?;
-      if (fcmToken == null) return;
-
-      final projectId = EnvConfig.fcmProjectId;
-      if (projectId.isEmpty) return;
-
-      await http.post(
-        Uri.parse(
-          'https://fcm.googleapis.com/v1/projects/$projectId/messages:send',
-        ),
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ${EnvConfig.fcmSenderId}',
-        },
-        body: jsonEncode({
-          'message': {
-            'token': fcmToken,
-            'notification': {'title': title, 'body': body},
-            'data': {
-              'type': 'notification',
-              'timestamp': DateTime.now().toIso8601String(),
-            },
-            'android': {
-              'priority': 'high',
-              'notification': {
-                'channel_id': 'high_importance_channel',
-                'priority': 'high',
-              },
-            },
-            'apns': {
-              'headers': {'apns-priority': '10'},
-            },
-          },
-        }),
-      );
-    } catch (e) {
-      throw Exception('Failed to send notification: $e');
-    }
+      await _client.rpc('send_notification', params: {
+        'p_user_id': userId,
+        'p_title': title,
+        'p_body': body,
+      });
+    } catch (_) {}
   }
 
   void _handleForegroundMessage(RemoteMessage message) {}
@@ -120,8 +74,6 @@ class NotificationService {
   Future<void> deleteToken() async {
     try {
       await _messaging.deleteToken();
-    } catch (e) {
-      throw Exception('Failed to delete FCM token: $e');
-    }
+    } catch (_) {}
   }
 }

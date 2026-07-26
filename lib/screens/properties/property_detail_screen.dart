@@ -4,7 +4,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_constants.dart';
+
 import '../../core/constants/app_text_styles.dart';
 import '../../core/models/property_model.dart';
 import '../../core/providers/property_provider.dart';

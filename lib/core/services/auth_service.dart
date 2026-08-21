@@ -34,6 +34,7 @@ class AuthService {
     required String email,
     required String password,
     required String name,
+    String? phone,
   }) async {
     try {
       final response = await _auth.signUp(
@@ -47,6 +48,7 @@ class AuthService {
           'id': response.user!.id,
           'email': email,
           'name': name,
+          if (phone != null && phone.isNotEmpty) 'phone': phone,
           'role': UserRole.client.name,
           'created_at': DateTime.now().toIso8601String(),
           'updated_at': DateTime.now().toIso8601String(),
@@ -61,54 +63,31 @@ class AuthService {
     }
   }
 
-  Future<AuthResponse> signUpPartner({
-    required String email,
-    required String password,
-    required String name,
-    required String phone,
-    required String companyName,
-    required String nif,
-    required String businessType,
-    required String address,
-    required String whatsapp,
-    required String license,
-  }) async {
+  /// Garante que o email existe em auth.users (Supabase Auth).
+  /// Se não existir, cria o utilizador em auth com senha temporária.
+  /// Retorna true se o utilizador já existia ou foi criado com sucesso.
+  Future<bool> ensureAuthUserExists(String email, String name) async {
     try {
-      final response = await _auth.signUp(
+      // Tenta criar o utilizador em auth.users
+      // Se já existir, o Supabase retorna erro "User already registered" — o que é bom
+      final tempPassword = 'AdminTemp${DateTime.now().millisecondsSinceEpoch}!';
+      await _auth.signUp(
         email: email,
-        password: password,
+        password: tempPassword,
         data: {'name': name},
       );
-
-      if (response.user != null) {
-        await _client.from(AppConstants.usersTable).upsert({
-          'id': response.user!.id,
-          'email': email,
-          'name': name,
-          'phone': phone,
-          'role': UserRole.agent.name,
-          'created_at': DateTime.now().toIso8601String(),
-          'updated_at': DateTime.now().toIso8601String(),
-        });
-
-        await _client.from(AppConstants.partnersTable).upsert({
-          'user_id': response.user!.id,
-          'company_name': companyName,
-          'nif': nif,
-          'business_type': businessType,
-          'address': address,
-          'whatsapp': whatsapp,
-          'license': license,
-          'created_at': DateTime.now().toIso8601String(),
-          'updated_at': DateTime.now().toIso8601String(),
-        });
-      }
-
-      return response;
+      return true;
     } on AuthException catch (e) {
-      throw AuthException(e.message);
-    } catch (e) {
-      throw Exception('Failed to sign up partner: $e');
+      // Se o utilizador já existe em auth.users, está tudo bem
+      final msg = e.message.toLowerCase();
+      if (msg.contains('already') ||
+          msg.contains('already registered') ||
+          msg.contains('already been registered') ||
+          msg.contains('duplicate')) {
+        return true;
+      }
+      // Para outros erros, relança para o chamador tratar
+      rethrow;
     }
   }
 
@@ -149,9 +128,9 @@ class AuthService {
     if (currentUser != null) {
       final dbUpdates = <String, dynamic>{
         'updated_at': DateTime.now().toIso8601String(),
-        if (name != null) 'name': name,
-        if (phone != null) 'phone': phone,
-        if (avatarUrl != null) 'avatar_url': avatarUrl,
+        'name': ?name,
+        'phone': ?phone,
+        'avatar_url': ?avatarUrl,
       };
 
       await _client

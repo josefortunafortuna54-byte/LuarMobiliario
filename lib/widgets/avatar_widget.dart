@@ -89,7 +89,7 @@ class AvatarWidget extends StatelessWidget {
         width: _dimension,
         height: _dimension,
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => _buildInitials(),
+        errorBuilder: (_, _, _) => _buildInitials(),
       );
     }
     return _buildInitials();

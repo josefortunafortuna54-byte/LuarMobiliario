@@ -139,7 +139,7 @@ class WelcomeScreen extends StatelessWidget {
             isFullWidth: true,
             size: CustomButtonSize.large,
             onPressed: () {
-              Navigator.of(context).pushReplacementNamed(AppRoutes.home);
+              Navigator.of(context).pushNamed(AppRoutes.login);
             },
           ),
           const SizedBox(height: 16),
@@ -181,19 +181,6 @@ class WelcomeScreen extends StatelessWidget {
                 ),
               ),
             ],
-          ),
-          const SizedBox(height: 12),
-          GestureDetector(
-            onTap: () {
-              Navigator.of(context).pushNamed(AppRoutes.partnerRegister);
-            },
-            child: Text(
-              'Quer ser parceiro? Cadastre-se',
-              style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.gold,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
           ),
           const SizedBox(height: 32),
           Text(

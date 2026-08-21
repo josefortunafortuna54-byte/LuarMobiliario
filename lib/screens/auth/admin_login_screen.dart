@@ -6,6 +6,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/providers/auth_provider.dart';
+import '../../core/services/auth_service.dart';
 import '../../core/services/supabase_service.dart';
 import '../../core/utils/responsive.dart';
 import '../../core/utils/routes.dart';
@@ -59,7 +60,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
 
       final response = await client
           .from(AppConstants.usersTable)
-          .select('role')
+          .select('role, name')
           .eq('email', email)
           .maybeSingle();
 
@@ -82,6 +83,21 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
         return;
       }
 
+      final name = response['name'] as String? ?? 'Admin';
+
+      final authService = AuthService();
+      final authUserReady = await authService.ensureAuthUserExists(email, name);
+
+      if (!mounted) return;
+
+      if (!authUserReady) {
+        setState(() {
+          _isLoading = false;
+          _error = 'Não foi possível preparar o acesso. Contacte o suporte.';
+        });
+        return;
+      }
+
       await client.auth.signInWithOtp(email: email);
 
       if (!mounted) return;
@@ -93,15 +109,27 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
       });
     } on AuthException catch (e) {
       if (!mounted) return;
+
+      String errorMsg;
+      final msg = e.message.toLowerCase();
+      if (msg.contains('email') &&
+          (msg.contains('smtp') || msg.contains('mail') || msg.contains('send'))) {
+        errorMsg = 'Erro no envio de email. Contacte o suporte técnico.';
+      } else if (msg.contains('rate limit')) {
+        errorMsg = 'Muitas tentativas. Aguarde alguns minutos e tente novamente.';
+      } else {
+        errorMsg = e.message;
+      }
+
       setState(() {
         _isLoading = false;
-        _error = e.message;
+        _error = errorMsg;
       });
     } catch (e) {
       if (!mounted) return;
       setState(() {
         _isLoading = false;
-        _error = 'Erro ao enviar código. Tente novamente.';
+        _error = 'Erro ao enviar código. Verifique a sua ligação à internet.';
       });
     }
   }
@@ -254,7 +282,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                 color: AppColors.navy.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.admin_panel_settings_outlined,
                 size: 20,
                 color: AppColors.navy,
@@ -320,7 +348,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
           ),
           child: Row(
             children: [
-              Icon(Icons.mark_email_read_outlined, size: 22, color: AppColors.success),
+              const Icon(Icons.mark_email_read_outlined, size: 22, color: AppColors.success),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
@@ -401,7 +429,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
       ),
       child: Row(
         children: [
-          Icon(Icons.error_outline_rounded, size: 20, color: AppColors.error),
+          const Icon(Icons.error_outline_rounded, size: 20, color: AppColors.error),
           const SizedBox(width: 10),
           Expanded(
             child: Text(

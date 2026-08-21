@@ -158,7 +158,7 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
                       vertical: 12,
                     ),
                     itemCount: _filteredProperties.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    separatorBuilder: (_, _) => const SizedBox(height: 12),
                     itemBuilder: (context, index) {
                       final property = _filteredProperties[index];
                       return _buildPropertyTile(property);
@@ -280,7 +280,7 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
                   ? Image.network(
                       imageUrl,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
+                      errorBuilder: (_, _, _) => Container(
                         color: AppColors.gray200,
                         child: const Icon(
                           Icons.apartment_rounded,

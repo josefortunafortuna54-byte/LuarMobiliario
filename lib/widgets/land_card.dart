@@ -68,7 +68,7 @@ class LandCard extends StatelessWidget {
           child: Image.network(
             imageUrl,
             fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => Container(
+            errorBuilder: (_, _, _) => Container(
               color: AppColors.gray200,
               child: const Icon(
                 Icons.landscape_rounded,

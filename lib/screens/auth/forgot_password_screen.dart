@@ -4,6 +4,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/providers/auth_provider.dart';
+import '../../core/utils/responsive.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_input.dart';
 
@@ -31,14 +32,21 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final authService = context.read<AuthProvider>();
-      await authService.resetPassword(_emailController.text.trim());
+      final auth = context.read<AuthProvider>();
+      await auth.resetPassword(_emailController.text.trim());
       if (mounted) setState(() { _sent = true; _isLoading = false; });
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro: $e'), backgroundColor: AppColors.error),
+          SnackBar(
+            content: const Text('Erro ao enviar email. Tente novamente.'),
+            backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
         );
       }
     }
@@ -46,6 +54,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final padding = Responsive.horizontalPadding(context);
+
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: AppBar(
@@ -56,8 +66,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         iconTheme: const IconThemeData(color: AppColors.gold),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: _sent ? _buildSuccess() : _buildForm(),
+        padding: EdgeInsets.symmetric(horizontal: padding),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: Responsive.contentMaxWidth(context),
+          ),
+          child: _sent ? _buildSuccess() : _buildForm(),
+        ),
       ),
     );
   }

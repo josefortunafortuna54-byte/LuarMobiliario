@@ -29,10 +29,10 @@ class AdminProvider extends ChangeNotifier {
 
     try {
       final results = await Future.wait([
-        _client.from('properties').select().eq('is_available', true),
-        _client.from('lands').select().eq('is_available', true),
-        _client.from('users').select(),
-        _client.from('messages').select().eq('is_read', false),
+        _client.from('properties').select('id').eq('is_available', true),
+        _client.from('lands').select('id').eq('is_available', true),
+        _client.from('users').select('id'),
+        _client.from('messages').select('id').eq('is_read', false),
       ]);
 
       _totalProperties = (results[0] as List).length;

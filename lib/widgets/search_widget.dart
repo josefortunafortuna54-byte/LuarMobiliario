@@ -26,18 +26,21 @@ class SearchWidget extends StatefulWidget {
 class _SearchWidgetState extends State<SearchWidget> {
   late final TextEditingController _controller;
   bool _isFocused = false;
+  bool _hasText = false;
   late final FocusNode _focusNode;
 
   @override
   void initState() {
     super.initState();
     _controller = widget.controller ?? TextEditingController();
+    _controller.addListener(_onTextChanged);
     _focusNode = FocusNode();
     _focusNode.addListener(_onFocusChange);
   }
 
   @override
   void dispose() {
+    _controller.removeListener(_onTextChanged);
     if (widget.controller == null) _controller.dispose();
     _focusNode.removeListener(_onFocusChange);
     _focusNode.dispose();
@@ -48,6 +51,15 @@ class _SearchWidgetState extends State<SearchWidget> {
     setState(() {
       _isFocused = _focusNode.hasFocus;
     });
+  }
+
+  void _onTextChanged() {
+    final hasText = _controller.text.isNotEmpty;
+    if (hasText != _hasText) {
+      setState(() {
+        _hasText = hasText;
+      });
+    }
   }
 
   @override
@@ -103,12 +115,11 @@ class _SearchWidgetState extends State<SearchWidget> {
               ),
             ),
           ),
-          if (_controller.text.isNotEmpty)
+          if (_hasText)
             GestureDetector(
               onTap: () {
                 _controller.clear();
                 widget.onSearch?.call('');
-                setState(() {});
               },
               child: const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 4),

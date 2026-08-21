@@ -155,7 +155,7 @@ class _LandsScreenState extends State<LandsScreen> {
           if (_showSortOptions) _buildSortDropdown(),
           Expanded(
             child: Consumer<LandProvider>(
-              builder: (_, provider, __) {
+              builder: (_, provider, _) {
                 if (provider.isLoading && provider.lands.isEmpty) {
                   return _buildShimmerGrid();
                 }
@@ -189,7 +189,7 @@ class _LandsScreenState extends State<LandsScreen> {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: _filterLabels.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (_, index) {
           final isSelected = _selectedFilterIndex == index;
           return Center(
@@ -329,7 +329,7 @@ class _LandsScreenState extends State<LandsScreen> {
         mainAxisSpacing: 12,
       ),
       itemCount: 6,
-      itemBuilder: (_, __) => const PropertyCardShimmer(),
+      itemBuilder: (_, _) => const PropertyCardShimmer(),
     );
   }
 

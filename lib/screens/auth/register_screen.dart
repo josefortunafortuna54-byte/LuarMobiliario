@@ -60,6 +60,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _emailController.text.trim(),
       _passwordController.text,
       _nameController.text.trim(),
+      phone: _phoneController.text.trim().isNotEmpty ? _phoneController.text.trim() : null,
     );
 
     if (!mounted) return;
@@ -102,8 +103,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) return 'Insira a sua senha';
     if (value.length < 8) return 'Mínimo de 8 caracteres';
-    if (!value.contains(RegExp(r'[A-Z]')))
+    if (!value.contains(RegExp(r'[A-Z]'))) {
       return 'Inclua pelo menos uma letra maiúscula';
+    }
     if (!value.contains(RegExp(r'[0-9]'))) return 'Inclua pelo menos um número';
     return null;
   }

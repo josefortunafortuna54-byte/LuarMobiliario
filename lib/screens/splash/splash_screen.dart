@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/constants/app_text_styles.dart';
+import '../../core/models/user_model.dart';
+import '../../core/providers/auth_provider.dart';
+import '../../core/services/supabase_service.dart';
 import '../../core/utils/routes.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -51,11 +55,31 @@ class _SplashScreenState extends State<SplashScreen>
         );
 
     _controller.forward();
-
-    Future.delayed(const Duration(seconds: 2), _navigate);
+    _checkSessionAndNavigate();
   }
 
-  void _navigate() {
+  Future<void> _checkSessionAndNavigate() async {
+    await Future.delayed(const Duration(seconds: 2));
+    if (!mounted) return;
+
+    try {
+      final session = SupabaseService.client.auth.currentSession;
+      if (session != null) {
+        final auth = context.read<AuthProvider>();
+        await auth.init();
+
+        if (!mounted) return;
+
+        if (auth.user?.role == UserRole.admin || auth.user?.role == UserRole.agent) {
+          Navigator.of(context).pushReplacementNamed(AppRoutes.adminDashboard);
+          return;
+        }
+
+        Navigator.of(context).pushReplacementNamed(AppRoutes.home);
+        return;
+      }
+    } catch (_) {}
+
     if (!mounted) return;
     Navigator.of(context).pushReplacementNamed(AppRoutes.welcome);
   }
@@ -96,7 +120,7 @@ class _SplashScreenState extends State<SplashScreen>
                     child: Column(
                       children: [
                         Text(
-                          'Luar Mobiliario',
+                          AppConstants.appName,
                           style: AppTextStyles.h2White.copyWith(
                             letterSpacing: 2,
                             fontWeight: FontWeight.w700,
@@ -124,18 +148,15 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                 ),
                 const Spacer(flex: 3),
-                FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: SizedBox(
-                    width: 28,
-                    height: 28,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.5,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        AppColors.gold.withValues(alpha: 0.7),
-                      ),
-                      backgroundColor: AppColors.gold.withValues(alpha: 0.15),
+                SizedBox(
+                  width: 28,
+                  height: 28,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      AppColors.gold.withValues(alpha: 0.7),
                     ),
+                    backgroundColor: AppColors.gold.withValues(alpha: 0.15),
                   ),
                 ),
                 const SizedBox(height: 32),

@@ -465,7 +465,7 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
 
   Widget _buildTypeDropdown() {
     return DropdownButtonFormField<String>(
-      value: _selectedType,
+      initialValue: _selectedType,
       decoration: InputDecoration(
         labelText: 'Tipo',
         labelStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.gray500),
@@ -491,7 +491,7 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
 
   Widget _buildTransactionDropdown() {
     return DropdownButtonFormField<String>(
-      value: _selectedTransaction,
+      initialValue: _selectedTransaction,
       decoration: InputDecoration(
         labelText: 'Transação',
         labelStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.gray500),

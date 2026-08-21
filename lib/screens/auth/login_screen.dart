@@ -42,7 +42,12 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!mounted) return;
 
     if (success) {
-      Navigator.of(context).pushReplacementNamed(AppRoutes.home);
+      final role = auth.user?.role;
+      if (role?.name == 'admin' || role?.name == 'agent') {
+        Navigator.of(context).pushReplacementNamed(AppRoutes.adminDashboard);
+      } else {
+        Navigator.of(context).pushReplacementNamed(AppRoutes.home);
+      }
     } else if (auth.error != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -67,7 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) return 'Insira a sua senha';
-    if (value.length < 6) return 'Mínimo de 6 caracteres';
+    if (value.length < 8) return 'Mínimo de 8 caracteres';
     return null;
   }
 
@@ -102,7 +107,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       _buildForgotPassword(),
                       const SizedBox(height: 32),
                       _buildRegisterLink(),
-                      _buildPartnerLink(),
                       const SizedBox(height: 40),
                     ],
                   );
@@ -171,7 +175,7 @@ class _LoginScreenState extends State<LoginScreen> {
           const SizedBox(height: 16),
           CustomInput(
             label: 'Senha',
-            hint: 'Mínimo 6 caracteres',
+            hint: 'Mínimo 8 caracteres',
             prefixIcon: Icons.lock_outline,
             obscureText: _obscurePassword,
             textInputAction: TextInputAction.done,
@@ -233,24 +237,5 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildPartnerLink() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          'Quer ser parceiro? ',
-          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.gray500),
-        ),
-        GestureDetector(
-          onTap: () {
-            Navigator.of(context).pushNamed(AppRoutes.partnerRegister);
-          },
-          child: Text(
-            'Cadastre-se',
-            style: AppTextStyles.bodyMediumBold.copyWith(color: AppColors.gold),
-          ),
-        ),
-      ],
-    );
-  }
+
 }

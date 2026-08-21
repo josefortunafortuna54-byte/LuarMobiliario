@@ -215,7 +215,7 @@ class _BookingsScreenState extends State<BookingsScreen>
       child: ListView.separated(
         padding: const EdgeInsets.all(16),
         itemCount: upcoming.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 12),
+        separatorBuilder: (_, _) => const SizedBox(height: 12),
         itemBuilder: (context, index) {
           final booking = upcoming[index];
           return _buildBookingCard(
@@ -243,7 +243,7 @@ class _BookingsScreenState extends State<BookingsScreen>
       child: ListView.separated(
         padding: const EdgeInsets.all(16),
         itemCount: history.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 12),
+        separatorBuilder: (_, _) => const SizedBox(height: 12),
         itemBuilder: (context, index) {
           final booking = history[index];
           return _buildBookingCard(booking: booking, showCancel: false);

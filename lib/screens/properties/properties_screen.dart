@@ -138,7 +138,7 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
           _buildSortBar(),
           Expanded(
             child: Consumer<PropertyProvider>(
-              builder: (_, provider, __) {
+              builder: (_, provider, _) {
                 if (provider.isLoading && provider.properties.isEmpty) {
                   return _buildShimmerGrid();
                 }
@@ -172,7 +172,7 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: _filterLabels.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (_, index) {
           final isSelected = _selectedFilterIndex == index;
           return Center(
@@ -320,7 +320,7 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
         mainAxisSpacing: 12,
       ),
       itemCount: 6,
-      itemBuilder: (_, __) => const PropertyCardShimmer(),
+      itemBuilder: (_, _) => const PropertyCardShimmer(),
     );
   }
 

@@ -42,7 +42,7 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Consumer<LandProvider>(
-      builder: (_, provider, __) {
+      builder: (_, provider, _) {
         if (provider.isLoading) {
           return const Scaffold(
             backgroundColor: AppColors.white,
@@ -212,7 +212,7 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
                         Image.network(
                           images[index],
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Container(
+                          errorBuilder: (_, _, _) => Container(
                             color: AppColors.gray200,
                             child: const Icon(
                               Icons.landscape_rounded,

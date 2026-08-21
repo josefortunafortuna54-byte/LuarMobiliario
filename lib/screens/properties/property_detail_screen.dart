@@ -42,7 +42,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Consumer<PropertyProvider>(
-      builder: (_, provider, __) {
+      builder: (_, provider, _) {
         if (provider.isLoading) {
           return const Scaffold(
             backgroundColor: AppColors.white,
@@ -216,7 +216,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                         Image.network(
                           images[index],
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Container(
+                          errorBuilder: (_, _, _) => Container(
                             color: AppColors.gray200,
                             child: const Icon(
                               Icons.apartment_rounded,

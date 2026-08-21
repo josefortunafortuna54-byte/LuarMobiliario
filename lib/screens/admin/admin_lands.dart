@@ -158,7 +158,7 @@ class _AdminLandsScreenState extends State<AdminLandsScreen> {
                       vertical: 12,
                     ),
                     itemCount: _filteredLands.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    separatorBuilder: (_, _) => const SizedBox(height: 12),
                     itemBuilder: (context, index) {
                       final land = _filteredLands[index];
                       return _buildLandTile(land);
@@ -280,7 +280,7 @@ class _AdminLandsScreenState extends State<AdminLandsScreen> {
                   ? Image.network(
                       imageUrl,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
+                      errorBuilder: (_, _, _) => Container(
                         color: AppColors.gray200,
                         child: const Icon(
                           Icons.landscape_rounded,

@@ -65,9 +65,10 @@ class _SearchScreenState extends State<SearchScreen> {
         centerTitle: true,
         actions: [
           Consumer<SearchProvider>(
-            builder: (_, provider, __) {
-              if (provider.activeFilterCount == 0)
+              builder: (_, provider, _) {
+              if (provider.activeFilterCount == 0) {
                 return const SizedBox.shrink();
+              }
               return TextButton(
                 onPressed: () {
                   provider.clearFilters();
@@ -106,7 +107,7 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
           Expanded(
             child: Consumer<SearchProvider>(
-              builder: (_, provider, __) {
+            builder: (_, provider, _) {
                 return Column(
                   children: [
                     if (provider.activeFilterCount > 0)
@@ -213,7 +214,7 @@ class _SearchScreenState extends State<SearchScreen> {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: chips.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (_, index) {
           final chip = chips[index];
           return Center(
@@ -292,7 +293,7 @@ class _SearchScreenState extends State<SearchScreen> {
         mainAxisSpacing: 12,
       ),
       itemCount: 6,
-      itemBuilder: (_, __) => const PropertyCardShimmer(),
+      itemBuilder: (_, _) => const PropertyCardShimmer(),
     );
   }
 

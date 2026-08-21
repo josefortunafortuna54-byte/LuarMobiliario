@@ -35,7 +35,7 @@ String formatPhone(String phone) {
   final digits = phone.replaceAll(RegExp(r'\D'), '');
   if (digits.length < 9) return phone;
 
-  final country = digits.startsWith('244') ? '+244' : '+244';
+  final country = '+244';
   final local = digits.length >= 12
       ? digits.substring(digits.length - 9)
       : digits.length >= 9

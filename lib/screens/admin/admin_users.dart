@@ -109,7 +109,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                         vertical: 8,
                       ),
                       itemCount: _filteredUsers.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 8),
+                      separatorBuilder: (_, _) => const SizedBox(height: 8),
                       itemBuilder: (context, index) {
                         final user = _filteredUsers[index];
                         return _buildUserTile(user);
@@ -498,7 +498,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
           ),
           const SizedBox(height: 12),
           DropdownButtonFormField<UserRole>(
-            value: _selectedRole,
+            initialValue: _selectedRole,
             isExpanded: true,
             decoration: InputDecoration(
               contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),

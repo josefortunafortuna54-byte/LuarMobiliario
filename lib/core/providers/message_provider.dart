@@ -31,26 +31,45 @@ class MessageProvider extends ChangeNotifier {
           .order('created_at', ascending: false);
 
       final Map<String, Map<String, dynamic>> convMap = {};
+      final Set<String> partnerIds = {};
+
       for (final msg in response as List) {
         final senderId = msg['sender_id'] as String;
         final receiverId = msg['receiver_id'] as String;
         final partnerId = senderId == userId ? receiverId : senderId;
 
         if (!convMap.containsKey(partnerId)) {
-          final userRes = await _client
-              .from('users')
-              .select('name, avatar_url')
-              .eq('id', partnerId)
-              .maybeSingle();
+          partnerIds.add(partnerId);
+        }
+      }
 
-          convMap[partnerId] = {
-            'partnerId': partnerId,
-            'partnerName': userRes?['name'] ?? 'Utilizador',
-            'partnerAvatar': userRes?['avatar_url'] ?? '',
-            'lastMessage': msg['content'] ?? '',
-            'lastMessageTime': msg['created_at'] ?? '',
-            'unreadCount': (msg['receiver_id'] == userId && msg['is_read'] == false) ? 1 : 0,
-          };
+      if (partnerIds.isNotEmpty) {
+        final usersRes = await _client
+            .from('users')
+            .select('id, name, avatar_url')
+            .inFilter('id', partnerIds.toList());
+
+        final Map<String, Map<String, dynamic>> usersMap = {};
+        for (final u in usersRes as List) {
+          usersMap[u['id'] as String] = u;
+        }
+
+        for (final msg in response as List) {
+          final senderId = msg['sender_id'] as String;
+          final receiverId = msg['receiver_id'] as String;
+          final partnerId = senderId == userId ? receiverId : senderId;
+
+          if (!convMap.containsKey(partnerId)) {
+            final userRes = usersMap[partnerId];
+            convMap[partnerId] = {
+              'partnerId': partnerId,
+              'partnerName': userRes?['name'] ?? 'Utilizador',
+              'partnerAvatar': userRes?['avatar_url'] ?? '',
+              'lastMessage': msg['content'] ?? '',
+              'lastMessageTime': msg['created_at'] ?? '',
+              'unreadCount': (msg['receiver_id'] == userId && msg['is_read'] == false) ? 1 : 0,
+            };
+          }
         }
       }
 
@@ -149,7 +168,7 @@ class MessageProvider extends ChangeNotifier {
     try {
       final response = await _client
           .from('messages')
-          .select()
+          .select('id')
           .eq('receiver_id', userId)
           .eq('is_read', false);
       return (response as List).length;

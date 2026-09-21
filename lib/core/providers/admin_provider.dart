@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../models/user_model.dart';
-import '../services/supabase_service.dart';
+import '../repositories/admin_repository.dart';
 
 class AdminProvider extends ChangeNotifier {
-  SupabaseClient get _client => SupabaseService.client;
+  final AdminRepository _repository = AdminRepository();
 
   int _totalProperties = 0;
   int _totalLands = 0;
@@ -28,17 +28,11 @@ class AdminProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final results = await Future.wait([
-        _client.from('properties').select('id').eq('is_available', true),
-        _client.from('lands').select('id').eq('is_available', true),
-        _client.from('users').select('id'),
-        _client.from('messages').select('id').eq('is_read', false),
-      ]);
-
-      _totalProperties = (results[0] as List).length;
-      _totalLands = (results[1] as List).length;
-      _totalUsers = (results[2] as List).length;
-      _totalUnreadMessages = (results[3] as List).length;
+      final stats = await _repository.fetchStats();
+      _totalProperties = stats.properties;
+      _totalLands = stats.lands;
+      _totalUsers = stats.users;
+      _totalUnreadMessages = stats.unreadMessages;
     } catch (e) {
       _error = e.toString();
     } finally {
@@ -53,14 +47,7 @@ class AdminProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await _client
-          .from('users')
-          .select()
-          .order('created_at', ascending: false);
-
-      _allUsers = (response as List)
-          .map((json) => UserModel.fromJson(json as Map<String, dynamic>))
-          .toList();
+      _allUsers = await _repository.fetchUsers();
     } catch (e) {
       _error = e.toString();
     } finally {
@@ -71,7 +58,7 @@ class AdminProvider extends ChangeNotifier {
 
   Future<bool> updateUserRole(String userId, UserRole newRole) async {
     try {
-      await _client.from('users').update({'role': newRole.name}).eq('id', userId);
+      await _repository.updateUserRole(userId, newRole);
 
       final index = _allUsers.indexWhere((u) => u.id == userId);
       if (index != -1) {
@@ -88,7 +75,7 @@ class AdminProvider extends ChangeNotifier {
 
   Future<bool> deleteUser(String userId) async {
     try {
-      await _client.auth.admin.deleteUser(userId);
+      await _repository.deleteUser(userId);
       _allUsers.removeWhere((u) => u.id == userId);
       _totalUsers = _allUsers.length;
       notifyListeners();

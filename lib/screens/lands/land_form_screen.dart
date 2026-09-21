@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +11,7 @@ import '../../core/services/storage_service.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_input.dart';
 import '../../widgets/loading_widget.dart';
+import '../../widgets/xfile_thumbnail.dart';
 
 class LandFormScreen extends StatefulWidget {
   const LandFormScreen({super.key});
@@ -23,7 +23,7 @@ class LandFormScreen extends StatefulWidget {
 class _LandFormScreenState extends State<LandFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _imagePicker = ImagePicker();
-  List<XFile> _selectedImages = [];
+  final List<XFile> _selectedImages = [];
   List<String> _existingImages = [];
   List<String> _selectedFeatures = [];
   bool _isSubmitting = false;
@@ -121,8 +121,10 @@ class _LandFormScreenState extends State<LandFormScreen> {
       List<String> allImages = List.from(_existingImages);
       for (final file in _selectedImages) {
         try {
+          final bytes = await file.readAsBytes();
           final url = await StorageService().uploadImage(
-            file: File(file.path),
+            bytes: bytes,
+            fileName: file.name,
             bucket: AppConstants.propertyImagesBucket,
           );
           allImages.add(url);
@@ -365,7 +367,7 @@ class _LandFormScreenState extends State<LandFormScreen> {
                   onRemove: () => _removeExistingImage(e.key),
                 )),
                 ..._selectedImages.asMap().entries.map((e) => _buildImageThumbnail(
-                  file: File(e.value.path),
+                  file: e.value,
                   onRemove: () => _removeNewImage(e.key),
                 )),
               ],
@@ -375,7 +377,7 @@ class _LandFormScreenState extends State<LandFormScreen> {
     );
   }
 
-  Widget _buildImageThumbnail({String? imageUrl, File? file, required VoidCallback onRemove}) {
+  Widget _buildImageThumbnail({String? imageUrl, XFile? file, required VoidCallback onRemove}) {
     return Stack(
       children: [
         Container(
@@ -383,7 +385,7 @@ class _LandFormScreenState extends State<LandFormScreen> {
           margin: const EdgeInsets.only(right: 8),
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: AppColors.gray200),
           clipBehavior: Clip.antiAlias,
-          child: imageUrl != null ? Image.network(imageUrl, fit: BoxFit.cover) : Image.file(file!, fit: BoxFit.cover),
+          child: imageUrl != null ? Image.network(imageUrl, fit: BoxFit.cover) : XFileThumbnail(file: file!),
         ),
         Positioned(
           top: 4, right: 12,

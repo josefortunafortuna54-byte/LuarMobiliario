@@ -10,9 +10,12 @@ O Supabase é a plataforma backend (BaaS) utilizada no projeto, fornecendo:
 
 - **PostgreSQL** — Base de dados relacional
 - **Supabase Auth** — Autenticação e gestão de utilizadores
-- **Supabase Storage** — Armazenamento de ficheiros (imagens, documentos)
-- **Supabase Realtime** — Atualizações em tempo real (subscriptions)
+- **Supabase Storage** — Armazenamento de ficheiros (imagens)
 - **Row Level Security (RLS)** — Autorização a nível de linha
+
+> **Nota:** O schema SQL completo e atualizado está nas **migrations** em
+> `luar_company/supabase/migrations/` (001 a 007) e resumido em `docs/DATABASE.md`.
+> Este guia descreve a configuração do projeto e as boas práticas.
 
 ---
 
@@ -59,22 +62,25 @@ FCM_PROJECT_ID=seu-project-id      # opcional
    - **Minimum password length**: 8 caracteres
    - **Enable email confirmations**: Conforme necessidade
 
-### Tabela `users`
+### Tabela `users` e o perfil do utilizador
 
-Após o registo no Supabase Auth, um registo é criado na tabela `users` via trigger ou via aplicação:
+O perfil em `public.users` usa o **mesmo `id` de `auth.users`**. É criado automaticamente
+pelo trigger `handle_new_user` (migration 007):
 
 ```sql
--- Trigger para criar perfil automaticamente após registo (alternativa)
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.users (id_auth, name, email, role)
+  INSERT INTO public.users (id, name, email, role, created_at, updated_at)
   VALUES (
     NEW.id,
-    COALESCE(NEW.raw_user_meta_data->>'name', ''),
+    COALESCE(NEW.raw_user_meta_data->>'name', 'Utilizador'),
     NEW.email,
-    'client'
-  );
+    'client',
+    NOW(),
+    NOW()
+  )
+  ON CONFLICT (id) DO NOTHING;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -84,337 +90,72 @@ CREATE TRIGGER on_auth_user_created
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 ```
 
+A aplicação também faz `upsert` deste registo após o registo (em `AuthService`).
+
 ---
 
-## Database Setup
+## Schema da Base de Dados
 
-### Criar Tabelas
+A base de dados contém as seguintes tabelas (definição completa nas migrations):
 
-Execute o seguinte SQL no Supabase Dashboard > SQL Editor:
+`users` · `categories` · `locations` · `properties` · `property_images` · `lands` ·
+`land_images` · `favorites` · `bookings` · `messages` · `notifications` · `partners`
 
-```sql
--- Tabela de utilizadores
-CREATE TABLE users (
-  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  id_auth     UUID UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE,
-  name        TEXT NOT NULL,
-  email       TEXT NOT NULL UNIQUE,
-  phone       TEXT DEFAULT '',
-  avatar_url  TEXT DEFAULT '',
-  role        TEXT NOT NULL DEFAULT 'client' CHECK (role IN ('client', 'agent', 'admin')),
-  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
-);
+**Diferenças importantes face a versões anteriores da documentação:**
 
--- Tabela de propriedades
-CREATE TABLE properties (
-  id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  title            TEXT NOT NULL,
-  description      TEXT NOT NULL DEFAULT '',
-  type             TEXT NOT NULL DEFAULT 'house'
-                     CHECK (type IN ('house', 'apartment', 'office', 'warehouse', 'condo', 'shop')),
-  transaction_type TEXT NOT NULL DEFAULT 'sale'
-                     CHECK (transaction_type IN ('sale', 'rent')),
-  price            NUMERIC(15, 2) NOT NULL DEFAULT 0,
-  area             NUMERIC(10, 2) NOT NULL DEFAULT 0,
-  bedrooms         INTEGER NOT NULL DEFAULT 0,
-  bathrooms        INTEGER NOT NULL DEFAULT 0,
-  garage           INTEGER NOT NULL DEFAULT 0,
-  address          TEXT NOT NULL DEFAULT '',
-  city             TEXT NOT NULL DEFAULT '',
-  municipality     TEXT NOT NULL DEFAULT '',
-  neighborhood     TEXT NOT NULL DEFAULT '',
-  latitude         NUMERIC(10, 7) DEFAULT 0,
-  longitude        NUMERIC(10, 7) DEFAULT 0,
-  images           TEXT[] DEFAULT '{}',
-  features         TEXT[] DEFAULT '{}',
-  agent_id         UUID REFERENCES users(id) ON DELETE SET NULL,
-  agent_name       TEXT DEFAULT '',
-  agent_phone      TEXT DEFAULT '',
-  is_featured      BOOLEAN DEFAULT false,
-  is_available     BOOLEAN DEFAULT true,
-  created_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at       TIMESTAMPTZ NOT NULL DEFAULT now()
-);
+- `users` **não** tem coluna `id_auth` — o `id` é o próprio `auth.users.id`
+- `properties`/`lands` **não** têm array `images` — imagens em tabelas filhas (`property_images`, `land_images`)
+- `favorites` usa `property_id`/`land_id` separados (não `item_id`/`item_type`)
+- `bookings` usa `property_id NOT NULL` + `date`/`time` (não `scheduled_date` nem `land_id`)
+- `role` é um ENUM (`user_role`), não TEXT
 
--- Tabela de terrenos
-CREATE TABLE lands (
-  id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  title            TEXT NOT NULL,
-  description      TEXT NOT NULL DEFAULT '',
-  type             TEXT NOT NULL DEFAULT 'urban'
-                     CHECK (type IN ('urban', 'agricultural', 'industrial', 'commercial', 'lot', 'farm')),
-  transaction_type TEXT NOT NULL DEFAULT 'sale'
-                     CHECK (transaction_type IN ('sale', 'rent')),
-  price            NUMERIC(15, 2) NOT NULL DEFAULT 0,
-  area             NUMERIC(10, 2) NOT NULL DEFAULT 0,
-  address          TEXT NOT NULL DEFAULT '',
-  city             TEXT NOT NULL DEFAULT '',
-  municipality     TEXT NOT NULL DEFAULT '',
-  neighborhood     TEXT NOT NULL DEFAULT '',
-  latitude         NUMERIC(10, 7) DEFAULT 0,
-  longitude        NUMERIC(10, 7) DEFAULT 0,
-  images           TEXT[] DEFAULT '{}',
-  features         TEXT[] DEFAULT '{}',
-  agent_id         UUID REFERENCES users(id) ON DELETE SET NULL,
-  agent_name       TEXT DEFAULT '',
-  agent_phone      TEXT DEFAULT '',
-  is_featured      BOOLEAN DEFAULT false,
-  is_available     BOOLEAN DEFAULT true,
-  created_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at       TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
--- Tabela de favoritos
-CREATE TABLE favorites (
-  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id     UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  item_id     UUID NOT NULL,
-  item_type   TEXT NOT NULL CHECK (item_type IN ('property', 'land')),
-  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
-  UNIQUE(user_id, item_id, item_type)
-);
-
--- Tabela de agendamentos
-CREATE TABLE bookings (
-  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id         UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  property_id     UUID REFERENCES properties(id) ON DELETE CASCADE,
-  land_id         UUID REFERENCES lands(id) ON DELETE CASCADE,
-  scheduled_date  TIMESTAMPTZ NOT NULL,
-  status          TEXT NOT NULL DEFAULT 'pending'
-                    CHECK (status IN ('pending', 'confirmed', 'cancelled', 'completed')),
-  notes           TEXT DEFAULT '',
-  created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
--- Tabela de mensagens
-CREATE TABLE messages (
-  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  sender_id   UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  receiver_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  content     TEXT NOT NULL,
-  is_read     BOOLEAN DEFAULT false,
-  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
--- Tabela de notificações
-CREATE TABLE notifications (
-  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id     UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  title       TEXT NOT NULL,
-  message     TEXT NOT NULL,
-  type        TEXT DEFAULT 'info',
-  is_read     BOOLEAN DEFAULT false,
-  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-```
-
-### Criar Índices
-
-```sql
--- Propriedades
-CREATE INDEX idx_properties_city ON properties(city);
-CREATE INDEX idx_properties_type ON properties(type);
-CREATE INDEX idx_properties_transaction ON properties(transaction_type);
-CREATE INDEX idx_properties_price ON properties(price);
-CREATE INDEX idx_properties_agent ON properties(agent_id);
-CREATE INDEX idx_properties_featured ON properties(is_featured) WHERE is_featured = true;
-CREATE INDEX idx_properties_available ON properties(is_available) WHERE is_available = true;
-
--- Terrenos
-CREATE INDEX idx_lands_city ON lands(city);
-CREATE INDEX idx_lands_type ON lands(type);
-CREATE INDEX idx_lands_price ON lands(price);
-CREATE INDEX idx_lands_agent ON lands(agent_id);
-
--- Favoritos
-CREATE INDEX idx_favorites_user ON favorites(user_id);
-
--- Mensagens
-CREATE INDEX idx_messages_receiver ON messages(receiver_id);
-CREATE INDEX idx_messages_sender ON messages(sender_id);
-
--- Agendamentos
-CREATE INDEX idx_bookings_user ON bookings(user_id);
-CREATE INDEX idx_bookings_property ON bookings(property_id);
-```
+Consulte [`docs/DATABASE.md`](DATABASE.md) para o schema detalhado e as políticas RLS.
 
 ---
 
 ## Storage Buckets
 
-### Criar Buckets
+Criados e configurados na migration 005:
 
-No Supabase Dashboard > Storage > New bucket:
+| Bucket | Público | Tamanho Máx | MIME Permitidos |
+|---|---|---|---|
+| `property-images` | Sim | 10 MB | jpeg, png, webp, gif |
+| `avatars` | Sim | 5 MB | jpeg, png, webp |
 
-| Bucket Name | Público | Tamanho Máx |
-|---|---|---|
-| `property-images` | Sim (leitura) | 10 MB |
-| `avatars` | Sim (leitura) | 10 MB |
-| `documents` | Não | 10 MB |
-| `products` | Sim (leitura) | 10 MB |
+Policies de storage (migration 007):
+- **Leitura** pública de ambos os buckets
+- **Upload** autenticado
+- **Delete** apenas pelo `owner_id` (dono do objeto)
 
-### Políticas de Storage
-
-```sql
--- property-images: leitura pública, escrita autenticada
-CREATE POLICY "Property images public read"
-  ON storage.objects FOR SELECT
-  USING (bucket_id = 'property-images');
-
-CREATE POLICY "Property images insert"
-  ON storage.objects FOR INSERT
-  WITH CHECK (
-    bucket_id = 'property-images'
-    AND auth.role() = 'authenticated'
-  );
-
--- avatars: leitura pública, escrita próprio utilizador
-CREATE POLICY "Avatars public read"
-  ON storage.objects FOR SELECT
-  USING (bucket_id = 'avatars');
-
-CREATE POLICY "Avatars insert"
-  ON storage.objects FOR INSERT
-  WITH CHECK (
-    bucket_id = 'avatars'
-    AND auth.role() = 'authenticated'
-  );
-
--- documents: acesso privado
-CREATE POLICY "Documents own read"
-  ON storage.objects FOR SELECT
-  USING (
-    bucket_id = 'documents'
-    AND auth.uid()::text = (storage.foldername(name))[1]
-  );
-```
+> Os buckets `documents` e `products` aparecem em documentação antiga mas **não** são
+> criados pelas migrações atuais.
 
 ---
 
 ## Row Level Security (RLS)
 
-### Ativar RLS
+Todas as tabelas têm RLS ativado. Legenda de políticas ativa (migrations 002–007):
+
+| Tabela | SELECT | INSERT | UPDATE | DELETE |
+|---|---|---|---|---|
+| `users` | próprio ou admin | próprio (`auth.uid() = id`) | próprio; role só por admin | admin |
+| `categories`, `locations` | público | admin | admin | admin |
+| `properties`, `lands` | público | agentes/admins | dono ou admin (com `WITH CHECK`) | admin |
+| `property_images`, `land_images` | público | admin ou agente dono | admin ou agente dono | admin ou agente dono |
+| `favorites` | próprio | próprio | — | próprio |
+| `bookings` | próprio, agentes, admin | próprio (`auth.uid() = user_id`) | próprio (cancelar) ou agentes/admins | — |
+| `messages` | remetente/destinatário | remetente | remetente/destinatário | — |
+| `notifications` | próprio | admin/RPC | próprio | — |
+| `partners` | público | admin | próprio | admin |
+
+Função auxiliar usada nas políticas:
 
 ```sql
-ALTER TABLE users ENABLE ROW LEVEL SECURITY;
-ALTER TABLE properties ENABLE ROW LEVEL SECURITY;
-ALTER TABLE lands ENABLE ROW LEVEL SECURITY;
-ALTER TABLE favorites ENABLE ROW LEVEL SECURITY;
-ALTER TABLE bookings ENABLE ROW LEVEL SECURITY;
-ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
-ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
+CREATE OR REPLACE FUNCTION public.get_user_role()
+RETURNS user_role AS $$
+  SELECT role FROM public.users WHERE id = auth.uid();
+$$ LANGUAGE sql SECURITY DEFINER STABLE;
 ```
-
-### Políticas
-
-```sql
--- ═══════════════════════════════════════════════════════════
--- USERS
--- ═══════════════════════════════════════════════════════════
-
-CREATE POLICY "Users read own profile" ON users
-  FOR SELECT USING (auth.uid() = id_auth);
-
-CREATE POLICY "Users update own profile" ON users
-  FOR UPDATE USING (auth.uid() = id_auth);
-
-CREATE POLICY "Admins read all users" ON users
-  FOR SELECT USING (
-    EXISTS (SELECT 1 FROM users WHERE id_auth = auth.uid() AND role = 'admin')
-  );
-
--- ═══════════════════════════════════════════════════════════
--- PROPERTIES
--- ═══════════════════════════════════════════════════════════
-
-CREATE POLICY "Properties public read" ON properties
-  FOR SELECT USING (true);
-
-CREATE POLICY "Agents create properties" ON properties
-  FOR INSERT WITH CHECK (auth.uid() = agent_id);
-
-CREATE POLICY "Agents update own properties" ON properties
-  FOR UPDATE USING (auth.uid() = agent_id);
-
-CREATE POLICY "Agents delete own properties" ON properties
-  FOR DELETE USING (auth.uid() = agent_id);
-
-CREATE POLICY "Admin manages all properties" ON properties
-  FOR ALL USING (
-    EXISTS (SELECT 1 FROM users WHERE id_auth = auth.uid() AND role = 'admin')
-  );
-
--- ═══════════════════════════════════════════════════════════
--- LANDS
--- ═══════════════════════════════════════════════════════════
-
-CREATE POLICY "Lands public read" ON lands
-  FOR SELECT USING (true);
-
-CREATE POLICY "Agents create lands" ON lands
-  FOR INSERT WITH CHECK (auth.uid() = agent_id);
-
-CREATE POLICY "Agents update own lands" ON lands
-  FOR UPDATE USING (auth.uid() = agent_id);
-
-CREATE POLICY "Agents delete own lands" ON lands
-  FOR DELETE USING (auth.uid() = agent_id);
-
-CREATE POLICY "Admin manages all lands" ON lands
-  FOR ALL USING (
-    EXISTS (SELECT 1 FROM users WHERE id_auth = auth.uid() AND role = 'admin')
-  );
-
--- ═══════════════════════════════════════════════════════════
--- FAVORITES
--- ═══════════════════════════════════════════════════════════
-
-CREATE POLICY "Users manage own favorites" ON favorites
-  FOR ALL USING (auth.uid() = user_id);
-
--- ═══════════════════════════════════════════════════════════
--- BOOKINGS
--- ═══════════════════════════════════════════════════════════
-
-CREATE POLICY "Users manage own bookings" ON bookings
-  FOR ALL USING (auth.uid() = user_id);
-
--- ═══════════════════════════════════════════════════════════
--- MESSAGES
--- ═══════════════════════════════════════════════════════════
-
-CREATE POLICY "Users read own messages" ON messages
-  FOR SELECT USING (auth.uid() = sender_id OR auth.uid() = receiver_id);
-
-CREATE POLICY "Users send messages" ON messages
-  FOR INSERT WITH CHECK (auth.uid() = sender_id);
-
--- ═══════════════════════════════════════════════════════════
--- NOTIFICATIONS
--- ═══════════════════════════════════════════════════════════
-
-CREATE POLICY "Users read own notifications" ON notifications
-  FOR SELECT USING (auth.uid() = user_id);
-
-CREATE POLICY "Service creates notifications" ON notifications
-  FOR INSERT WITH CHECK (auth.role() = 'authenticated');
-```
-
----
-
-## Variáveis de Ambiente — Resumo
-
-| Variável | Obrigatória | Descrição | Onde usar |
-|---|---|---|---|
-| `SUPABASE_URL` | Sim | URL do projeto Supabase | App Flutter |
-| `SUPABASE_ANON_KEY` | Sim | Chave pública (anon) | App Flutter |
-| `FCM_SENDER_ID` | Não | ID do remetente FCM | App Flutter |
-| `FCM_PROJECT_ID` | Não | ID do projeto Firebase | App Flutter |
-
-**Nunca** usar a `service_role` key no cliente Flutter.
 
 ---
 
@@ -433,50 +174,43 @@ npx supabase --version
 scoop install supabase
 ```
 
-### Iniciar Projeto Local
+### Aplicar Migrations
 
 ```bash
 # Login no Supabase
 supabase login
 
-# Vincular ao projeto remoto
+# Vincular ao projeto remoto (a partir da pasta luar_company/supabase)
 supabase link --project-ref seu-project-ref
 
-# Criar migration
-supabase migration new create_tables
-
-# Aplicar migrations
+# Aplicar as migrations
 supabase db push
 
 # Gerar tipos TypeScript (útil para referência)
 supabase gen types typescript --schema public > database.types.ts
 ```
 
-### Estrutura de Migrations
+Alternativamente, execute `scripts/deploy_supabase.sh`, que automatiza estes passos.
 
-```
-supabase/
-├── migrations/
-│   ├── 20260719000000_create_users.sql
-│   ├── 20260719000001_create_properties.sql
-│   ├── 20260719000002_create_lands.sql
-│   ├── 20260719000003_create_favorites.sql
-│   ├── 20260719000004_create_bookings.sql
-│   ├── 20260719000005_create_messages.sql
-│   ├── 20260719000006_create_notifications.sql
-│   ├── 20260719000007_create_indexes.sql
-│   └── 20260719000008_enable_rls.sql
-├── seed.sql
-└── config.toml
-```
+---
 
-### Seed Data (Desenvolvimento)
+## RPC de Notificações
+
+A aplicação envia notificações push através da função RPC `send_notification`, que deve
+existir no Supabase:
 
 ```sql
--- seed.sql
-INSERT INTO users (id_auth, name, email, role) VALUES
-  ('uuid-admin', 'Admin Luar', 'admin@luarcompany.ao', 'admin'),
-  ('uuid-agent', 'João Silva', 'joao@luarcompany.ao', 'agent');
+-- Exemplo: notificação em tabela + envio FCM (adaptar ao ambiente)
+CREATE OR REPLACE FUNCTION public.send_notification(
+  p_user_id UUID,
+  p_title TEXT,
+  p_body TEXT
+) RETURNS void AS $$
+BEGIN
+  INSERT INTO public.notifications (user_id, title, body)
+  VALUES (p_user_id, p_title, p_body);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 ```
 
 ---
@@ -485,21 +219,21 @@ INSERT INTO users (id_auth, name, email, role) VALUES
 
 ### Performance
 
-- Usar índices em colunas frequentemente filtradas
-- Limitar o número de colunas no `select()` (evitar `select('*')`)
+- Usar índices em colunas frequentemente filtradas (definidos nas migrations)
+- Limitar o número de colunas no `select()` (evitar `select('*')` onde possível)
 - Usar paginação (`range()`) para listas grandes
 - Evitar queries N+1 (carregar dados relacionados em batch)
 
 ### Segurança
 
-- Ativar RLS em todas as tabelas
-- Usar políticas explícitas para cada operação
+- RLS ativo em todas as tabelas
+- Políticas explícitas para cada operação
 - Revisar políticas regularmente
-- Não expor a `service_role` key
+- Nunca expor a `service_role` key no cliente
 
 ### Monitorização
 
-- Usar o Dashboard do Supabase para monitorar queries
+- Usar o Dashboard do Supabase para monitorizar queries
 - Verificar logs de autenticação
-- Monitorar uso de Storage
+- Monitorizar uso de Storage
 - Revisar métricas de performance de queries

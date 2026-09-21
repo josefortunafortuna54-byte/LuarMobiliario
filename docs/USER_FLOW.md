@@ -159,7 +159,6 @@ PropertyCard (em qualquer lista)
         → Localização
         → Características (chips)
         → Descrição completa
-        → Mapa (Google Maps)
         → Informações do agente
       → Ações:
         → ❤️ Favoritar / Remover favorito
@@ -258,7 +257,8 @@ PropertyDetailScreen
 ### 9.1 Dashboard
 
 ```
-ProfileScreen → "Painel Admin" (apenas para role=admin)
+HomeScreen → tocar 5x no logotipo do header → AdminLoginScreen
+  → Login do administrador (role=admin/agent)
   → AdminDashboard
     → Métricas: total propriedades, total utilizadores, agendamentos pendentes
     → Acesso rápido para gestão

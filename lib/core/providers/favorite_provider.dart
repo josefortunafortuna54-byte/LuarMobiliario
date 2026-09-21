@@ -1,13 +1,12 @@
 import 'package:flutter/foundation.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/favorite_model.dart';
 import '../models/property_model.dart';
 import '../models/land_model.dart';
-import '../services/supabase_service.dart';
+import '../repositories/favorite_repository.dart';
 
 class FavoriteProvider extends ChangeNotifier {
-  final SupabaseClient _client = SupabaseService.client;
+  final FavoriteRepository _repository = FavoriteRepository();
 
   List<FavoriteModel> _favorites = [];
   bool _isLoading = false;
@@ -20,15 +19,7 @@ class FavoriteProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await _client
-          .from('favorites')
-          .select()
-          .eq('user_id', userId)
-          .order('created_at', ascending: false);
-
-      _favorites = (response as List<dynamic>)
-          .map((json) => FavoriteModel.fromJson(json as Map<String, dynamic>))
-          .toList();
+      _favorites = await _repository.fetchFavorites(userId);
     } catch (e) {
       _favorites = [];
     } finally {
@@ -53,27 +44,18 @@ class FavoriteProvider extends ChangeNotifier {
       if (existingIndex != -1) {
         final existing = _favorites[existingIndex];
 
-        await _client.from('favorites').delete().eq('id', existing.id);
+        await _repository.remove(existing.id);
 
         _favorites.removeAt(existingIndex);
         notifyListeners();
         return false;
       } else {
-        final data = <String, dynamic>{
-          'user_id': userId,
-          'created_at': DateTime.now().toIso8601String(),
-        };
+        final newFavorite = await _repository.add(
+          userId: userId,
+          propertyId: propertyId,
+          landId: landId,
+        );
 
-        if (propertyId != null) data['property_id'] = propertyId;
-        if (landId != null) data['land_id'] = landId;
-
-        final response = await _client
-            .from('favorites')
-            .insert(data)
-            .select()
-            .single();
-
-        final newFavorite = FavoriteModel.fromJson(response);
         _favorites.insert(0, newFavorite);
         notifyListeners();
         return true;
@@ -98,17 +80,8 @@ class FavoriteProvider extends ChangeNotifier {
         .map((f) => f.propertyId!)
         .toList();
 
-    if (propertyIds.isEmpty) return [];
-
     try {
-      final response = await _client
-          .from('properties')
-          .select()
-          .inFilter('id', propertyIds);
-
-      return (response as List<dynamic>)
-          .map((json) => PropertyModel.fromJson(json as Map<String, dynamic>))
-          .toList();
+      return await _repository.fetchFavoriteProperties(propertyIds);
     } catch (e) {
       return [];
     }
@@ -120,17 +93,8 @@ class FavoriteProvider extends ChangeNotifier {
         .map((f) => f.landId!)
         .toList();
 
-    if (landIds.isEmpty) return [];
-
     try {
-      final response = await _client
-          .from('lands')
-          .select()
-          .inFilter('id', landIds);
-
-      return (response as List<dynamic>)
-          .map((json) => LandModel.fromJson(json as Map<String, dynamic>))
-          .toList();
+      return await _repository.fetchFavoriteLands(landIds);
     } catch (e) {
       return [];
     }

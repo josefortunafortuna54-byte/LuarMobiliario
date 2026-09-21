@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:path/path.dart' as path;
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -12,28 +12,26 @@ class StorageService {
   static const _uuid = Uuid();
 
   Future<String> uploadImage({
-    required File file,
+    required Uint8List bytes,
+    required String fileName,
     required String bucket,
     String? customPath,
   }) async {
     try {
-      final fileExtension = path.extension(file.path).replaceAll('.', '');
-      final fileName = '${_uuid.v4()}.$fileExtension';
+      final fileExtension = path.extension(fileName).replaceAll('.', '');
+      final safeExtension = fileExtension.isEmpty ? 'jpg' : fileExtension;
+      final storageFileName = '${_uuid.v4()}.$safeExtension';
       final uploadPath = customPath != null
-          ? '$customPath/$fileName'
-          : fileName;
+          ? '$customPath/$storageFileName'
+          : storageFileName;
 
-      final response = await _client.storage
+      await _client.storage
           .from(bucket)
-          .upload(
+          .uploadBinary(
             uploadPath,
-            file,
+            bytes,
             fileOptions: const FileOptions(upsert: true),
           );
-
-      if (response.isEmpty) {
-        throw Exception('Upload returned empty response');
-      }
 
       final publicUrl = _client.storage.from(bucket).getPublicUrl(uploadPath);
       return publicUrl;
@@ -43,7 +41,7 @@ class StorageService {
   }
 
   Future<List<String>> uploadMultipleImages({
-    required List<File> files,
+    required List<({Uint8List bytes, String fileName})> files,
     required String bucket,
     String? customPath,
   }) async {
@@ -52,7 +50,8 @@ class StorageService {
 
       for (final file in files) {
         final url = await uploadImage(
-          file: file,
+          bytes: file.bytes,
+          fileName: file.fileName,
           bucket: bucket,
           customPath: customPath,
         );

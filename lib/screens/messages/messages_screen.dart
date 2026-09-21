@@ -6,7 +6,7 @@ import '../../core/providers/auth_provider.dart';
 import '../../core/providers/message_provider.dart';
 import '../../core/utils/routes.dart';
 import '../../widgets/avatar_widget.dart';
-import '../../components/empty_state.dart';
+import '../../widgets/empty_state.dart';
 
 class MessagesScreen extends StatefulWidget {
   const MessagesScreen({super.key});

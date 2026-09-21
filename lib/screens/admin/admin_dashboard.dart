@@ -242,6 +242,18 @@ class _AdminDashboardState extends State<AdminDashboard> {
               ),
             ],
           ),
+        const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _buildActionCard(
+                  icon: Icons.handshake_outlined,
+                  title: 'Ver\nParceiros',
+                  onTap: () => Navigator.pushNamed(context, AppRoutes.partners),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );

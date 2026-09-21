@@ -100,7 +100,6 @@ flutter build ios --release
 - Permissões no `Info.plist`:
   - `NSCameraUsageDescription` (para tirar fotos)
   - `NSPhotoLibraryUsageDescription` (para selecionar fotos)
-  - `NSLocationWhenInUseUsageDescription` (para mapas)
 
 ---
 
@@ -145,7 +144,7 @@ Copie o conteúdo de `build/web/` para o diretório de static files do seu servi
 ### Produção
 
 ```env
-SUPABASE_URL=https://vgwaxjxkknogmwnmuiux.supabase.co
+SUPABASE_URL=https://seu-projeto.supabase.co
 SUPABASE_ANON_KEY=<chave-produção>
 FCM_SENDER_ID=<sender-id-produção>
 FCM_PROJECT_ID=<project-id-produção>
@@ -185,7 +184,7 @@ FCM_PROJECT_ID=
 A versão da aplicação é definida no `pubspec.yaml`:
 
 ```yaml
-version: 1.0.0+1
+version: 1.0.0
 #         │     │
 #         │     └─ Build number (incrementar a cada deploy)
 #         └─ Versão semântica (major.minor.patch)

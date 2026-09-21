@@ -1,12 +1,11 @@
 import 'package:flutter/foundation.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../constants/app_constants.dart';
 import '../models/land_model.dart';
-import '../services/supabase_service.dart';
+import '../repositories/land_repository.dart';
 
 class LandProvider extends ChangeNotifier {
-  SupabaseClient get _client => SupabaseService.client;
+  final LandRepository _repository = LandRepository();
 
   List<LandModel> _lands = [];
   List<LandModel> _featuredLands = [];
@@ -23,17 +22,6 @@ class LandProvider extends ChangeNotifier {
   String? get error => _error;
   bool get hasMore => _hasMore;
 
-  List<String> _extractImageUrls(dynamic imagesData) {
-    if (imagesData == null) return [];
-    try {
-      return (imagesData as List)
-          .map((img) => (img as Map<String, dynamic>)['image_url'] as String)
-          .toList();
-    } catch (_) {
-      return [];
-    }
-  }
-
   Future<void> loadLands({Map<String, dynamic>? filters}) async {
     _isLoading = true;
     _error = null;
@@ -42,47 +30,11 @@ class LandProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final from = 0;
-      final to = AppConstants.defaultPageSize - 1;
-
-      var query = _client.from('lands').select('*, land_images(image_url)').eq('is_available', true);
-
-      if (filters != null) {
-        for (final entry in filters.entries) {
-          if (entry.value != null) {
-            switch (entry.key) {
-              case 'minPrice':
-                query = query.gte('price', entry.value);
-              case 'maxPrice':
-                query = query.lte('price', entry.value);
-              case 'minArea':
-                query = query.gte('area', entry.value);
-              case 'maxArea':
-                query = query.lte('area', entry.value);
-              case 'type':
-                query = query.eq('type', entry.value);
-              case 'transactionType':
-                query = query.eq('transaction_type', entry.value);
-              case 'city':
-                query = query.ilike('city', '%${entry.value}%');
-              case 'municipality':
-                query = query.ilike('municipality', '%${entry.value}%');
-              case 'neighborhood':
-                query = query.ilike('neighborhood', '%${entry.value}%');
-            }
-          }
-        }
-      }
-
-      final response = await query
-          .order('created_at', ascending: false)
-          .range(from, to);
-
-      _lands = (response as List).map((json) {
-        final j = json as Map<String, dynamic>;
-        final images = _extractImageUrls(j.remove('land_images'));
-        return LandModel.fromJson(j).copyWith(images: images);
-      }).toList();
+      _lands = await _repository.fetchLands(
+        filters: filters,
+        page: 0,
+        pageSize: AppConstants.defaultPageSize,
+      );
 
       _hasMore = _lands.length >= AppConstants.defaultPageSize;
       _currentPage = 1;
@@ -102,47 +54,11 @@ class LandProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final from = _currentPage * AppConstants.defaultPageSize;
-      final to = from + AppConstants.defaultPageSize - 1;
-
-      var query = _client.from('lands').select('*, land_images(image_url)').eq('is_available', true);
-
-      if (filters != null) {
-        for (final entry in filters.entries) {
-          if (entry.value != null) {
-            switch (entry.key) {
-              case 'minPrice':
-                query = query.gte('price', entry.value);
-              case 'maxPrice':
-                query = query.lte('price', entry.value);
-              case 'minArea':
-                query = query.gte('area', entry.value);
-              case 'maxArea':
-                query = query.lte('area', entry.value);
-              case 'type':
-                query = query.eq('type', entry.value);
-              case 'transactionType':
-                query = query.eq('transaction_type', entry.value);
-              case 'city':
-                query = query.ilike('city', '%${entry.value}%');
-              case 'municipality':
-                query = query.ilike('municipality', '%${entry.value}%');
-              case 'neighborhood':
-                query = query.ilike('neighborhood', '%${entry.value}%');
-            }
-          }
-        }
-      }
-
-      final response = await query
-          .order('created_at', ascending: false)
-          .range(from, to);
-
-      final newLands = (response as List).map((json) {
-        final j = json as Map<String, dynamic>;
-        final images = _extractImageUrls(j.remove('land_images'));
-        return LandModel.fromJson(j).copyWith(images: images);
-      }).toList();
+      final newLands = await _repository.fetchLands(
+        filters: filters,
+        page: _currentPage,
+        pageSize: AppConstants.defaultPageSize,
+      );
 
       _lands.addAll(newLands);
       _hasMore = newLands.length >= AppConstants.defaultPageSize;
@@ -161,19 +77,7 @@ class LandProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await _client
-          .from('lands')
-          .select('*, land_images(image_url)')
-          .eq('is_featured', true)
-          .eq('is_available', true)
-          .order('created_at', ascending: false)
-          .limit(10);
-
-      _featuredLands = (response as List).map((json) {
-        final j = json as Map<String, dynamic>;
-        final images = _extractImageUrls(j.remove('land_images'));
-        return LandModel.fromJson(j).copyWith(images: images);
-      }).toList();
+      _featuredLands = await _repository.fetchFeatured();
     } catch (e) {
       _error = e.toString();
     } finally {
@@ -188,15 +92,7 @@ class LandProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await _client
-          .from('lands')
-          .select('*, land_images(image_url)')
-          .eq('id', id)
-          .single();
-
-      final j = response;
-      final images = _extractImageUrls(j.remove('land_images'));
-      _selectedLand = LandModel.fromJson(j).copyWith(images: images);
+      _selectedLand = await _repository.fetchById(id);
     } catch (e) {
       _error = e.toString();
     } finally {
@@ -211,31 +107,8 @@ class LandProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final data = land.toJson();
-      data.remove('id');
-      final imageUrls = List<String>.from(data.remove('images') ?? []);
-      data['created_at'] = DateTime.now().toIso8601String();
-      data['updated_at'] = DateTime.now().toIso8601String();
-
-      final response = await _client
-          .from('lands')
-          .insert(data)
-          .select()
-          .single();
-
-      final newLand = LandModel.fromJson(response);
-
-      if (imageUrls.isNotEmpty) {
-        final imageRecords = imageUrls
-            .map((url) => {'land_id': newLand.id, 'image_url': url})
-            .toList();
-        await _client.from('land_images').insert(imageRecords);
-      }
-
-      _lands.insert(
-        0,
-        newLand.copyWith(images: imageUrls),
-      );
+      final newLand = await _repository.create(land);
+      _lands.insert(0, newLand);
       _isLoading = false;
       notifyListeners();
       return true;
@@ -253,21 +126,9 @@ class LandProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final data = land.toJson();
-      final imageUrls = List<String>.from(data.remove('images') ?? []);
-      data['updated_at'] = DateTime.now().toIso8601String();
+      await _repository.update(land);
 
-      await _client.from('lands').update(data).eq('id', land.id);
-
-      await _client.from('land_images').delete().eq('land_id', land.id);
-      if (imageUrls.isNotEmpty) {
-        final imageRecords = imageUrls
-            .map((url) => {'land_id': land.id, 'image_url': url})
-            .toList();
-        await _client.from('land_images').insert(imageRecords);
-      }
-
-      final updated = land.copyWith(images: imageUrls);
+      final updated = land.copyWith(images: List<String>.from(land.images));
       final index = _lands.indexWhere((l) => l.id == land.id);
       if (index != -1) {
         _lands[index] = updated;
@@ -294,9 +155,7 @@ class LandProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _client.from('land_images').delete().eq('land_id', id);
-
-      await _client.from('lands').update({'is_available': false}).eq('id', id);
+      await _repository.delete(id);
 
       _lands.removeWhere((l) => l.id == id);
 
@@ -323,22 +182,7 @@ class LandProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await _client
-          .from('lands')
-          .select('*, land_images(image_url)')
-          .eq('is_available', true)
-          .or(
-            'title.ilike.%$searchQuery%,description.ilike.%$searchQuery%,address.ilike.%$searchQuery%,city.ilike.%$searchQuery%,municipality.ilike.%$searchQuery%,neighborhood.ilike.%$searchQuery%',
-          )
-          .order('created_at', ascending: false)
-          .limit(AppConstants.defaultPageSize);
-
-      _lands = (response as List).map((json) {
-        final j = json as Map<String, dynamic>;
-        final images = _extractImageUrls(j.remove('land_images'));
-        return LandModel.fromJson(j).copyWith(images: images);
-      }).toList();
-
+      _lands = await _repository.search(searchQuery);
       _hasMore = _lands.length >= AppConstants.defaultPageSize;
       _currentPage = 1;
     } catch (e) {

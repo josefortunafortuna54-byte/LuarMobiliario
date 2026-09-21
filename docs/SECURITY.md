@@ -65,77 +65,107 @@ RLS é a primeira linha de defesa na base de dados. Deve ser ativado em todas as
 
 ### Políticas Implementadas
 
+> Conforme `supabase/migrations/002_rls_role_based_policies.sql`, refinadas em `006_enforce_admin_rls.sql` e `007_security_fixes.sql`. O `id` da tabela `users` coincide com `auth.uid()`. O role é obtido pela função helper `public.get_user_role()`.
+
 #### Tabela `users`
 
 ```sql
--- Utilizadores veem o seu próprio perfil
-CREATE POLICY "Users read own profile" ON users
-  FOR SELECT USING (auth.uid() = id_auth);
+-- Leitura: o próprio utilizador ou admin (evita expor PII publicamente)
+CREATE POLICY "Users: read own or admin" ON users
+  FOR SELECT USING (auth.uid() = id OR public.get_user_role() = 'admin');
 
--- Utilizadores atualizam o seu próprio perfil
-CREATE POLICY "Users update own profile" ON users
-  FOR UPDATE USING (auth.uid() = id_auth);
+-- Inserção: ao registar, o utilizador cria o seu próprio perfil
+CREATE POLICY "Users: insert own" ON users
+  FOR INSERT WITH CHECK (auth.uid() = id);
 
--- Admin pode ver todos os utilizadores
-CREATE POLICY "Admins read all users" ON users
-  FOR SELECT USING (
-    EXISTS (SELECT 1 FROM users WHERE id_auth = auth.uid() AND role = 'admin')
-  );
+-- Atualização: o próprio perfil (role só alterável por admin — trigger prevent_role_change)
+CREATE POLICY "Users: update own profile" ON users
+  FOR UPDATE USING (auth.uid() = id);
+
+-- Admin gere tudo
+CREATE POLICY "Users: admin full access" ON users
+  FOR ALL USING (public.get_user_role() = 'admin');
 ```
 
 #### Tabela `properties`
 
 ```sql
--- Propriedades são públicas para leitura
-CREATE POLICY "Properties public read" ON properties
+-- Leitura pública
+CREATE POLICY "Properties: public read" ON properties
   FOR SELECT USING (true);
 
--- Agentes criam propriedades
-CREATE POLICY "Agents create properties" ON properties
-  FOR INSERT WITH CHECK (auth.uid() = agent_id);
+-- Agentes e admins criam
+CREATE POLICY "Properties: agents and admins insert" ON properties
+  FOR INSERT WITH CHECK (public.get_user_role() IN ('agent', 'admin'));
 
--- Agentes editam as suas propriedades
-CREATE POLICY "Agents update own properties" ON properties
-  FOR UPDATE USING (auth.uid() = agent_id);
+-- Agente dono ou admin atualizam; WITH CHECK impede a reatribuição de agent_id
+CREATE POLICY "Properties: update own or admin" ON properties
+  FOR UPDATE USING (auth.uid() = agent_id OR public.get_user_role() = 'admin')
+  WITH CHECK (public.get_user_role() = 'admin' OR auth.uid() = agent_id);
 
--- Agentes eliminam as suas propriedades
-CREATE POLICY "Agents delete own properties" ON properties
-  FOR DELETE USING (auth.uid() = agent_id);
-
--- Admin pode gerir todas as propriedades
-CREATE POLICY "Admin manages all properties" ON properties
-  FOR ALL USING (
-    EXISTS (SELECT 1 FROM users WHERE id_auth = auth.uid() AND role = 'admin')
-  );
+-- Eliminação apenas por admin
+CREATE POLICY "Properties: admin delete" ON properties
+  FOR DELETE USING (public.get_user_role() = 'admin');
 ```
 
 #### Tabela `lands`
 
 ```sql
--- Mesmas políticas de properties, adaptadas para lands
-CREATE POLICY "Lands public read" ON lands FOR SELECT USING (true);
-CREATE POLICY "Agents create lands" ON lands FOR INSERT WITH CHECK (auth.uid() = agent_id);
-CREATE POLICY "Agents update own lands" ON lands FOR UPDATE USING (auth.uid() = agent_id);
+CREATE POLICY "Lands: public read" ON lands FOR SELECT USING (true);
+CREATE POLICY "Lands: agents and admins insert" ON lands
+  FOR INSERT WITH CHECK (public.get_user_role() IN ('agent', 'admin'));
+CREATE POLICY "Lands: update own or admin" ON lands
+  FOR UPDATE USING (auth.uid() = agent_id OR public.get_user_role() = 'admin')
+  WITH CHECK (public.get_user_role() = 'admin' OR auth.uid() = agent_id);
+CREATE POLICY "Lands: admin delete" ON lands FOR DELETE USING (public.get_user_role() = 'admin');
 ```
 
 #### Tabela `favorites`
 
 ```sql
--- Utilizadores veem e gerem os seus favoritos
-CREATE POLICY "Users manage own favorites" ON favorites
-  FOR ALL USING (auth.uid() = user_id);
+CREATE POLICY "Favorites: read own" ON favorites FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Favorites: insert own" ON favorites FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Favorites: delete own" ON favorites FOR DELETE USING (auth.uid() = user_id);
 ```
 
 #### Tabela `messages`
 
 ```sql
 -- Utilizadores veem mensagens que enviaram ou receberam
-CREATE POLICY "Users read own messages" ON messages
+CREATE POLICY "Messages: read own" ON messages
   FOR SELECT USING (auth.uid() = sender_id OR auth.uid() = receiver_id);
 
--- Utilizadores enviam mensagens
-CREATE POLICY "Users send messages" ON messages
+-- Envio com sender_id = auth.uid()
+CREATE POLICY "Messages: authenticated insert" ON messages
   FOR INSERT WITH CHECK (auth.uid() = sender_id);
+
+-- Marcar como lidas
+CREATE POLICY "Messages: update own" ON messages
+  FOR UPDATE USING (auth.uid() = sender_id OR auth.uid() = receiver_id);
+```
+
+#### Tabela `bookings`
+
+```sql
+-- Leitura: próprio utilizador, agentes e admins
+CREATE POLICY "Bookings: read own or agent" ON bookings
+  FOR SELECT USING (auth.uid() = user_id OR public.get_user_role() IN ('agent', 'admin'));
+
+-- Criação com user_id = auth.uid()
+CREATE POLICY "Bookings: authenticated insert" ON bookings
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- Utilizador pode apenas cancelar agendamentos pending; agentes/admins confirmam/cancelam
+CREATE POLICY "Bookings: update own" ON bookings
+  FOR UPDATE USING (auth.uid() = user_id OR public.get_user_role() IN ('agent', 'admin'));
+```
+
+#### Tabela `notifications`
+
+```sql
+CREATE POLICY "Notifications: read own" ON notifications FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Notifications: admin insert" ON notifications FOR INSERT WITH CHECK (public.get_user_role() = 'admin');
+CREATE POLICY "Notifications: update own" ON notifications FOR UPDATE USING (auth.uid() = user_id);
 ```
 
 ---
@@ -163,7 +193,7 @@ CREATE POLICY "Users send messages" ON messages
 
 - **HTTPS obrigatório**: Todas as comunicações com Supabase usam HTTPS
 - **Certificados SSL**: Geridos pelo Supabase
-- **APIs externas**: Google Maps, Firebase usam HTTPS
+- **APIs externas**: Firebase usa HTTPS
 
 ---
 
@@ -177,7 +207,6 @@ CREATE POLICY "Users send messages" ON messages
 | Email | Autenticação e contacto | Enquanto conta existir |
 | Telefone | Contacto com agentes | Enquanto conta existir |
 | Avatar | Personalização do perfil | Enquanto conta existir |
-| Localização | Funcionalidade de mapas | Não armazenada permanentemente |
 
 ### Direitos do Utilizador
 

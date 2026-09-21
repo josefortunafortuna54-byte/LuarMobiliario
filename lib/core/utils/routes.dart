@@ -24,6 +24,8 @@ import '../../screens/messages/chat_screen.dart';
 import '../../screens/properties/property_form_screen.dart';
 import '../../screens/lands/land_form_screen.dart';
 import '../../screens/profile/edit_profile_screen.dart';
+import '../../screens/partners/partners_screen.dart';
+import '../../screens/partners/partner_form_screen.dart';
 
 abstract final class AppRoutes {
   static const String splash = '/';
@@ -50,6 +52,8 @@ abstract final class AppRoutes {
   static const String propertyForm = '/property-form';
   static const String landForm = '/land-form';
   static const String editProfile = '/edit-profile';
+  static const String partners = '/partners';
+  static const String partnerForm = '/partner-form';
 }
 
 Route<dynamic> onGenerateRoute(RouteSettings settings) {
@@ -137,6 +141,12 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
 
     case AppRoutes.editProfile:
       return _buildRoute(const EditProfileScreen(), settings);
+
+    case AppRoutes.partners:
+      return _buildRoute(const PartnersScreen(), settings);
+
+    case AppRoutes.partnerForm:
+      return _buildRoute(const PartnerFormScreen(), settings);
 
     default:
       return _buildRoute(const WelcomeScreen(), settings);

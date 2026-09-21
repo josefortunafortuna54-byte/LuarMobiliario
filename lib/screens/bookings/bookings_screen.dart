@@ -42,6 +42,12 @@ class _BookingsScreenState extends State<BookingsScreen>
     await context.read<BookingProvider>().loadBookings(userId);
   }
 
+  String _shortPropertyId(String id) {
+    if (id.isEmpty) return 'Imóvel';
+    if (id.length > 8) return id.substring(0, 8);
+    return id;
+  }
+
   Future<void> _onRefresh() async {
     await _loadBookings();
   }
@@ -53,7 +59,7 @@ class _BookingsScreenState extends State<BookingsScreen>
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text('Cancelar Agendamento', style: AppTextStyles.h6),
         content: Text(
-          'Deseja cancelar o agendamento para "${booking.propertyTitle.isNotEmpty ? booking.propertyTitle : booking.propertyId.substring(0, 8)}"?',
+          'Deseja cancelar o agendamento para "${booking.propertyTitle.isNotEmpty ? booking.propertyTitle : _shortPropertyId(booking.propertyId)}"?',
           style: AppTextStyles.bodyMedium,
         ),
         actions: [
@@ -298,7 +304,7 @@ class _BookingsScreenState extends State<BookingsScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        booking.propertyTitle.isNotEmpty ? booking.propertyTitle : 'Imóvel #${booking.propertyId.substring(0, 8)}',
+                        booking.propertyTitle.isNotEmpty ? booking.propertyTitle : 'Imóvel #${_shortPropertyId(booking.propertyId)}',
                         style: AppTextStyles.bodyMediumBold,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,

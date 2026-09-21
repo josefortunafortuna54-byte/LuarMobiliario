@@ -24,6 +24,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentBottomNav = 0;
+  int _logoTapCount = 0;
 
   @override
   void initState() {
@@ -110,16 +111,25 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Row(
             children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                clipBehavior: Clip.antiAlias,
-                child: Image.asset(
-                  'logo.png',
-                  fit: BoxFit.cover,
+              GestureDetector(
+                onTap: () {
+                  _logoTapCount++;
+                  if (_logoTapCount >= 5) {
+                    _logoTapCount = 0;
+                    Navigator.of(context).pushNamed(AppRoutes.adminLogin);
+                  }
+                },
+                child: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: Image.asset(
+                    'logo.png',
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
               const Spacer(),
@@ -174,12 +184,13 @@ class _HomeScreenState extends State<HomeScreen> {
         count: 0,
         filterType: 'apartment',
       ),
-      _CategoryData(icon: Icons.landscape_rounded, title: 'Terrenos', count: 0, filterType: null),
+      _CategoryData(icon: Icons.landscape_rounded, title: 'Terrenos', count: 0, isLand: true),
       _CategoryData(
         icon: Icons.agriculture_rounded,
         title: 'Fazendas',
         count: 0,
-        filterType: null,
+        filterType: 'farm',
+        isLand: true,
       ),
       _CategoryData(
         icon: Icons.warehouse_outlined,
@@ -228,6 +239,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             title: cat.title,
                             count: cat.count,
                             filterType: cat.filterType,
+                            isLand: cat.isLand,
                           ),
                         ))
                     .toList(),
@@ -243,15 +255,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 separatorBuilder: (_, _) => const SizedBox(width: 12),
                 itemBuilder: (context, index) {
                   final cat = categories[index];
-                  return SizedBox(
-                    width: 100,
-                    child: _buildCategoryItem(
-                      icon: cat.icon,
-                      title: cat.title,
-                      count: cat.count,
-                      filterType: cat.filterType,
-                    ),
-                  );
+                    return SizedBox(
+                      width: 100,
+                      child: _buildCategoryItem(
+                        icon: cat.icon,
+                        title: cat.title,
+                        count: cat.count,
+                        filterType: cat.filterType,
+                        isLand: cat.isLand,
+                      ),
+                    );
                 },
               ),
             ),
@@ -265,10 +278,15 @@ class _HomeScreenState extends State<HomeScreen> {
     required String title,
     required int count,
     String? filterType,
+    bool isLand = false,
   }) {
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).pushNamed(AppRoutes.properties, arguments: filterType);
+        if (isLand) {
+          Navigator.of(context).pushNamed(AppRoutes.lands, arguments: filterType);
+        } else {
+          Navigator.of(context).pushNamed(AppRoutes.properties, arguments: filterType);
+        }
       },
       child: Container(
         width: 100,
@@ -931,12 +949,14 @@ class _CategoryData {
   final String title;
   final int count;
   final String? filterType;
+  final bool isLand;
 
   const _CategoryData({
     required this.icon,
     required this.title,
     required this.count,
     this.filterType,
+    this.isLand = false,
   });
 }
 

@@ -48,9 +48,10 @@ class AvatarWidget extends StatelessWidget {
   };
 
   String get _initials {
-    if (name == null || name!.isEmpty) return '?';
+    if (name == null || name!.trim().isEmpty) return '?';
     final parts = name!.trim().split(RegExp(r'\s+'));
-    if (parts.length >= 2) {
+    if (parts.isEmpty || parts[0].isEmpty) return '?';
+    if (parts.length >= 2 && parts[1].isNotEmpty) {
       return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
     }
     return parts[0][0].toUpperCase();

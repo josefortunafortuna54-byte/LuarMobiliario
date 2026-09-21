@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -54,8 +53,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (picked == null) return;
 
     try {
+      final bytes = await picked.readAsBytes();
       final url = await StorageService().uploadImage(
-        file: File(picked.path),
+        bytes: bytes,
+        fileName: picked.name,
         bucket: AppConstants.avatarBucket,
       );
       if (mounted) setState(() => _avatarUrl = url);

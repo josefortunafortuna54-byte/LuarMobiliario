@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../constants/app_constants.dart';
@@ -123,7 +124,9 @@ class AuthService {
           UserAttributes(data: userAttributes),
         );
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[Luar] Failed to update auth profile: $e');
+    }
 
     if (currentUser != null) {
       final dbUpdates = <String, dynamic>{

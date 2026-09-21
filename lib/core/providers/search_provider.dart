@@ -1,13 +1,13 @@
 import 'package:flutter/foundation.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../constants/app_constants.dart';
 import '../models/property_model.dart';
 import '../models/land_model.dart';
-import '../services/supabase_service.dart';
+import '../repositories/land_repository.dart';
+import '../repositories/property_repository.dart';
 
 class SearchProvider extends ChangeNotifier {
-  final SupabaseClient _client = SupabaseService.client;
+  final PropertyRepository _propertyRepository = PropertyRepository();
+  final LandRepository _landRepository = LandRepository();
 
   String _query = '';
   String? _propertyType;
@@ -123,8 +123,34 @@ class SearchProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final properties = await _searchProperties();
-      final lands = await _searchLands();
+      final properties = await _propertyRepository.searchAdvanced(
+        query: _query,
+        type: _propertyType,
+        transactionType: _transactionType,
+        city: _city,
+        municipality: _municipality,
+        neighborhood: _neighborhood,
+        minPrice: _minPrice,
+        maxPrice: _maxPrice,
+        minArea: _minArea,
+        maxArea: _maxArea,
+        bedrooms: _bedrooms,
+        bathrooms: _bathrooms,
+        garage: _garage,
+      );
+
+      final lands = await _landRepository.searchAdvanced(
+        query: _query,
+        type: _landType,
+        transactionType: _transactionType,
+        city: _city,
+        municipality: _municipality,
+        neighborhood: _neighborhood,
+        minPrice: _minPrice,
+        maxPrice: _maxPrice,
+        minArea: _minArea,
+        maxArea: _maxArea,
+      );
 
       _results = [...properties, ...lands];
     } catch (e) {
@@ -133,129 +159,6 @@ class SearchProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
-  }
-
-  Future<List<PropertyModel>> _searchProperties() async {
-    var queryBuilder = _client
-        .from('properties')
-        .select()
-        .eq('is_available', true);
-
-    if (_query.isNotEmpty) {
-      queryBuilder = queryBuilder.or(
-        'title.ilike.%$_query%,description.ilike.%$_query%,address.ilike.%$_query%,city.ilike.%$_query%,municipality.ilike.%$_query%,neighborhood.ilike.%$_query%',
-      );
-    }
-
-    if (_transactionType != null) {
-      queryBuilder = queryBuilder.eq('transaction_type', _transactionType!);
-    }
-
-    if (_city != null) {
-      queryBuilder = queryBuilder.ilike('city', '%$_city%');
-    }
-
-    if (_municipality != null) {
-      queryBuilder = queryBuilder.ilike('municipality', '%$_municipality%');
-    }
-
-    if (_neighborhood != null) {
-      queryBuilder = queryBuilder.ilike('neighborhood', '%$_neighborhood%');
-    }
-
-    if (_minPrice != null) {
-      queryBuilder = queryBuilder.gte('price', _minPrice!);
-    }
-
-    if (_maxPrice != null) {
-      queryBuilder = queryBuilder.lte('price', _maxPrice!);
-    }
-
-    if (_minArea != null) {
-      queryBuilder = queryBuilder.gte('area', _minArea!);
-    }
-
-    if (_maxArea != null) {
-      queryBuilder = queryBuilder.lte('area', _maxArea!);
-    }
-
-    if (_bedrooms != null) {
-      queryBuilder = queryBuilder.eq('bedrooms', _bedrooms!);
-    }
-
-    if (_bathrooms != null) {
-      queryBuilder = queryBuilder.eq('bathrooms', _bathrooms!);
-    }
-
-    if (_garage != null) {
-      queryBuilder = queryBuilder.gte('garage', _garage!);
-    }
-
-    if (_propertyType != null) {
-      queryBuilder = queryBuilder.eq('type', _propertyType!);
-    }
-
-    final response = await queryBuilder
-        .order('created_at', ascending: false)
-        .limit(AppConstants.defaultPageSize);
-
-    return (response as List<dynamic>)
-        .map((json) => PropertyModel.fromJson(json as Map<String, dynamic>))
-        .toList();
-  }
-
-  Future<List<LandModel>> _searchLands() async {
-    var queryBuilder = _client.from('lands').select().eq('is_available', true);
-
-    if (_query.isNotEmpty) {
-      queryBuilder = queryBuilder.or(
-        'title.ilike.%$_query%,description.ilike.%$_query%,address.ilike.%$_query%,city.ilike.%$_query%,municipality.ilike.%$_query%,neighborhood.ilike.%$_query%',
-      );
-    }
-
-    if (_transactionType != null) {
-      queryBuilder = queryBuilder.eq('transaction_type', _transactionType!);
-    }
-
-    if (_city != null) {
-      queryBuilder = queryBuilder.ilike('city', '%$_city%');
-    }
-
-    if (_municipality != null) {
-      queryBuilder = queryBuilder.ilike('municipality', '%$_municipality%');
-    }
-
-    if (_neighborhood != null) {
-      queryBuilder = queryBuilder.ilike('neighborhood', '%$_neighborhood%');
-    }
-
-    if (_minPrice != null) {
-      queryBuilder = queryBuilder.gte('price', _minPrice!);
-    }
-
-    if (_maxPrice != null) {
-      queryBuilder = queryBuilder.lte('price', _maxPrice!);
-    }
-
-    if (_minArea != null) {
-      queryBuilder = queryBuilder.gte('area', _minArea!);
-    }
-
-    if (_maxArea != null) {
-      queryBuilder = queryBuilder.lte('area', _maxArea!);
-    }
-
-    if (_landType != null) {
-      queryBuilder = queryBuilder.eq('type', _landType!);
-    }
-
-    final response = await queryBuilder
-        .order('created_at', ascending: false)
-        .limit(AppConstants.defaultPageSize);
-
-    return (response as List<dynamic>)
-        .map((json) => LandModel.fromJson(json as Map<String, dynamic>))
-        .toList();
   }
 
   List<PropertyModel> get propertyResults =>

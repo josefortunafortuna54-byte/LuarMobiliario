@@ -87,5 +87,57 @@ void main() {
         'Esta é uma...',
       );
     });
+
+    test('truncates text with exactly maxLength characters', () {
+      expect(truncateText('1234567890', 10), '1234567890');
+    });
+
+    test('truncates text longer than maxLength', () {
+      expect(truncateText('12345678901', 10), '1234567890...');
+    });
+
+    test('handles empty string', () {
+      expect(truncateText('', 5), '');
+    });
+  });
+
+  group('formatPriceRaw', () {
+    test('formats zero', () {
+      expect(formatPriceRaw(0), '0');
+    });
+
+    test('formats small value without separator', () {
+      expect(formatPriceRaw(999), '999');
+    });
+
+    test('formats value with one separator', () {
+      expect(formatPriceRaw(1000), '1.000');
+    });
+
+    test('formats value with multiple separators', () {
+      expect(formatPriceRaw(1234567890), '1.234.567.890');
+    });
+
+    test('formats exactly one thousand', () {
+      expect(formatPriceRaw(1000), '1.000');
+    });
+
+    test('formats negative value', () {
+      expect(formatPriceRaw(-1500), '-1.500');
+    });
+  });
+
+  group('formatPriceCurrency', () {
+    test('prepends AOA prefix', () {
+      expect(formatPriceCurrency(1500000), 'AOA 1.500.000');
+    });
+
+    test('formats zero', () {
+      expect(formatPriceCurrency(0), 'AOA 0');
+    });
+
+    test('formats large value', () {
+      expect(formatPriceCurrency(500000000), 'AOA 500.000.000');
+    });
   });
 }

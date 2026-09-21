@@ -1,11 +1,10 @@
 import 'package:flutter/foundation.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/booking_model.dart';
-import '../services/supabase_service.dart';
+import '../repositories/booking_repository.dart';
 
 class BookingProvider extends ChangeNotifier {
-  final SupabaseClient _client = SupabaseService.client;
+  final BookingRepository _repository = BookingRepository();
 
   List<BookingModel> _bookings = [];
   bool _isLoading = false;
@@ -41,15 +40,7 @@ class BookingProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await _client
-          .from('bookings')
-          .select('*, properties(title)')
-          .eq('user_id', userId)
-          .order('created_at', ascending: false);
-
-      _bookings = (response as List<dynamic>)
-          .map((json) => BookingModel.fromJson(json as Map<String, dynamic>))
-          .toList();
+      _bookings = await _repository.fetchByUser(userId);
     } catch (e) {
       _error = e.toString();
       _bookings = [];
@@ -65,15 +56,7 @@ class BookingProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final data = booking.toJson()..remove('id');
-
-      final response = await _client
-          .from('bookings')
-          .insert(data)
-          .select()
-          .single();
-
-      final newBooking = BookingModel.fromJson(response);
+      final newBooking = await _repository.create(booking);
       _bookings.insert(0, newBooking);
       _isLoading = false;
       notifyListeners();
@@ -92,10 +75,7 @@ class BookingProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _client
-          .from('bookings')
-          .update({'status': BookingStatus.cancelled.name})
-          .eq('id', bookingId);
+      await _repository.cancel(bookingId);
 
       final index = _bookings.indexWhere((b) => b.id == bookingId);
       if (index != -1) {

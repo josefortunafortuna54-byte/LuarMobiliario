@@ -6,6 +6,9 @@ abstract final class AppConstants {
   // ── Supabase (via .env) ───────────────────────────────────────────
   // Valores carregados de EnvConfig - nao hardcode aqui
 
+  // ── Admin ────────────────────────────────────────────────────────
+  // Valor carregado de EnvConfig - nao hardcode aqui
+
   // ── Contact ────────────────────────────────────────────────────────
 
   static const String whatsappNumber = '244923456789';
@@ -33,6 +36,7 @@ abstract final class AppConstants {
   static const String notificationsTable = 'notifications';
   static const String propertiesTable = 'properties';
   static const String landsTable = 'lands';
+  static const String partnersTable = 'partners';
 
   // ── Firebase (via .env) ───────────────────────────────────────────
   // Valores carregados de EnvConfig - nao hardcode aqui

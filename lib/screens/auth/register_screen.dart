@@ -24,8 +24,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  bool _obscurePassword = true;
-  bool _obscureConfirmPassword = true;
+  final bool _obscurePassword = true;
+  final bool _obscureConfirmPassword = true;
   bool _acceptTerms = false;
 
   @override

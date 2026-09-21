@@ -97,14 +97,13 @@ A navegação principal é feita via barra de navegação inferior fixa:
 - Estado vazio quando sem resultados
 
 ### Ecrã de Detalhe (Propriedade/Terreno)
-- Galeria de imagens (photo_view para zoom)
+- Galeria de imagens (swipeable, indicador de posição)
 - Título e preço (gold, Playfair Display)
 - Localização com ícone de mapa
 - Características (chips)
 - Descrição completa
 - Informações do agente (avatar, nome, telefone)
 - Botões: WhatsApp, Ligar, Mensagem, Agendar Visita
-- Mapa de localização (Google Maps)
 
 ### Ecrã de Favoritos
 - Lista de propriedades/terrenos favoritos
@@ -121,10 +120,11 @@ A navegação principal é feita via barra de navegação inferior fixa:
 ### Ecrã de Perfil
 - Avatar (circular, border radius 999px)
 - Nome e email
-- Opções: Editar Perfil, Agendamentos, Admin (se admin), Sair
+- Opções: Editar Perfil, Favoritos, Agendamentos, Mensagens, Sair
 - Divisores entre secções
 
 ### Ecrã Administrativo
+- Acesso oculto: tocar 5x no logotipo do header da Home abre o AdminLoginScreen
 - Dashboard com métricas
 - Gestão de propriedades (CRUD)
 - Gestão de utilizadores
@@ -191,10 +191,10 @@ A navegação principal é feita via barra de navegação inferior fixa:
 ## Imagens e Media
 
 ### Galeria de Imagens
-- Utiliza `cached_network_image` para cache
-- `photo_view` para zoom em ecrã de detalhe
-- Indicador de posição (dots) no carrossel
-- Placeholder com shimmer durante carregamento
+- Imagens carregadas via `Image.network` (Supabase Storage)
+- Galeria swipeable (PageView) com indicador de posição (dots)
+- Placeholder com animação shimmer durante carregamento
+- Fallback: ícone de imagem quando o URL está vazio ou falha
 
 ### Avatares
 - Formato circular (border radius 999px)

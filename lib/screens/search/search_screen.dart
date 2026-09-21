@@ -101,7 +101,13 @@ class _SearchScreenState extends State<SearchScreen> {
               controller: _searchController,
               hintText: 'Pesquisar imóveis e terrenos...',
               autofocus: false,
-              onSearch: _onSearchChanged,
+              onChanged: _onSearchChanged,
+              onSearch: (value) {
+                _debounce?.cancel();
+                final provider = context.read<SearchProvider>();
+                provider.setFilter(query: value);
+                provider.search();
+              },
               onFilterTap: _openFilterSheet,
             ),
           ),
@@ -128,7 +134,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
     if (provider.query.isNotEmpty) {
       chips.add(
-        _FilterChipData('"{provider.query}"', () {
+        _FilterChipData('"${provider.query}"', () {
           provider.setFilter(query: '');
           _searchController.clear();
           provider.search();
@@ -138,7 +144,7 @@ class _SearchScreenState extends State<SearchScreen> {
     if (provider.transactionType != null) {
       chips.add(
         _FilterChipData(
-          provider.transactionType == 'sale' ? 'Venda' : 'Aluguel',
+          provider.transactionType == 'sale' ? 'Venda' : 'Arrendamento',
           () => _removeFilter(provider, 'transactionType'),
         ),
       );
@@ -632,7 +638,7 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
 
   Widget _buildTransactionChips() {
     final types = ['sale', 'rent'];
-    final labels = ['Venda', 'Aluguel'];
+    final labels = ['Venda', 'Arrendamento'];
 
     return Wrap(
       spacing: 8,

@@ -2,10 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/user_model.dart';
-import '../services/auth_service.dart';
+import '../repositories/auth_repository.dart';
 
 class AuthProvider extends ChangeNotifier {
-  final AuthService _authService = AuthService();
+  final AuthRepository _authRepository = AuthRepository();
 
   UserModel? _user;
   bool _isLoading = false;
@@ -22,7 +22,7 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final user = await _authService.getCurrentUser();
+      final user = await _authRepository.getCurrentUser();
       _user = user;
     } catch (e) {
       _user = null;
@@ -39,8 +39,8 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _authService.signInWithEmail(email: email, password: password);
-      final user = await _authService.getCurrentUser();
+      await _authRepository.signInWithEmail(email: email, password: password);
+      final user = await _authRepository.getCurrentUser();
       _user = user;
       _isLoading = false;
       notifyListeners();
@@ -64,13 +64,13 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _authService.signUpWithEmail(
+      await _authRepository.signUpWithEmail(
         email: email,
         password: password,
         name: name,
         phone: phone,
       );
-      final user = await _authService.getCurrentUser();
+      final user = await _authRepository.getCurrentUser();
       _user = user;
       _isLoading = false;
       notifyListeners();
@@ -94,7 +94,7 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _authService.signOut();
+      await _authRepository.signOut();
       _user = null;
     } catch (e) {
       _error = e.toString();
@@ -114,13 +114,13 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _authService.updateProfile(
+      await _authRepository.updateProfile(
         name: name,
         phone: phone,
         avatarUrl: avatarUrl,
       );
 
-      final user = await _authService.getCurrentUser();
+      final user = await _authRepository.getCurrentUser();
       _user = user;
 
       _isLoading = false;
@@ -140,7 +140,7 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _authService.resetPassword(email);
+      await _authRepository.resetPassword(email);
       _isLoading = false;
       notifyListeners();
     } catch (e) {

@@ -182,6 +182,8 @@ void main() {
         PropertyType.condo,
       );
       expect(PropertyModel.fromJson({'type': 'shop'}).type, PropertyType.shop);
+      expect(PropertyModel.fromJson({'type': 'lot'}).type, PropertyType.house);
+      expect(PropertyModel.fromJson({'type': 'farm'}).type, PropertyType.house);
     });
 
     test('defaults numeric fields to 0 when null', () {

@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +11,7 @@ import '../../core/services/storage_service.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_input.dart';
 import '../../widgets/loading_widget.dart';
+import '../../widgets/xfile_thumbnail.dart';
 
 class PropertyFormScreen extends StatefulWidget {
   const PropertyFormScreen({super.key});
@@ -23,7 +23,7 @@ class PropertyFormScreen extends StatefulWidget {
 class _PropertyFormScreenState extends State<PropertyFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _imagePicker = ImagePicker();
-  List<XFile> _selectedImages = [];
+  final List<XFile> _selectedImages = [];
   List<String> _existingImages = [];
   List<String> _selectedFeatures = [];
   bool _isSubmitting = false;
@@ -139,8 +139,10 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
 
       for (final file in _selectedImages) {
         try {
+          final bytes = await file.readAsBytes();
           final url = await StorageService().uploadImage(
-            file: File(file.path),
+            bytes: bytes,
+            fileName: file.name,
             bucket: AppConstants.propertyImagesBucket,
           );
           allImages.add(url);
@@ -417,7 +419,7 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
                   onRemove: () => _removeExistingImage(entry.key),
                 )),
                 ..._selectedImages.asMap().entries.map((entry) => _buildImageThumbnail(
-                  file: File(entry.value.path),
+                  file: entry.value,
                   onRemove: () => _removeNewImage(entry.key),
                 )),
               ],
@@ -427,7 +429,7 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
     );
   }
 
-  Widget _buildImageThumbnail({String? imageUrl, File? file, required VoidCallback onRemove}) {
+  Widget _buildImageThumbnail({String? imageUrl, XFile? file, required VoidCallback onRemove}) {
     return Stack(
       children: [
         Container(
@@ -441,7 +443,7 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
           clipBehavior: Clip.antiAlias,
           child: imageUrl != null
               ? Image.network(imageUrl, fit: BoxFit.cover)
-              : Image.file(file!, fit: BoxFit.cover),
+              : XFileThumbnail(file: file!),
         ),
         Positioned(
           top: 4,

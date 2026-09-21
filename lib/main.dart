@@ -11,6 +11,7 @@ import 'core/providers/admin_provider.dart';
 import 'core/providers/favorite_provider.dart';
 import 'core/providers/land_provider.dart';
 import 'core/providers/property_provider.dart';
+import 'core/providers/partner_provider.dart';
 import 'core/providers/search_provider.dart';
 import 'core/services/notification_service.dart';
 import 'core/services/supabase_service.dart';
@@ -18,9 +19,7 @@ import 'core/services/supabase_service.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  try {
-    await dotenv.load();
-  } catch (_) {}
+  await dotenv.load();
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -29,11 +28,11 @@ Future<void> main() async {
 
   try {
     await SupabaseService.initialize();
-  } catch (_) {}
+  } catch (e) {
+    debugPrint('[Luar] Supabase initialization failed: $e');
+  }
 
-  try {
-    await NotificationService().initialize();
-  } catch (_) {}
+  await NotificationService().initialize();
 
   runApp(
     MultiProvider(
@@ -46,6 +45,7 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => BookingProvider()),
         ChangeNotifierProvider(create: (_) => MessageProvider()),
         ChangeNotifierProvider(create: (_) => AdminProvider()),
+        ChangeNotifierProvider(create: (_) => PartnerProvider()),
       ],
       child: const LuarCompanyApp(),
     ),

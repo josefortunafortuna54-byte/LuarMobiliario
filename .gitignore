@@ -53,3 +53,9 @@ app.*.map.json
 *.jks
 *.keystore
 key.properties
+
+# Kotlin compile cache
+android/.kotlin/
+
+# Supabase CLI artifacts
+supabase/.temp/

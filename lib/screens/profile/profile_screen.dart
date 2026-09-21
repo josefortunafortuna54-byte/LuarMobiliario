@@ -5,7 +5,6 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/providers/auth_provider.dart';
-import '../../core/models/user_model.dart';
 import '../../core/utils/responsive.dart';
 import '../../core/utils/routes.dart';
 import '../../widgets/avatar_widget.dart';
@@ -75,8 +74,6 @@ class ProfileScreen extends StatelessWidget {
             return _buildGuestState(context, isDesktop);
           }
 
-          final isAgentOrAdmin = user.role == UserRole.agent || user.role == UserRole.admin;
-
           return Center(
             child: ConstrainedBox(
               constraints: BoxConstraints(
@@ -87,7 +84,7 @@ class ProfileScreen extends StatelessWidget {
                   children: [
                     _buildProfileHeader(user, isDesktop),
                     const SizedBox(height: 8),
-                    _buildMenuSection(context, isAgentOrAdmin: isAgentOrAdmin, padding: padding),
+                    _buildMenuSection(context, padding: padding),
                     const SizedBox(height: 32),
                     _buildVersionInfo(),
                     const SizedBox(height: 32),
@@ -156,19 +153,13 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuSection(BuildContext context, {required bool isAgentOrAdmin, double padding = 16}) {
+  Widget _buildMenuSection(BuildContext context, {double padding = 16}) {
     final menuItems = [
       _MenuItem(
         icon: Icons.edit_outlined,
         title: 'Editar Perfil',
         route: AppRoutes.editProfile,
       ),
-      if (isAgentOrAdmin)
-        _MenuItem(
-          icon: Icons.home_outlined,
-          title: 'Meus Imóveis',
-          route: AppRoutes.adminProperties,
-        ),
       _MenuItem(
         icon: Icons.favorite_border_rounded,
         title: 'Favoritos',
@@ -183,6 +174,11 @@ class ProfileScreen extends StatelessWidget {
         icon: Icons.chat_bubble_outline_rounded,
         title: 'Mensagens',
         route: AppRoutes.messages,
+      ),
+      const _MenuItem(
+        icon: Icons.handshake_outlined,
+        title: 'Parceiros',
+        route: AppRoutes.partners,
       ),
       _MenuItem(
         icon: Icons.logout_rounded,

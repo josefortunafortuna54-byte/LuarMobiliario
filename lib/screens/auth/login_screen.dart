@@ -21,7 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _obscurePassword = true;
+  final bool _obscurePassword = true;
 
   @override
   void dispose() {
@@ -42,12 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!mounted) return;
 
     if (success) {
-      final role = auth.user?.role;
-      if (role?.name == 'admin' || role?.name == 'agent') {
-        Navigator.of(context).pushReplacementNamed(AppRoutes.adminDashboard);
-      } else {
-        Navigator.of(context).pushReplacementNamed(AppRoutes.home);
-      }
+      Navigator.of(context).pushReplacementNamed(AppRoutes.home);
     } else if (auth.error != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

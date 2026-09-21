@@ -147,11 +147,11 @@ class WelcomeScreen extends StatelessWidget {
             width: double.infinity,
             child: OutlinedButton.icon(
               onPressed: () {
-                Navigator.of(context).pushNamed(AppRoutes.adminLogin);
+                Navigator.of(context).pushNamed(AppRoutes.register);
               },
-              icon: const Icon(Icons.admin_panel_settings_outlined, size: 20),
+              icon: const Icon(Icons.person_add_outlined, size: 20),
               label: Text(
-                'Entrar como Admin',
+                'Criar Conta',
                 style: AppTextStyles.buttonLarge.copyWith(color: AppColors.navy),
               ),
               style: OutlinedButton.styleFrom(
@@ -162,25 +162,6 @@ class WelcomeScreen extends StatelessWidget {
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 32),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Não tem conta? ',
-                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.gray500),
-              ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.of(context).pushNamed(AppRoutes.register);
-                },
-                child: Text(
-                  'Cadastre-se',
-                  style: AppTextStyles.bodyMediumBold.copyWith(color: AppColors.gold),
-                ),
-              ),
-            ],
           ),
           const SizedBox(height: 32),
           Text(

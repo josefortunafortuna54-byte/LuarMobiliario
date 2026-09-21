@@ -8,6 +8,7 @@ class SearchWidget extends StatefulWidget {
     super.key,
     this.hintText = 'Pesquisar imóveis...',
     this.onSearch,
+    this.onChanged,
     this.onFilterTap,
     this.controller,
     this.autofocus = false,
@@ -15,6 +16,7 @@ class SearchWidget extends StatefulWidget {
 
   final String hintText;
   final ValueChanged<String>? onSearch;
+  final ValueChanged<String>? onChanged;
   final VoidCallback? onFilterTap;
   final TextEditingController? controller;
   final bool autofocus;
@@ -54,12 +56,14 @@ class _SearchWidgetState extends State<SearchWidget> {
   }
 
   void _onTextChanged() {
-    final hasText = _controller.text.isNotEmpty;
+    final value = _controller.text;
+    final hasText = value.isNotEmpty;
     if (hasText != _hasText) {
       setState(() {
         _hasText = hasText;
       });
     }
+    widget.onChanged?.call(value);
   }
 
   @override

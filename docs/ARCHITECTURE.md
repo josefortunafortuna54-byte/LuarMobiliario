@@ -21,7 +21,7 @@ A aplicação Flutter utiliza o Supabase como plataforma backend (BaaS), elimina
 
 ```
 ┌─────────────────────────────────────────┐
-│                   UI                     │
+│                  UI                     │
 │   Screens → Widgets → Components        │
 ├─────────────────────────────────────────┤
 │                State                    │
@@ -34,7 +34,7 @@ A aplicação Flutter utiliza o Supabase como plataforma backend (BaaS), elimina
 │         Repositories → Services         │
 ├─────────────────────────────────────────┤
 │             External APIs               │
-│      Supabase · Firebase · Google Maps  │
+│             Supabase · Firebase         │
 └─────────────────────────────────────────┘
 ```
 
@@ -63,6 +63,7 @@ Providers baseados em `ChangeNotifier` que expõem o estado reativo à UI:
   - `FavoriteRepository` — Gestão de favoritos
   - `BookingRepository` — Gestão de agendamentos
   - `MessageRepository` — Gestão de mensagens
+  - `AdminRepository` — Painel administrativo (estatísticas, utilizadores)
 
 - **Services**: Integrações com serviços externos
   - `SupabaseService` — Inicialização e instância do cliente Supabase
@@ -72,9 +73,8 @@ Providers baseados em `ChangeNotifier` que expõem o estado reativo à UI:
 
 #### 4. External APIs
 
-- **Supabase**: PostgreSQL, Auth, Storage, Realtime
+- **Supabase**: PostgreSQL, Auth, Storage
 - **Firebase Cloud Messaging**: Notificações push
-- **Google Maps**: Mapas e geolocalização
 
 ---
 
@@ -210,14 +210,17 @@ luar_company/lib/
 │   │   ├── land_provider.dart
 │   │   ├── search_provider.dart
 │   │   ├── favorite_provider.dart
-│   │   └── booking_provider.dart
+│   │   ├── booking_provider.dart
+│   │   ├── message_provider.dart
+│   │   └── admin_provider.dart
 │   ├── repositories/
 │   │   ├── auth_repository.dart
 │   │   ├── property_repository.dart
 │   │   ├── land_repository.dart
 │   │   ├── favorite_repository.dart
 │   │   ├── booking_repository.dart
-│   │   └── message_repository.dart
+│   │   ├── message_repository.dart
+│   │   └── admin_repository.dart
 │   ├── services/
 │   │   ├── supabase_service.dart
 │   │   ├── auth_service.dart

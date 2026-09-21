@@ -52,8 +52,19 @@ class _LandsScreenState extends State<LandsScreen> {
   @override
   void initState() {
     super.initState();
+    _applyRouteArgument();
     _loadLands();
     _scrollController.addListener(_onScroll);
+  }
+
+  void _applyRouteArgument() {
+    final filterType = ModalRoute.of(context)?.settings.arguments as String?;
+    if (filterType != null) {
+      final index = _filterKeys.indexOf(filterType);
+      if (index != -1) {
+        _selectedFilterIndex = index;
+      }
+    }
   }
 
   @override

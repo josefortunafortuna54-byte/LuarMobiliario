@@ -1,12 +1,11 @@
 import 'package:flutter/foundation.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../constants/app_constants.dart';
 import '../models/property_model.dart';
-import '../services/supabase_service.dart';
+import '../repositories/property_repository.dart';
 
 class PropertyProvider extends ChangeNotifier {
-  SupabaseClient get _client => SupabaseService.client;
+  final PropertyRepository _repository = PropertyRepository();
 
   List<PropertyModel> _properties = [];
   List<PropertyModel> _featuredProperties = [];
@@ -24,55 +23,6 @@ class PropertyProvider extends ChangeNotifier {
   String? get error => _error;
   bool get hasMore => _hasMore;
 
-  List<String> _extractImageUrls(dynamic imagesData) {
-    if (imagesData == null) return [];
-    try {
-      return (imagesData as List)
-          .map((img) => (img as Map<String, dynamic>)['image_url'] as String)
-          .toList();
-    } catch (_) {
-      return [];
-    }
-  }
-
-  PostgrestFilterBuilder<dynamic> _applyFilters(
-    PostgrestFilterBuilder<dynamic> query,
-    Map<String, dynamic>? filters,
-  ) {
-    if (filters == null) return query;
-    for (final entry in filters.entries) {
-      if (entry.value != null) {
-        switch (entry.key) {
-          case 'type':
-            query = query.eq('type', entry.value);
-          case 'transactionType':
-            query = query.eq('transaction_type', entry.value);
-          case 'city':
-            query = query.ilike('city', '%${entry.value}%');
-          case 'municipality':
-            query = query.ilike('municipality', '%${entry.value}%');
-          case 'neighborhood':
-            query = query.ilike('neighborhood', '%${entry.value}%');
-          case 'minPrice':
-            query = query.gte('price', entry.value);
-          case 'maxPrice':
-            query = query.lte('price', entry.value);
-          case 'minArea':
-            query = query.gte('area', entry.value);
-          case 'maxArea':
-            query = query.lte('area', entry.value);
-          case 'bedrooms':
-            query = query.eq('bedrooms', entry.value);
-          case 'bathrooms':
-            query = query.eq('bathrooms', entry.value);
-          case 'garage':
-            query = query.gte('garage', entry.value);
-        }
-      }
-    }
-    return query;
-  }
-
   Future<void> loadProperties({Map<String, dynamic>? filters}) async {
     _isLoading = true;
     _error = null;
@@ -82,27 +32,13 @@ class PropertyProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final from = 0;
-      final to = AppConstants.defaultPageSize - 1;
-
-      final query = _applyFilters(
-        _client
-            .from('properties')
-            .select('*, property_images(image_url)')
-            .eq('is_available', true),
-        filters,
+      final response = await _repository.fetchProperties(
+        filters: filters,
+        page: 0,
+        pageSize: AppConstants.defaultPageSize,
       );
 
-      final response = await query
-          .order('created_at', ascending: false)
-          .range(from, to);
-
-      _properties = (response as List).map((json) {
-        final j = json as Map<String, dynamic>;
-        final images = _extractImageUrls(j.remove('property_images'));
-        return PropertyModel.fromJson(j).copyWith(images: images);
-      }).toList();
-
+      _properties = response;
       _hasMore = _properties.length >= AppConstants.defaultPageSize;
       _currentPage = 1;
     } catch (e) {
@@ -121,29 +57,14 @@ class PropertyProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final from = _currentPage * AppConstants.defaultPageSize;
-      final to = from + AppConstants.defaultPageSize - 1;
-
-      final query = _applyFilters(
-        _client
-            .from('properties')
-            .select('*, property_images(image_url)')
-            .eq('is_available', true),
-        filters ?? _currentFilters,
+      final response = await _repository.fetchProperties(
+        filters: filters ?? _currentFilters,
+        page: _currentPage,
+        pageSize: AppConstants.defaultPageSize,
       );
 
-      final response = await query
-          .order('created_at', ascending: false)
-          .range(from, to);
-
-      final newProperties = (response as List).map((json) {
-        final j = json as Map<String, dynamic>;
-        final images = _extractImageUrls(j.remove('property_images'));
-        return PropertyModel.fromJson(j).copyWith(images: images);
-      }).toList();
-
-      _properties.addAll(newProperties);
-      _hasMore = newProperties.length >= AppConstants.defaultPageSize;
+      _properties.addAll(response);
+      _hasMore = response.length >= AppConstants.defaultPageSize;
       _currentPage++;
     } catch (e) {
       _error = e.toString();
@@ -159,19 +80,7 @@ class PropertyProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await _client
-          .from('properties')
-          .select('*, property_images(image_url)')
-          .eq('is_featured', true)
-          .eq('is_available', true)
-          .order('created_at', ascending: false)
-          .limit(10);
-
-      _featuredProperties = (response as List).map((json) {
-        final j = json as Map<String, dynamic>;
-        final images = _extractImageUrls(j.remove('property_images'));
-        return PropertyModel.fromJson(j).copyWith(images: images);
-      }).toList();
+      _featuredProperties = await _repository.fetchFeatured();
     } catch (e) {
       _error = e.toString();
     } finally {
@@ -186,15 +95,7 @@ class PropertyProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await _client
-          .from('properties')
-          .select('*, property_images(image_url)')
-          .eq('id', id)
-          .single();
-
-      final j = response;
-      final images = _extractImageUrls(j.remove('property_images'));
-      _selectedProperty = PropertyModel.fromJson(j).copyWith(images: images);
+      _selectedProperty = await _repository.fetchById(id);
     } catch (e) {
       _error = e.toString();
     } finally {
@@ -209,31 +110,8 @@ class PropertyProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final data = property.toJson();
-      data.remove('id');
-      final imageUrls = List<String>.from(data.remove('images') ?? []);
-      data['created_at'] = DateTime.now().toIso8601String();
-      data['updated_at'] = DateTime.now().toIso8601String();
-
-      final response = await _client
-          .from('properties')
-          .insert(data)
-          .select()
-          .single();
-
-      final newProperty = PropertyModel.fromJson(response);
-
-      if (imageUrls.isNotEmpty) {
-        final imageRecords = imageUrls
-            .map((url) => {'property_id': newProperty.id, 'image_url': url})
-            .toList();
-        await _client.from('property_images').insert(imageRecords);
-      }
-
-      _properties.insert(
-        0,
-        newProperty.copyWith(images: imageUrls),
-      );
+      final newProperty = await _repository.create(property);
+      _properties.insert(0, newProperty);
       _isLoading = false;
       notifyListeners();
       return true;
@@ -251,21 +129,11 @@ class PropertyProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final data = property.toJson();
-      final imageUrls = List<String>.from(data.remove('images') ?? []);
-      data['updated_at'] = DateTime.now().toIso8601String();
+      await _repository.update(property);
 
-      await _client.from('properties').update(data).eq('id', property.id);
-
-      await _client.from('property_images').delete().eq('property_id', property.id);
-      if (imageUrls.isNotEmpty) {
-        final imageRecords = imageUrls
-            .map((url) => {'property_id': property.id, 'image_url': url})
-            .toList();
-        await _client.from('property_images').insert(imageRecords);
-      }
-
-      final updated = property.copyWith(images: imageUrls);
+      final updated = property.copyWith(
+        images: List<String>.from(property.images),
+      );
       final index = _properties.indexWhere((p) => p.id == property.id);
       if (index != -1) {
         _properties[index] = updated;
@@ -292,12 +160,7 @@ class PropertyProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _client.from('property_images').delete().eq('property_id', id);
-
-      await _client
-          .from('properties')
-          .update({'is_available': false})
-          .eq('id', id);
+      await _repository.delete(id);
 
       _properties.removeWhere((p) => p.id == id);
 
@@ -324,22 +187,7 @@ class PropertyProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await _client
-          .from('properties')
-          .select('*, property_images(image_url)')
-          .eq('is_available', true)
-          .or(
-            'title.ilike.%$searchQuery%,description.ilike.%$searchQuery%,address.ilike.%$searchQuery%,city.ilike.%$searchQuery%,municipality.ilike.%$searchQuery%,neighborhood.ilike.%$searchQuery%',
-          )
-          .order('created_at', ascending: false)
-          .limit(AppConstants.defaultPageSize);
-
-      _properties = (response as List).map((json) {
-        final j = json as Map<String, dynamic>;
-        final images = _extractImageUrls(j.remove('property_images'));
-        return PropertyModel.fromJson(j).copyWith(images: images);
-      }).toList();
-
+      _properties = await _repository.search(searchQuery);
       _hasMore = _properties.length >= AppConstants.defaultPageSize;
       _currentPage = 1;
     } catch (e) {

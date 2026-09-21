@@ -7,6 +7,7 @@ import '../../core/models/property_model.dart';
 import '../../core/models/user_model.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/providers/property_provider.dart';
+import '../../core/utils/formatters.dart';
 import '../../core/utils/routes.dart';
 import '../../widgets/loading_widget.dart';
 
@@ -66,13 +67,7 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
   }
 
   String _formatPrice(double value) {
-    final parts = value.toStringAsFixed(0).split('.');
-    final buffer = StringBuffer();
-    for (var i = 0; i < parts[0].length; i++) {
-      if (i > 0 && (parts[0].length - i) % 3 == 0) buffer.write('.');
-      buffer.write(parts[0][i]);
-    }
-    return 'AOA ${buffer.toString()}';
+    return formatPriceCurrency(value);
   }
 
   Future<void> _deleteProperty(PropertyModel property) async {

@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/constants/app_text_styles.dart';
-import '../../core/models/user_model.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/services/supabase_service.dart';
 import '../../core/utils/routes.dart';
@@ -70,15 +69,12 @@ class _SplashScreenState extends State<SplashScreen>
 
         if (!mounted) return;
 
-        if (auth.user?.role == UserRole.admin || auth.user?.role == UserRole.agent) {
-          Navigator.of(context).pushReplacementNamed(AppRoutes.adminDashboard);
-          return;
-        }
-
         Navigator.of(context).pushReplacementNamed(AppRoutes.home);
         return;
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[Luar] Session check failed: $e');
+    }
 
     if (!mounted) return;
     Navigator.of(context).pushReplacementNamed(AppRoutes.welcome);

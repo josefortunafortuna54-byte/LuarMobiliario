@@ -26,3 +26,9 @@
 # image_picker / plugin registries (Android embedding)
 -keep class io.flutter.plugin.** { *; }
 -keep class io.flutter.embedding.** { *; }
+
+# Play Core (referenciado pelo Flutter para split/deferred components;
+# a classe nao esta presente em APK unico — R8 veria com "Missing classes")
+-dontwarn com.google.android.play.core.**
+-keep class com.google.android.play.core.splitinstall.** { *; }
+-keep class com.google.android.play.core.splitcompat.** { *; }

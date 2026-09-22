@@ -19,7 +19,11 @@ import 'core/services/supabase_service.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await dotenv.load();
+  try {
+    await dotenv.load();
+  } catch (e) {
+    debugPrint('[Luar] dotenv load failed: $e');
+  }
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

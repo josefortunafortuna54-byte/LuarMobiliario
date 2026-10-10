@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:luar_company/l10n/app_localizations.dart';
 
 import '../core/constants/app_colors.dart';
 import '../core/constants/app_text_styles.dart';
+import '../core/theme/app_palette.dart';
 import '../core/utils/formatters.dart';
 
 enum PropertyListingType { venda, arrendamento }
@@ -36,8 +38,8 @@ class PropertyCard extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onDetailsTap;
 
-  String get _badgeLabel =>
-      listingType == PropertyListingType.venda ? 'Venda' : 'Arrendamento';
+  String _badgeLabel(AppLocalizations l10n) =>
+      listingType == PropertyListingType.venda ? l10n.venda : l10n.arrendamento;
 
   Color get _badgeColor => listingType == PropertyListingType.venda
       ? AppColors.gold
@@ -56,7 +58,7 @@ class PropertyCard extends StatelessWidget {
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: context.palette.surface,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -74,7 +76,10 @@ class PropertyCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [_buildImage(height: 220), _buildContent()],
+          children: [
+            _buildImage(height: 220, context: context),
+            _buildContent(context),
+          ],
         ),
       ),
     );
@@ -86,7 +91,7 @@ class PropertyCard extends StatelessWidget {
       child: Container(
         height: 140,
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: context.palette.surface,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -104,15 +109,15 @@ class PropertyCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: Row(
           children: [
-            _buildImage(width: 160),
-            Expanded(child: _buildHorizontalContent()),
+            _buildImage(width: 160, context: context),
+            Expanded(child: _buildHorizontalContent(context)),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildImage({double? height, double? width}) {
+  Widget _buildImage({double? height, double? width, required BuildContext context}) {
     return Stack(
       children: [
         SizedBox(
@@ -122,11 +127,11 @@ class PropertyCard extends StatelessWidget {
             imageUrl,
             fit: BoxFit.cover,
             errorBuilder: (_, _, _) => Container(
-              color: AppColors.gray200,
-              child: const Icon(
+              color: context.palette.surfaceAlt,
+              child: Icon(
                 Icons.apartment_rounded,
                 size: 48,
-                color: AppColors.gray400,
+                color: context.palette.textMuted,
               ),
             ),
           ),
@@ -155,7 +160,7 @@ class PropertyCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              _badgeLabel,
+              _badgeLabel(AppLocalizations.of(context)),
               style: AppTextStyles.labelMedium.copyWith(color: AppColors.white),
             ),
           ),
@@ -164,7 +169,9 @@ class PropertyCard extends StatelessWidget {
     );
   }
 
-  Widget _buildContent() {
+  Widget _buildContent(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final palette = context.palette;
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -189,7 +196,7 @@ class PropertyCard extends StatelessWidget {
                 child: Text(
                   location,
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.gray500,
+                    color: palette.textSecondary,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -198,7 +205,7 @@ class PropertyCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          _buildFeaturesRow(),
+          _buildFeaturesRow(context: context),
           const SizedBox(height: 16),
           Row(
             children: [
@@ -220,7 +227,7 @@ class PropertyCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    'Detalhes',
+                    l10n.detalhes,
                     style: AppTextStyles.buttonSmall.copyWith(
                       color: AppColors.white,
                     ),
@@ -234,7 +241,9 @@ class PropertyCard extends StatelessWidget {
     );
   }
 
-  Widget _buildHorizontalContent() {
+  Widget _buildHorizontalContent(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final palette = context.palette;
     return Padding(
       padding: const EdgeInsets.all(12),
       child: Column(
@@ -260,7 +269,7 @@ class PropertyCard extends StatelessWidget {
                 child: Text(
                   location,
                   style: AppTextStyles.bodyTiny.copyWith(
-                    color: AppColors.gray500,
+                    color: palette.textSecondary,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -269,7 +278,7 @@ class PropertyCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-          _buildFeaturesRow(compact: true),
+          _buildFeaturesRow(compact: true, context: context),
           const SizedBox(height: 12),
           Row(
             children: [
@@ -291,7 +300,7 @@ class PropertyCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    'Detalhes',
+                    l10n.detalhes,
                     style: AppTextStyles.buttonSmall.copyWith(
                       fontSize: 10,
                       color: AppColors.white,
@@ -306,10 +315,11 @@ class PropertyCard extends StatelessWidget {
     );
   }
 
-  Widget _buildFeaturesRow({bool compact = false}) {
+  Widget _buildFeaturesRow({bool compact = false, required BuildContext context}) {
     final iconSize = compact ? 14.0 : 16.0;
     final textSize = compact ? AppTextStyles.bodyTiny : AppTextStyles.bodySmall;
     final spacing = compact ? 6.0 : 8.0;
+    final palette = context.palette;
 
     final features = <Widget>[];
 
@@ -320,6 +330,8 @@ class PropertyCard extends StatelessWidget {
           text: '$bedrooms',
           iconSize: iconSize,
           textStyle: textSize,
+          iconColor: palette.textMuted,
+          textColor: palette.textBody,
         ),
       );
     }
@@ -332,6 +344,8 @@ class PropertyCard extends StatelessWidget {
           text: '$bathrooms',
           iconSize: iconSize,
           textStyle: textSize,
+          iconColor: palette.textMuted,
+          textColor: palette.textBody,
         ),
       );
     }
@@ -344,6 +358,8 @@ class PropertyCard extends StatelessWidget {
           text: '${area!.toStringAsFixed(0)} m²',
           iconSize: iconSize,
           textStyle: textSize,
+          iconColor: palette.textMuted,
+          textColor: palette.textBody,
         ),
       );
     }
@@ -358,21 +374,30 @@ class _FeatureItem extends StatelessWidget {
     required this.text,
     required this.iconSize,
     required this.textStyle,
+    this.iconColor,
+    this.textColor,
   });
 
   final IconData icon;
   final String text;
   final double iconSize;
   final TextStyle textStyle;
+  final Color? iconColor;
+  final Color? textColor;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: iconSize, color: AppColors.gray400),
+        Icon(icon, size: iconSize, color: iconColor ?? context.palette.textMuted),
         const SizedBox(width: 4),
-        Text(text, style: textStyle.copyWith(color: AppColors.gray600)),
+        Text(
+          text,
+          style: textStyle.copyWith(
+            color: textColor ?? context.palette.textBody,
+          ),
+        ),
       ],
     );
   }

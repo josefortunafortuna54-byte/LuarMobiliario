@@ -88,7 +88,7 @@ CREATE POLICY "Locations: admin manage" ON locations
 
 -- ════════════════════════════════════════════════════════════════════
 -- 5. STORAGE avatars — owner deve poder atualizar/apagar apenas o seu
--- Nota: storage.objects insert para avatars deve ter owner_id = auth.uid().
+-- Nota: storage.objects insert para avatars deve ter owner_id::text = auth.uid()::text.
 -- ════════════════════════════════════════════════════════════════════
 
 DROP POLICY IF EXISTS "Avatars: authenticated upload" ON storage.objects;
@@ -96,7 +96,7 @@ CREATE POLICY "Avatars: authenticated upload" ON storage.objects
   FOR INSERT TO authenticated
   WITH CHECK (
     bucket_id = 'avatars'
-    AND owner_id = auth.uid()
+    AND owner_id::text = auth.uid()::text
   );
 
 DROP POLICY IF EXISTS "Avatars: update own" ON storage.objects;
@@ -104,11 +104,11 @@ CREATE POLICY "Avatars: update own" ON storage.objects
   FOR UPDATE TO authenticated
   USING (
     bucket_id = 'avatars'
-    AND owner_id = auth.uid()
+    AND owner_id::text = auth.uid()::text
   )
   WITH CHECK (
     bucket_id = 'avatars'
-    AND owner_id = auth.uid()
+    AND owner_id::text = auth.uid()::text
   );
 
 -- ════════════════════════════════════════════════════════════════════

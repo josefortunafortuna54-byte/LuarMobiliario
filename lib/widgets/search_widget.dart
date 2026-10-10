@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 
 import '../core/constants/app_colors.dart';
 import '../core/constants/app_text_styles.dart';
+import '../core/theme/app_palette.dart';
+import '../l10n/app_localizations.dart';
 
 class SearchWidget extends StatefulWidget {
   const SearchWidget({
     super.key,
-    this.hintText = 'Pesquisar imóveis...',
+    this.hintText = '',
     this.onSearch,
     this.onChanged,
     this.onFilterTap,
@@ -68,14 +70,17 @@ class _SearchWidgetState extends State<SearchWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
+    final hintText = widget.hintText.isEmpty ? l10n.pesquisarImoveis : widget.hintText;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeInOut,
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: palette.surface,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: _isFocused ? AppColors.gold : AppColors.gray200,
+          color: _isFocused ? AppColors.gold : palette.borderStrong,
           width: _isFocused ? 1.5 : 1,
         ),
         boxShadow: [
@@ -90,12 +95,12 @@ class _SearchWidgetState extends State<SearchWidget> {
       ),
       child: Row(
         children: [
-          const Padding(
-            padding: EdgeInsets.only(left: 14),
+          Padding(
+            padding: const EdgeInsets.only(left: 14),
             child: Icon(
               Icons.search_rounded,
               size: 22,
-              color: AppColors.gray400,
+              color: palette.textMuted,
             ),
           ),
           Expanded(
@@ -107,9 +112,9 @@ class _SearchWidgetState extends State<SearchWidget> {
               textInputAction: TextInputAction.search,
               onSubmitted: widget.onSearch,
               decoration: InputDecoration(
-                hintText: widget.hintText,
+                hintText: hintText,
                 hintStyle: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.gray400,
+                  color: palette.textMuted,
                 ),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(
@@ -125,12 +130,12 @@ class _SearchWidgetState extends State<SearchWidget> {
                 _controller.clear();
                 widget.onSearch?.call('');
               },
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 4),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Icon(
                   Icons.close_rounded,
                   size: 18,
-                  color: AppColors.gray400,
+                  color: palette.textMuted,
                 ),
               ),
             ),

@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:luar_company/widgets/land_card.dart';
 
+import '../helpers/test_app.dart';
+
 final _kTransparentImage = Uint8List.fromList(<int>[
   0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d, 0x49,
   0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x08, 0x06,
@@ -104,7 +106,7 @@ void main() {
   });
 
   Widget wrapInApp(Widget child) {
-    return MaterialApp(home: Scaffold(body: child));
+    return testApp(home: Scaffold(body: child));
   }
 
   LandCard createCard({

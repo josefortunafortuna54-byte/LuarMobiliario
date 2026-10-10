@@ -7,8 +7,10 @@ import '../../core/models/property_model.dart';
 import '../../core/models/user_model.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/providers/property_provider.dart';
+import '../../core/theme/app_palette.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/utils/routes.dart';
+import '../../l10n/app_localizations.dart';
 import '../../widgets/loading_widget.dart';
 
 class AdminPropertiesScreen extends StatefulWidget {
@@ -28,12 +30,13 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final user = context.read<AuthProvider>().user;
-      final isAgentOrAdmin = user?.role == UserRole.agent || user?.role == UserRole.admin;
+      final isAgentOrAdmin =
+          user?.role == UserRole.agent || user?.role == UserRole.admin;
       if (!isAgentOrAdmin && mounted) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Acesso restrito a agentes e administradores'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context).acessoRestritoAgentes),
             backgroundColor: AppColors.error,
           ),
         );
@@ -71,29 +74,31 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
   }
 
   Future<void> _deleteProperty(PropertyModel property) async {
+    final l10n = AppLocalizations.of(context);
+    final palette = context.palette;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('Remover Imóvel', style: AppTextStyles.h6),
+        title: Text(l10n.removerImovel, style: AppTextStyles.h6),
         content: Text(
-          'Deseja remover "${property.title}"? Esta ação pode ser desfeita.',
+          l10n.desejaRemoverImovel(property.title),
           style: AppTextStyles.bodyMedium,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
             child: Text(
-              'Cancelar',
+              l10n.cancelar,
               style: AppTextStyles.buttonMedium.copyWith(
-                color: AppColors.gray600,
+                color: palette.textBody,
               ),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             child: Text(
-              'Remover',
+              l10n.remover,
               style: AppTextStyles.buttonMedium.copyWith(
                 color: AppColors.error,
               ),
@@ -110,14 +115,16 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: palette.surface,
       appBar: AppBar(
         backgroundColor: AppColors.navy,
         elevation: 0,
         centerTitle: true,
         title: Text(
-          'Gerir Imóveis',
+          l10n.gerirImoveis,
           style: AppTextStyles.h6.copyWith(color: AppColors.white),
         ),
         iconTheme: const IconThemeData(color: AppColors.gold),
@@ -129,8 +136,10 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
             child: Consumer<PropertyProvider>(
               builder: (context, provider, _) {
                 if (provider.isLoading && provider.properties.isEmpty) {
-                  return const Center(
-                    child: LoadingWidget(message: 'Carregando imóveis...'),
+                  return Center(
+                    child: LoadingWidget(
+                      message: AppLocalizations.of(context).carregandoImoveis,
+                    ),
                   );
                 }
 
@@ -176,9 +185,11 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
   }
 
   Widget _buildSearchBar() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-      color: AppColors.white,
+      color: palette.surface,
       child: TextField(
         controller: _searchController,
         style: AppTextStyles.bodyMedium,
@@ -186,16 +197,16 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
           setState(() => _searchQuery = value);
         },
         decoration: InputDecoration(
-          hintText: 'Pesquisar imóveis...',
+          hintText: l10n.pesquisarImoveis,
           hintStyle: AppTextStyles.bodyMedium.copyWith(
-            color: AppColors.gray400,
+            color: palette.textMuted,
           ),
-          prefixIcon: const Padding(
-            padding: EdgeInsets.only(left: 14, right: 10),
+          prefixIcon: Padding(
+            padding: const EdgeInsets.only(left: 14, right: 10),
             child: Icon(
               Icons.search_rounded,
               size: 22,
-              color: AppColors.gray400,
+              color: palette.textMuted,
             ),
           ),
           prefixIconConstraints: const BoxConstraints(
@@ -208,18 +219,18 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
                     _searchController.clear();
                     setState(() => _searchQuery = '');
                   },
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 4),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
                     child: Icon(
                       Icons.close_rounded,
                       size: 18,
-                      color: AppColors.gray400,
+                      color: palette.textMuted,
                     ),
                   ),
                 )
               : null,
           filled: true,
-          fillColor: AppColors.gray50,
+          fillColor: palette.background,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 14,
             vertical: 14,
@@ -230,7 +241,7 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: AppColors.gray200),
+            borderSide: BorderSide(color: palette.borderStrong),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
@@ -242,6 +253,8 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
   }
 
   Widget _buildPropertyTile(PropertyModel property) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final imageUrl = property.images.isNotEmpty ? property.images.first : '';
     final location = [
       property.neighborhood,
@@ -250,9 +263,9 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: palette.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.gray100),
+        border: Border.all(color: palette.border),
         boxShadow: [
           BoxShadow(
             color: AppColors.navy.withValues(alpha: 0.06),
@@ -276,20 +289,20 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
                       imageUrl,
                       fit: BoxFit.cover,
                       errorBuilder: (_, _, _) => Container(
-                        color: AppColors.gray200,
-                        child: const Icon(
+                        color: palette.surfaceAlt,
+                        child: Icon(
                           Icons.apartment_rounded,
                           size: 32,
-                          color: AppColors.gray400,
+                          color: palette.textMuted,
                         ),
                       ),
                     )
                   : Container(
-                      color: AppColors.gray200,
-                      child: const Icon(
+                      color: palette.surfaceAlt,
+                      child: Icon(
                         Icons.apartment_rounded,
                         size: 32,
-                        color: AppColors.gray400,
+                        color: palette.textMuted,
                       ),
                     ),
             ),
@@ -319,7 +332,7 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
                         child: Text(
                           location,
                           style: AppTextStyles.bodyTiny.copyWith(
-                            color: AppColors.gray500,
+                            color: palette.textSecondary,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -339,13 +352,17 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
           Column(
             children: [
               IconButton(
-                onPressed: () => Navigator.pushNamed(context, AppRoutes.propertyForm, arguments: property),
+                onPressed: () => Navigator.pushNamed(
+                  context,
+                  AppRoutes.propertyForm,
+                  arguments: property,
+                ),
                 icon: const Icon(
                   Icons.edit_outlined,
                   size: 20,
                   color: AppColors.info,
                 ),
-                tooltip: 'Editar',
+                tooltip: l10n.editar,
               ),
               IconButton(
                 onPressed: () => _deleteProperty(property),
@@ -354,7 +371,7 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
                   size: 20,
                   color: AppColors.error,
                 ),
-                tooltip: 'Remover',
+                tooltip: l10n.remover,
               ),
             ],
           ),
@@ -365,6 +382,8 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
   }
 
   Widget _buildEmptyState() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 48),
@@ -390,15 +409,15 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
             ),
             const SizedBox(height: 24),
             Text(
-              'Sem imóveis',
+              l10n.semImoveis,
               style: AppTextStyles.h5,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
-              'Cadastre o primeiro imóvel utilizando o botão abaixo.',
+              l10n.cadastrePrimeiroImovel,
               style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.gray500,
+                color: palette.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -409,26 +428,26 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
   }
 
   Widget _buildNoResults() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 48),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.search_off_rounded,
-              size: 56,
-              color: AppColors.gray300,
-            ),
+            Icon(Icons.search_off_rounded, size: 56, color: palette.textMuted),
             const SizedBox(height: 16),
             Text(
-              'Sem resultados',
-              style: AppTextStyles.h6.copyWith(color: AppColors.gray500),
+              l10n.semResultados,
+              style: AppTextStyles.h6.copyWith(color: palette.textSecondary),
             ),
             const SizedBox(height: 8),
             Text(
-              'Nenhum imóvel encontrado para "$_searchQuery"',
-              style: AppTextStyles.bodySmall.copyWith(color: AppColors.gray500),
+              l10n.nenhumImovelBusca(_searchQuery),
+              style: AppTextStyles.bodySmall.copyWith(
+                color: palette.textSecondary,
+              ),
               textAlign: TextAlign.center,
             ),
           ],

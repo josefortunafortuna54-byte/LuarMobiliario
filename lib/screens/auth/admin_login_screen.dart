@@ -8,8 +8,10 @@ import '../../core/constants/app_text_styles.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/services/auth_service.dart';
 import '../../core/services/supabase_service.dart';
+import '../../core/theme/app_palette.dart';
 import '../../core/utils/responsive.dart';
 import '../../core/utils/routes.dart';
+import '../../l10n/app_localizations.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_input.dart';
 
@@ -69,7 +71,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
       if (response == null) {
         setState(() {
           _isLoading = false;
-          _error = 'Email não encontrado';
+          _error = AppLocalizations.of(context).emailNaoEncontrado;
         });
         return;
       }
@@ -78,7 +80,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
       if (role != 'admin' && role != 'agent') {
         setState(() {
           _isLoading = false;
-          _error = 'Sem permissões de administrador';
+          _error = AppLocalizations.of(context).semPermissoesAdmin;
         });
         return;
       }
@@ -93,7 +95,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
       if (!authUserReady) {
         setState(() {
           _isLoading = false;
-          _error = 'Não foi possível preparar o acesso. Contacte o suporte.';
+          _error = AppLocalizations.of(context).prepararAcessoErro;
         });
         return;
       }
@@ -113,10 +115,12 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
       String errorMsg;
       final msg = e.message.toLowerCase();
       if (msg.contains('email') &&
-          (msg.contains('smtp') || msg.contains('mail') || msg.contains('send'))) {
-        errorMsg = 'Erro no envio de email. Contacte o suporte técnico.';
+          (msg.contains('smtp') ||
+              msg.contains('mail') ||
+              msg.contains('send'))) {
+        errorMsg = AppLocalizations.of(context).erroEnvioEmail;
       } else if (msg.contains('rate limit')) {
-        errorMsg = 'Muitas tentativas. Aguarde alguns minutos e tente novamente.';
+        errorMsg = AppLocalizations.of(context).muitasTentativas;
       } else {
         errorMsg = e.message;
       }
@@ -129,7 +133,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
       if (!mounted) return;
       setState(() {
         _isLoading = false;
-        _error = 'Erro ao enviar código. Verifique a sua ligação à internet.';
+        _error = AppLocalizations.of(context).erroEnvioCodigo;
       });
     }
   }
@@ -164,7 +168,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
       } else {
         setState(() {
           _isLoading = false;
-          _error = 'Código inválido ou expirado';
+          _error = AppLocalizations.of(context).codigoInvalido;
         });
       }
     } on AuthException catch (e) {
@@ -177,7 +181,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
       if (!mounted) return;
       setState(() {
         _isLoading = false;
-        _error = 'Erro ao verificar código. Tente novamente.';
+        _error = AppLocalizations.of(context).erroVerificarCodigo;
       });
     }
   }
@@ -191,16 +195,18 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   }
 
   String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) return 'Insira o seu e-mail';
+    final l10n = AppLocalizations.of(context);
+    if (value == null || value.isEmpty) return l10n.insiraEmail;
     if (!RegExp(AppConstants.emailRegex).hasMatch(value)) {
-      return 'E-mail inválido';
+      return l10n.emailInvalido;
     }
     return null;
   }
 
   String? _validateOtp(String? value) {
-    if (value == null || value.isEmpty) return 'Insira o código';
-    if (value.length < 6) return 'Código deve ter 6 dígitos';
+    final l10n = AppLocalizations.of(context);
+    if (value == null || value.isEmpty) return l10n.insiraCodigo;
+    if (value.length < 6) return l10n.codigo6Digitos;
     return null;
   }
 
@@ -209,9 +215,10 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
     final isDesktop = Responsive.isDesktop(context);
     final isTablet = Responsive.isTablet(context);
     final padding = Responsive.horizontalPadding(context);
+    final palette = context.palette;
 
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: palette.surface,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -271,6 +278,8 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   }
 
   Widget _buildHeader() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -289,31 +298,31 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
               ),
             ),
             const SizedBox(width: 10),
-            Text(
-              'Acesso Admin',
-              style: AppTextStyles.h4,
-            ),
+            Text(l10n.acessoAdmin, style: AppTextStyles.h4),
           ],
         ),
         const SizedBox(height: 8),
         Text(
           _otpSent
-              ? 'Código enviado para ${_maskedEmail ?? ""}'
-              : 'Insira o email para receber o código de acesso',
-          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.gray500),
+              ? l10n.codigoEnviado(_maskedEmail ?? '')
+              : l10n.insiraEmailCodigo,
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: palette.textSecondary,
+          ),
         ),
       ],
     );
   }
 
   Widget _buildEmailSection() {
+    final l10n = AppLocalizations.of(context);
     return Column(
       children: [
         Form(
           key: _emailFormKey,
           child: CustomInput(
-            label: 'E-mail do administrador',
-            hint: 'exemplo@email.com',
+            label: l10n.emailAdmin,
+            hint: l10n.emailHint,
             prefixIcon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
             textInputAction: TextInputAction.done,
@@ -325,7 +334,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
         ),
         const SizedBox(height: 24),
         CustomButton(
-          text: 'Enviar Código',
+          text: l10n.enviarCodigo,
           isFullWidth: true,
           size: CustomButtonSize.large,
           isLoading: _isLoading,
@@ -337,6 +346,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   }
 
   Widget _buildOtpSection() {
+    final l10n = AppLocalizations.of(context);
     return Column(
       children: [
         Container(
@@ -348,11 +358,15 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
           ),
           child: Row(
             children: [
-              const Icon(Icons.mark_email_read_outlined, size: 22, color: AppColors.success),
+              const Icon(
+                Icons.mark_email_read_outlined,
+                size: 22,
+                color: AppColors.success,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  'Verifique a sua caixa de entrada',
+                  l10n.verifiqueCaixa,
                   style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.success,
                     fontWeight: FontWeight.w600,
@@ -366,8 +380,8 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
         Form(
           key: _otpFormKey,
           child: CustomInput(
-            label: 'Código de verificação',
-            hint: '000000',
+            label: l10n.codigoVerificacao,
+            hint: l10n.codigoHint,
             prefixIcon: Icons.pin_outlined,
             keyboardType: TextInputType.number,
             textInputAction: TextInputAction.done,
@@ -383,7 +397,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
           child: TextButton(
             onPressed: _isLoading ? null : _sendOtp,
             child: Text(
-              'Reenviar código',
+              l10n.reenviarCodigo,
               style: AppTextStyles.bodySmall.copyWith(
                 color: AppColors.gold,
                 fontWeight: FontWeight.w600,
@@ -393,7 +407,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
         ),
         const SizedBox(height: 16),
         CustomButton(
-          text: 'Verificar e Entrar',
+          text: l10n.verificarEntrar,
           isFullWidth: true,
           size: CustomButtonSize.large,
           isLoading: _isLoading,
@@ -405,16 +419,18 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   }
 
   Widget _buildBackButton() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return TextButton.icon(
       onPressed: _isLoading
           ? null
           : _otpSent
-              ? _goBackToEmail
-              : () => Navigator.of(context).pop(),
+          ? _goBackToEmail
+          : () => Navigator.of(context).pop(),
       icon: const Icon(Icons.arrow_back_rounded, size: 18),
       label: Text(
-        _otpSent ? 'Usar outro email' : 'Voltar',
-        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.gray500),
+        _otpSent ? l10n.usarOutroEmail : l10n.voltar,
+        style: AppTextStyles.bodyMedium.copyWith(color: palette.textSecondary),
       ),
     );
   }
@@ -429,7 +445,11 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
       ),
       child: Row(
         children: [
-          const Icon(Icons.error_outline_rounded, size: 20, color: AppColors.error),
+          const Icon(
+            Icons.error_outline_rounded,
+            size: 20,
+            color: AppColors.error,
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(

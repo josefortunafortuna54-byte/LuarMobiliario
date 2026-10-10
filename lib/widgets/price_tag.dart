@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../core/constants/app_colors.dart';
 import '../core/constants/app_text_styles.dart';
+import '../core/theme/app_palette.dart';
 import '../core/utils/formatters.dart';
+import '../l10n/app_localizations.dart';
 
 enum PriceTagSize { small, medium, large }
 
@@ -40,9 +41,9 @@ class PriceTag extends StatelessWidget {
         if (isRent) ...[
           const SizedBox(width: 2),
           Text(
-            '/mês',
+            AppLocalizations.of(context).perMes,
             style: AppTextStyles.bodySmall.copyWith(
-              color: AppColors.gray500,
+              color: context.palette.textSecondary,
               fontWeight: FontWeight.w500,
             ),
           ),

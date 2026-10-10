@@ -4,7 +4,9 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/providers/message_provider.dart';
+import '../../core/theme/app_palette.dart';
 import '../../core/utils/routes.dart';
+import '../../l10n/app_localizations.dart';
 import '../../widgets/avatar_widget.dart';
 import '../../widgets/empty_state.dart';
 
@@ -27,12 +29,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
     });
   }
 
-  String _formatTime(String timeStr) {
+  String _formatTime(String timeStr, AppLocalizations l10n) {
     try {
       final time = DateTime.parse(timeStr);
       final now = DateTime.now();
       final diff = now.difference(time);
-      if (diff.inMinutes < 1) return 'Agora';
+      if (diff.inMinutes < 1) return l10n.agora;
       if (diff.inMinutes < 60) return '${diff.inMinutes}min';
       if (diff.inHours < 24) return '${diff.inHours}h';
       if (diff.inDays < 7) return '${diff.inDays}d';
@@ -45,15 +47,17 @@ class _MessagesScreenState extends State<MessagesScreen> {
   @override
   Widget build(BuildContext context) {
     final isGuest = context.watch<AuthProvider>().user == null;
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: palette.surface,
       appBar: AppBar(
         backgroundColor: AppColors.navy,
         elevation: 0,
         centerTitle: true,
         title: Text(
-          'Mensagens',
+          l10n.mensagens,
           style: AppTextStyles.h6.copyWith(color: AppColors.white),
         ),
         iconTheme: const IconThemeData(color: AppColors.gold),
@@ -63,6 +67,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
   }
 
   Widget _buildAuthenticatedBody() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Consumer<MessageProvider>(
       builder: (context, provider, _) {
         if (provider.isLoading && provider.conversations.isEmpty) {
@@ -74,10 +80,10 @@ class _MessagesScreenState extends State<MessagesScreen> {
         }
 
         if (provider.conversations.isEmpty) {
-          return const EmptyState(
+          return EmptyState(
             icon: Icons.chat_bubble_outline_rounded,
-            title: 'Sem mensagens',
-            subtitle: 'Suas conversas com corretores e vendedores aparecerão aqui.',
+            title: l10n.semMensagens,
+            subtitle: l10n.suasConversas,
           );
         }
 
@@ -97,7 +103,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
               height: 1,
               indent: 80,
               endIndent: 16,
-              color: AppColors.gray100,
+              color: palette.border,
             ),
             itemBuilder: (context, index) {
               final conv = provider.conversations[index];
@@ -111,6 +117,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
   }
 
   Widget _buildGuestState() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 48),
@@ -136,34 +144,17 @@ class _MessagesScreenState extends State<MessagesScreen> {
             ),
             const SizedBox(height: 24),
             Text(
-              'Crie uma conta',
+              l10n.mensagensDisponiveisConta,
               style: AppTextStyles.h5,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
-              'Registre-se para conversar com corretores e vendedores.',
-              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.gray500),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pushNamed(AppRoutes.register);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.gold,
-                  foregroundColor: AppColors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                ),
-                child: Text(
-                  'Criar Conta',
-                  style: AppTextStyles.buttonMedium.copyWith(color: AppColors.white),
-                ),
+              l10n.converseCorretores,
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: palette.textSecondary,
               ),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
@@ -172,6 +163,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
   }
 
   Widget _buildConversationTile(Map<String, dynamic> conv, bool hasUnread) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -213,10 +206,14 @@ class _MessagesScreenState extends State<MessagesScreen> {
                           ),
                         ),
                         Text(
-                          _formatTime(conv['lastMessageTime'] ?? ''),
+                          _formatTime(conv['lastMessageTime'] ?? '', l10n),
                           style: AppTextStyles.bodyTiny.copyWith(
-                            color: hasUnread ? AppColors.gold : AppColors.gray400,
-                            fontWeight: hasUnread ? FontWeight.w600 : FontWeight.w400,
+                            color: hasUnread
+                                ? AppColors.gold
+                                : palette.textMuted,
+                            fontWeight: hasUnread
+                                ? FontWeight.w600
+                                : FontWeight.w400,
                           ),
                         ),
                       ],
@@ -228,8 +225,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
                           child: Text(
                             conv['lastMessage'] ?? '',
                             style: AppTextStyles.bodySmall.copyWith(
-                              color: hasUnread ? AppColors.gray800 : AppColors.gray500,
-                              fontWeight: hasUnread ? FontWeight.w500 : FontWeight.w400,
+                              color: hasUnread
+                                  ? palette.textBody
+                                  : palette.textSecondary,
+                              fontWeight: hasUnread
+                                  ? FontWeight.w500
+                                  : FontWeight.w400,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,

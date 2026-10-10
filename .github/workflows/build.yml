@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build & Release
 
 on:
   push:
@@ -7,10 +7,47 @@ on:
     branches: [main, master]
   workflow_dispatch:
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
+jobs:
+  quality:
+    name: Analyze & Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.44.1"
+          channel: stable
+          cache: true
+
+      - name: Create .env from secrets
+        run: |
+          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" > .env
+          echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> .env
+          echo "FCM_SENDER_ID=${{ secrets.FCM_SENDER_ID }}" >> .env
+          echo "FCM_PROJECT_ID=${{ secrets.FCM_PROJECT_ID }}" >> .env
+          echo "FCM_API_KEY=${{ secrets.FCM_API_KEY }}" >> .env
+          echo "FCM_APP_ID=${{ secrets.FCM_APP_ID }}" >> .env
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos
+
+      - name: Run tests
+        run: flutter test
+
+  build-apk:
+    name: Build Signed Release APK
+    needs: quality
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,23 +65,51 @@ jobs:
           channel: stable
           cache: true
 
-      - name: Create .env file
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: gradle-${{ runner.os }}-
+
+      - name: Create .env from secrets
         run: |
           echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" > .env
           echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> .env
           echo "FCM_SENDER_ID=${{ secrets.FCM_SENDER_ID }}" >> .env
           echo "FCM_PROJECT_ID=${{ secrets.FCM_PROJECT_ID }}" >> .env
+          echo "FCM_API_KEY=${{ secrets.FCM_API_KEY }}" >> .env
+          echo "FCM_APP_ID=${{ secrets.FCM_APP_ID }}" >> .env
 
-      - name: Flutter pub get
+      - name: Configure release signing
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > android/app/android.jks
+            cat > android/key.properties <<EOF
+          storeFile=android.jks
+          storePassword=$KEYSTORE_PASSWORD
+          keyAlias=$KEY_ALIAS
+          keyPassword=$KEY_PASSWORD
+          EOF
+            echo "Release signing configured."
+          else
+            echo "::warning::KEYSTORE_BASE64 nao definido - o APK sera assinado com a chave de debug."
+          fi
+
+      - name: Install dependencies
         run: flutter pub get
-
-      - name: Analyze
-        run: flutter analyze --no-fatal-infos
 
       - name: Build APK
         timeout-minutes: 30
         env:
-          GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs=-Xmx4g"
+          GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs=-Xmx4g -Dorg.gradle.workers.max=2"
         run: flutter build apk --release --no-tree-shake-icons
 
       - name: Upload APK
@@ -53,3 +118,54 @@ jobs:
           name: luar-mobiliario-apk-${{ github.run_number }}
           path: build/app/outputs/flutter-apk/app-release.apk
           if-no-files-found: error
+
+  build-web:
+    name: Build & Deploy Web
+    needs: quality
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.44.1"
+          channel: stable
+          cache: true
+
+      - name: Create .env from secrets
+        run: |
+          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" > .env
+          echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> .env
+          echo "FCM_SENDER_ID=${{ secrets.FCM_SENDER_ID }}" >> .env
+          echo "FCM_PROJECT_ID=${{ secrets.FCM_PROJECT_ID }}" >> .env
+          echo "FCM_API_KEY=${{ secrets.FCM_API_KEY }}" >> .env
+          echo "FCM_APP_ID=${{ secrets.FCM_APP_ID }}" >> .env
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Web
+        run: flutter build web --release --base-href "/LuarMobiliario/"
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

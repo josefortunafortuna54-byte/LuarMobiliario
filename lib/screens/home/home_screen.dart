@@ -7,13 +7,17 @@ import '../../core/constants/app_constants.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/models/land_model.dart';
 import '../../core/models/property_model.dart';
+import '../../core/providers/auth_provider.dart';
 import '../../core/providers/land_provider.dart';
 import '../../core/providers/property_provider.dart';
+import '../../core/theme/app_palette.dart';
 import '../../core/utils/responsive.dart';
 import '../../core/utils/routes.dart';
+import '../../l10n/app_localizations.dart';
 import '../../widgets/land_card.dart';
 import '../../widgets/property_card.dart';
 import '../../widgets/search_widget.dart';
+import '../../widgets/settings_sheet.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -53,16 +57,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     final padding = Responsive.horizontalPadding(context);
     final isDesktop = Responsive.isDesktop(context);
+    final isGuest = context.watch<AuthProvider>().user == null;
 
     return Scaffold(
-      backgroundColor: AppColors.offWhite,
+      backgroundColor: palette.background,
       body: SafeArea(
         bottom: false,
         child: RefreshIndicator(
           color: AppColors.gold,
-          backgroundColor: AppColors.white,
+          backgroundColor: palette.surface,
           onRefresh: _onRefresh,
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(
@@ -91,11 +97,13 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       floatingActionButton: _buildWhatsAppFAB(),
-      bottomNavigationBar: isDesktop ? null : _buildBottomNav(),
+      bottomNavigationBar: isDesktop ? null : _buildBottomNav(isGuest: isGuest),
     );
   }
 
   Widget _buildHeroBanner(double padding) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Container(
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(padding, 28, padding, 32),
@@ -126,13 +134,26 @@ class _HomeScreenState extends State<HomeScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   clipBehavior: Clip.antiAlias,
-                  child: Image.asset(
-                    'logo.png',
-                    fit: BoxFit.cover,
-                  ),
+                  child: Image.asset('logo.png', fit: BoxFit.cover),
                 ),
               ),
               const Spacer(),
+              GestureDetector(
+                onTap: () => showSettingsSheet(context),
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppColors.white.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.settings_outlined,
+                    color: AppColors.white,
+                    size: 22,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
@@ -149,7 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 28),
           Text(
-            'Encontre o seu\nimóvel ideal',
+            l10n.homeHeroTitle,
             style: AppTextStyles.h2White.copyWith(
               fontSize: Responsive.fontSize(context, 32),
               height: 1.15,
@@ -157,14 +178,16 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Casas, apartamentos, terrenos e mais',
-            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.gray400),
+            l10n.homeHeroSubtitle,
+            style: AppTextStyles.bodyMedium.copyWith(color: palette.textMuted),
           ),
           const SizedBox(height: 24),
           SearchWidget(
-            hintText: 'Pesquisar por localização, tipo...',
+            hintText: l10n.homeSearchHint,
             onSearch: (query) {
-              Navigator.of(context).pushNamed(AppRoutes.search, arguments: query);
+              Navigator.of(
+                context,
+              ).pushNamed(AppRoutes.search, arguments: query);
             },
             onFilterTap: () {
               Navigator.of(context).pushNamed(AppRoutes.properties);
@@ -176,25 +199,36 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildCategoriesSection(double padding, bool isDesktop) {
+    final l10n = AppLocalizations.of(context);
     final categories = [
-      _CategoryData(icon: Icons.home_outlined, title: 'Casas', count: 0, filterType: 'house'),
+      _CategoryData(
+        icon: Icons.home_outlined,
+        title: l10n.casas,
+        count: 0,
+        filterType: 'house',
+      ),
       _CategoryData(
         icon: Icons.apartment_rounded,
-        title: 'Apartamentos',
+        title: l10n.apartamentos,
         count: 0,
         filterType: 'apartment',
       ),
-      _CategoryData(icon: Icons.landscape_rounded, title: 'Terrenos', count: 0, isLand: true),
+      _CategoryData(
+        icon: Icons.landscape_rounded,
+        title: l10n.terrenos,
+        count: 0,
+        isLand: true,
+      ),
       _CategoryData(
         icon: Icons.agriculture_rounded,
-        title: 'Fazendas',
+        title: l10n.fazendas,
         count: 0,
         filterType: 'farm',
         isLand: true,
       ),
       _CategoryData(
         icon: Icons.warehouse_outlined,
-        title: 'Armazéns',
+        title: l10n.armazens,
         count: 0,
         filterType: 'warehouse',
       ),
@@ -210,11 +244,11 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Categorias', style: AppTextStyles.h5),
+                Text(l10n.categorias, style: AppTextStyles.h5),
                 TextButton(
                   onPressed: () {},
                   child: Text(
-                    'Ver todas',
+                    l10n.verTodas,
                     style: AppTextStyles.bodySmall.copyWith(
                       color: AppColors.gold,
                       fontWeight: FontWeight.w600,
@@ -232,16 +266,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 spacing: 12,
                 runSpacing: 12,
                 children: categories
-                    .map((cat) => SizedBox(
-                          width: 120,
-                          child: _buildCategoryItem(
-                            icon: cat.icon,
-                            title: cat.title,
-                            count: cat.count,
-                            filterType: cat.filterType,
-                            isLand: cat.isLand,
-                          ),
-                        ))
+                    .map(
+                      (cat) => SizedBox(
+                        width: 120,
+                        child: _buildCategoryItem(
+                          icon: cat.icon,
+                          title: cat.title,
+                          count: cat.count,
+                          filterType: cat.filterType,
+                          isLand: cat.isLand,
+                        ),
+                      ),
+                    )
                     .toList(),
               ),
             )
@@ -255,16 +291,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 separatorBuilder: (_, _) => const SizedBox(width: 12),
                 itemBuilder: (context, index) {
                   final cat = categories[index];
-                    return SizedBox(
-                      width: 100,
-                      child: _buildCategoryItem(
-                        icon: cat.icon,
-                        title: cat.title,
-                        count: cat.count,
-                        filterType: cat.filterType,
-                        isLand: cat.isLand,
-                      ),
-                    );
+                  return SizedBox(
+                    width: 100,
+                    child: _buildCategoryItem(
+                      icon: cat.icon,
+                      title: cat.title,
+                      count: cat.count,
+                      filterType: cat.filterType,
+                      isLand: cat.isLand,
+                    ),
+                  );
                 },
               ),
             ),
@@ -283,9 +319,13 @@ class _HomeScreenState extends State<HomeScreen> {
     return GestureDetector(
       onTap: () {
         if (isLand) {
-          Navigator.of(context).pushNamed(AppRoutes.lands, arguments: filterType);
+          Navigator.of(
+            context,
+          ).pushNamed(AppRoutes.lands, arguments: filterType);
         } else {
-          Navigator.of(context).pushNamed(AppRoutes.properties, arguments: filterType);
+          Navigator.of(
+            context,
+          ).pushNamed(AppRoutes.properties, arguments: filterType);
         }
       },
       child: Container(
@@ -334,6 +374,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildFeaturedPropertiesSection(double padding, bool isDesktop) {
     return Consumer<PropertyProvider>(
       builder: (context, propertyProvider, _) {
+        final l10n = AppLocalizations.of(context);
         final featured = propertyProvider.featuredProperties;
         final isLoading = propertyProvider.isLoading && featured.isEmpty;
 
@@ -346,13 +387,13 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Imóveis em Destaque', style: AppTextStyles.h5),
+                  Text(l10n.imoveisDestaque, style: AppTextStyles.h5),
                   TextButton(
                     onPressed: () {
                       Navigator.of(context).pushNamed(AppRoutes.properties);
                     },
                     child: Text(
-                      'Ver todos',
+                      l10n.verTodos,
                       style: AppTextStyles.bodySmall.copyWith(
                         color: AppColors.gold,
                         fontWeight: FontWeight.w600,
@@ -376,7 +417,7 @@ class _HomeScreenState extends State<HomeScreen> {
             else if (featured.isEmpty)
               _buildEmptyState(
                 icon: Icons.apartment_rounded,
-                message: 'Nenhum imóvel em destaque no momento',
+                message: l10n.nenhumImovelDestaque,
                 padding: padding,
               )
             else if (isDesktop)
@@ -387,10 +428,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   runSpacing: 16,
                   children: featured
                       .take(4)
-                      .map((property) => SizedBox(
-                            width: 280,
-                            child: _buildPropertyCard(property),
-                          ))
+                      .map(
+                        (property) => SizedBox(
+                          width: 280,
+                          child: _buildPropertyCard(property),
+                        ),
+                      )
                       .toList(),
                 ),
               )
@@ -456,6 +499,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildFeaturedLandsSection(double padding, bool isDesktop) {
     return Consumer<LandProvider>(
       builder: (context, landProvider, _) {
+        final l10n = AppLocalizations.of(context);
         final featured = landProvider.featuredLands;
         final isLoading = landProvider.isLoading && featured.isEmpty;
 
@@ -468,13 +512,13 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Terrenos em Destaque', style: AppTextStyles.h5),
+                  Text(l10n.terrenosDestaque, style: AppTextStyles.h5),
                   TextButton(
                     onPressed: () {
                       Navigator.of(context).pushNamed(AppRoutes.lands);
                     },
                     child: Text(
-                      'Ver todos',
+                      l10n.verTodos,
                       style: AppTextStyles.bodySmall.copyWith(
                         color: AppColors.gold,
                         fontWeight: FontWeight.w600,
@@ -498,7 +542,7 @@ class _HomeScreenState extends State<HomeScreen> {
             else if (featured.isEmpty)
               _buildEmptyState(
                 icon: Icons.landscape_rounded,
-                message: 'Nenhum terreno em destaque no momento',
+                message: l10n.nenhumTerrenoDestaque,
                 padding: padding,
               )
             else if (isDesktop)
@@ -509,10 +553,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   runSpacing: 16,
                   children: featured
                       .take(4)
-                      .map((land) => SizedBox(
-                            width: 280,
-                            child: _buildLandCard(land),
-                          ))
+                      .map(
+                        (land) =>
+                            SizedBox(width: 280, child: _buildLandCard(land)),
+                      )
                       .toList(),
                 ),
               )
@@ -556,43 +600,47 @@ class _HomeScreenState extends State<HomeScreen> {
       badgeLabel: badgeLabel,
       features: land.features.take(3).toList(),
       onTap: () {
-        Navigator.of(context).pushNamed(AppRoutes.landDetail, arguments: land.id);
+        Navigator.of(
+          context,
+        ).pushNamed(AppRoutes.landDetail, arguments: land.id);
       },
     );
   }
 
   String _landTypeLabel(LandType type) {
+    final l10n = AppLocalizations.of(context);
     return switch (type) {
-      LandType.urban => 'Urbano',
-      LandType.agricultural => 'Agrícola',
-      LandType.industrial => 'Industrial',
-      LandType.commercial => 'Comercial',
-      LandType.lot => 'Lote',
-      LandType.farm => 'Fazenda',
+      LandType.urban => l10n.urbano,
+      LandType.agricultural => l10n.agricola,
+      LandType.industrial => l10n.industrial,
+      LandType.commercial => l10n.comercial,
+      LandType.lot => l10n.lote,
+      LandType.farm => l10n.fazenda,
     };
   }
 
   Widget _buildServicesSection(double padding, bool isDesktop) {
+    final l10n = AppLocalizations.of(context);
     final services = [
       _ServiceData(
         icon: Icons.shopping_cart_outlined,
-        title: 'Compra',
-        description: 'Encontre o imóvel dos seus sonhos',
+        title: l10n.servicoCompra,
+        description: l10n.servicoCompraDesc,
       ),
       _ServiceData(
         icon: Icons.sell_outlined,
-        title: 'Venda',
-        description: 'Venda com segurança e rapidez',
+        title: l10n.servicoVenda,
+        description: l10n.servicoVendaDesc,
       ),
       _ServiceData(
         icon: Icons.key_outlined,
-        title: 'Arrendamento',
-        description: 'Alugue com as melhores condições',
+        title: l10n.servicoArrendamento,
+        description: l10n.servicoArrendamentoDesc,
       ),
       _ServiceData(
         icon: Icons.business_center_outlined,
-        title: 'Consultoria',
-        description: 'Assessoria personalizada',
+        title: l10n.servicoConsultoria,
+        description: l10n.servicoConsultoriaDesc,
       ),
     ];
 
@@ -602,7 +650,7 @@ class _HomeScreenState extends State<HomeScreen> {
         const SizedBox(height: 32),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: padding),
-          child: Text('Serviços', style: AppTextStyles.h5),
+          child: Text(l10n.servicos, style: AppTextStyles.h5),
         ),
         const SizedBox(height: 16),
         if (isDesktop)
@@ -612,10 +660,10 @@ class _HomeScreenState extends State<HomeScreen> {
               spacing: 12,
               runSpacing: 12,
               children: services
-                  .map((service) => SizedBox(
-                        width: 150,
-                        child: _buildServiceCard(service),
-                      ))
+                  .map(
+                    (service) =>
+                        SizedBox(width: 150, child: _buildServiceCard(service)),
+                  )
                   .toList(),
             ),
           )
@@ -629,10 +677,7 @@ class _HomeScreenState extends State<HomeScreen> {
               separatorBuilder: (_, _) => const SizedBox(width: 12),
               itemBuilder: (context, index) {
                 final service = services[index];
-                return SizedBox(
-                  width: 150,
-                  child: _buildServiceCard(service),
-                );
+                return SizedBox(width: 150, child: _buildServiceCard(service));
               },
             ),
           ),
@@ -641,15 +686,16 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildServiceCard(_ServiceData service) {
+    final palette = context.palette;
     return GestureDetector(
       onTap: () {},
       child: Container(
         width: 150,
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: palette.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.gray100, width: 1),
+          border: Border.all(color: palette.border, width: 1),
           boxShadow: [
             BoxShadow(
               color: AppColors.navy.withValues(alpha: 0.04),
@@ -674,13 +720,15 @@ class _HomeScreenState extends State<HomeScreen> {
             Text(
               service.title,
               style: AppTextStyles.bodyMediumBold.copyWith(
-                color: AppColors.navy,
+                color: palette.textTitle,
               ),
             ),
             const SizedBox(height: 4),
             Text(
               service.description,
-              style: AppTextStyles.bodyTiny.copyWith(color: AppColors.gray500),
+              style: AppTextStyles.bodyTiny.copyWith(
+                color: palette.textSecondary,
+              ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
@@ -691,27 +739,28 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildWhyChooseUsSection(double padding) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final benefits = [
       _BenefitData(
         icon: Icons.workspace_premium_outlined,
-        title: 'Experiência no Mercado',
-        description:
-            'Mais de 10 anos de atuação no mercado imobiliário angolano',
+        title: l10n.beneficioExperiencia,
+        description: l10n.beneficioExperienciaDesc,
       ),
       _BenefitData(
         icon: Icons.handshake_outlined,
-        title: 'Atendimento Personalizado',
-        description: 'Cada cliente recebe atenção dedicada e sob medida',
+        title: l10n.beneficioAtendimento,
+        description: l10n.beneficioAtendimentoDesc,
       ),
       _BenefitData(
         icon: Icons.description_outlined,
-        title: 'Documentação Segura',
-        description: 'Cuidamos de toda a documentação com rigor e segurança',
+        title: l10n.beneficioDocumentacao,
+        description: l10n.beneficioDocumentacaoDesc,
       ),
       _BenefitData(
         icon: Icons.trending_up_rounded,
-        title: 'Melhores Preços',
-        description: 'Negociações transparentes e preços competitivos',
+        title: l10n.beneficioPrecos,
+        description: l10n.beneficioPrecosDesc,
       ),
     ];
 
@@ -724,12 +773,12 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Por que escolher-nos?', style: AppTextStyles.h5),
+              Text(l10n.porqueEscolher, style: AppTextStyles.h5),
               const SizedBox(height: 8),
               Text(
-                'A confiança que o mercado reconhece',
+                l10n.confiancaMercado,
                 style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.gray500,
+                  color: palette.textSecondary,
                 ),
               ),
             ],
@@ -742,12 +791,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildBenefitItem(_BenefitData benefit, double padding) {
+    final palette = context.palette;
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: padding, vertical: 8),
       child: Container(
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: palette.surface,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: AppColors.gold.withValues(alpha: 0.15),
@@ -780,14 +830,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   Text(
                     benefit.title,
                     style: AppTextStyles.bodyMediumBold.copyWith(
-                      color: AppColors.navy,
+                      color: palette.textTitle,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     benefit.description,
                     style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.gray500,
+                      color: palette.textSecondary,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -806,23 +856,24 @@ class _HomeScreenState extends State<HomeScreen> {
     required String message,
     double padding = 24,
   }) {
+    final palette = context.palette;
     return Container(
       height: 140,
       margin: EdgeInsets.symmetric(horizontal: padding),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: palette.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.gray100, width: 1),
+        border: Border.all(color: palette.border, width: 1),
       ),
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 40, color: AppColors.gray300),
+            Icon(icon, size: 40, color: palette.textMuted),
             const SizedBox(height: 12),
             Text(
               message,
-              style: AppTextStyles.bodySmall.copyWith(color: AppColors.gray400),
+              style: AppTextStyles.bodySmall.copyWith(color: palette.textMuted),
               textAlign: TextAlign.center,
             ),
           ],
@@ -842,7 +893,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildBottomNav() {
+  Widget _buildBottomNav({bool isGuest = false}) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       decoration: BoxDecoration(
         color: AppColors.navy,
@@ -863,27 +915,29 @@ class _HomeScreenState extends State<HomeScreen> {
               _buildNavItem(
                 icon: Icons.home_outlined,
                 activeIcon: Icons.home_rounded,
-                label: 'Início',
+                label: l10n.inicio,
                 index: 0,
               ),
               _buildNavItem(
                 icon: Icons.search_outlined,
                 activeIcon: Icons.search_rounded,
-                label: 'Pesquisar',
+                label: l10n.pesquisar,
                 index: 1,
               ),
-              _buildNavItem(
-                icon: Icons.favorite_outline,
-                activeIcon: Icons.favorite_rounded,
-                label: 'Favoritos',
-                index: 2,
-              ),
-              _buildNavItem(
-                icon: Icons.person_outline,
-                activeIcon: Icons.person_rounded,
-                label: 'Perfil',
-                index: 3,
-              ),
+              if (!isGuest) ...[
+                _buildNavItem(
+                  icon: Icons.favorite_outline,
+                  activeIcon: Icons.favorite_rounded,
+                  label: l10n.favoritos,
+                  index: 2,
+                ),
+                _buildNavItem(
+                  icon: Icons.person_outline,
+                  activeIcon: Icons.person_rounded,
+                  label: l10n.perfil,
+                  index: 3,
+                ),
+              ],
             ],
           ),
         ),
@@ -897,6 +951,7 @@ class _HomeScreenState extends State<HomeScreen> {
     required String label,
     required int index,
   }) {
+    final palette = context.palette;
     final isSelected = _currentBottomNav == index;
 
     return GestureDetector(
@@ -927,13 +982,13 @@ class _HomeScreenState extends State<HomeScreen> {
             Icon(
               isSelected ? activeIcon : icon,
               size: 24,
-              color: isSelected ? AppColors.gold : AppColors.gray400,
+              color: isSelected ? AppColors.gold : palette.textMuted,
             ),
             const SizedBox(height: 4),
             Text(
               label,
               style: AppTextStyles.bodyTiny.copyWith(
-                color: isSelected ? AppColors.gold : AppColors.gray400,
+                color: isSelected ? AppColors.gold : palette.textMuted,
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
               ),
             ),

@@ -6,6 +6,8 @@ import '../../core/constants/app_text_styles.dart';
 import '../../core/models/user_model.dart';
 import '../../core/providers/admin_provider.dart';
 import '../../core/providers/auth_provider.dart';
+import '../../core/theme/app_palette.dart';
+import '../../l10n/app_localizations.dart';
 import '../../widgets/avatar_widget.dart';
 
 class AdminUsersScreen extends StatefulWidget {
@@ -30,8 +32,8 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
       if (user?.role != UserRole.admin && mounted) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Acesso restrito a administradores'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context).acessoRestritoAdmin),
             backgroundColor: AppColors.error,
           ),
         );
@@ -75,14 +77,16 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: palette.surface,
       appBar: AppBar(
         backgroundColor: AppColors.navy,
         elevation: 0,
         centerTitle: true,
         title: Text(
-          'Utilizadores',
+          l10n.utilizadores,
           style: AppTextStyles.h6.copyWith(color: AppColors.white),
         ),
         iconTheme: const IconThemeData(color: AppColors.gold),
@@ -123,9 +127,11 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
   }
 
   Widget _buildSearchBar() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-      color: AppColors.white,
+      color: palette.surface,
       child: TextField(
         controller: _searchController,
         style: AppTextStyles.bodyMedium,
@@ -136,16 +142,16 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
           });
         },
         decoration: InputDecoration(
-          hintText: 'Pesquisar utilizadores...',
+          hintText: l10n.pesquisarUtilizadores,
           hintStyle: AppTextStyles.bodyMedium.copyWith(
-            color: AppColors.gray400,
+            color: palette.textMuted,
           ),
-          prefixIcon: const Padding(
-            padding: EdgeInsets.only(left: 14, right: 10),
+          prefixIcon: Padding(
+            padding: const EdgeInsets.only(left: 14, right: 10),
             child: Icon(
               Icons.search_rounded,
               size: 22,
-              color: AppColors.gray400,
+              color: palette.textMuted,
             ),
           ),
           prefixIconConstraints: const BoxConstraints(
@@ -161,18 +167,18 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                       _filterUsers();
                     });
                   },
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 4),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
                     child: Icon(
                       Icons.close_rounded,
                       size: 18,
-                      color: AppColors.gray400,
+                      color: palette.textMuted,
                     ),
                   ),
                 )
               : null,
           filled: true,
-          fillColor: AppColors.gray50,
+          fillColor: palette.background,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 14,
             vertical: 14,
@@ -183,7 +189,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: AppColors.gray200),
+            borderSide: BorderSide(color: palette.borderStrong),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
@@ -195,13 +201,17 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
   }
 
   Widget _buildUserCount() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [
           Text(
-            '${_filteredUsers.length} utilizador${_filteredUsers.length != 1 ? 'es' : ''}',
-            style: AppTextStyles.bodySmall.copyWith(color: AppColors.gray500),
+            l10n.contarUtilizadores(_filteredUsers.length),
+            style: AppTextStyles.bodySmall.copyWith(
+              color: palette.textSecondary,
+            ),
           ),
         ],
       ),
@@ -209,6 +219,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
   }
 
   Widget _buildUserTile(UserModel user) {
+    final palette = context.palette;
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -219,9 +230,9 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
         child: Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: AppColors.white,
+            color: palette.surface,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.gray100),
+            border: Border.all(color: palette.border),
             boxShadow: [
               BoxShadow(
                 color: AppColors.navy.withValues(alpha: 0.04),
@@ -252,7 +263,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                     Text(
                       user.email,
                       style: AppTextStyles.bodyTiny.copyWith(
-                        color: AppColors.gray500,
+                        color: palette.textSecondary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -265,7 +276,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
               Icon(
                 Icons.chevron_right_rounded,
                 size: 22,
-                color: AppColors.gray300,
+                color: palette.textMuted,
               ),
             ],
           ),
@@ -275,10 +286,11 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
   }
 
   Widget _buildRoleBadge(UserRole role) {
+    final l10n = AppLocalizations.of(context);
     final (label, color) = switch (role) {
-      UserRole.admin => ('Admin', AppColors.error),
-      UserRole.agent => ('Agente', AppColors.gold),
-      UserRole.client => ('Cliente', AppColors.info),
+      UserRole.admin => (l10n.admin, AppColors.error),
+      UserRole.agent => (l10n.agente, AppColors.gold),
+      UserRole.client => (l10n.cliente, AppColors.info),
     };
 
     return Container(
@@ -305,6 +317,8 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
   }
 
   Widget _buildEmptyState() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 48),
@@ -330,17 +344,17 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
             ),
             const SizedBox(height: 24),
             Text(
-              'Sem resultados',
+              l10n.semResultados,
               style: AppTextStyles.h5,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
               _searchQuery.isNotEmpty
-                  ? 'Nenhum utilizador encontrado para "$_searchQuery"'
-                  : 'Nenhum utilizador registado.',
+                  ? l10n.nenhumUtilizadorBusca(_searchQuery)
+                  : l10n.nenhumUtilizador,
               style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.gray500,
+                color: palette.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -376,17 +390,20 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final (roleLabel, roleColor) = switch (widget.user.role) {
-      UserRole.admin => ('Administrador', AppColors.error),
-      UserRole.agent => ('Agente Imobiliário', AppColors.gold),
-      UserRole.client => ('Cliente', AppColors.info),
+      UserRole.admin => (l10n.administrador, AppColors.error),
+      UserRole.agent => (l10n.agenteImobiliario, AppColors.gold),
+      UserRole.client => (l10n.cliente, AppColors.info),
     };
 
-    final isCurrentUser = context.read<AuthProvider>().user?.id == widget.user.id;
+    final isCurrentUser =
+        context.read<AuthProvider>().user?.id == widget.user.id;
 
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.white,
+      decoration: BoxDecoration(
+        color: palette.surface,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
@@ -398,7 +415,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: AppColors.gray300,
+                color: palette.textMuted,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -427,19 +444,21 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
             const SizedBox(height: 24),
             _buildDetailRow(
               icon: Icons.email_outlined,
-              label: 'Email',
+              label: l10n.email,
               value: widget.user.email,
             ),
             const SizedBox(height: 12),
             _buildDetailRow(
               icon: Icons.phone_outlined,
-              label: 'Telefone',
-              value: widget.user.phone.isNotEmpty ? widget.user.phone : 'Não informado',
+              label: l10n.telefone,
+              value: widget.user.phone.isNotEmpty
+                  ? widget.user.phone
+                  : l10n.naoInformado,
             ),
             const SizedBox(height: 12),
             _buildDetailRow(
               icon: Icons.calendar_today_outlined,
-              label: 'Registado em',
+              label: l10n.registadoEm,
               value: _formatDate(widget.user.createdAt),
             ),
             const SizedBox(height: 20),
@@ -462,9 +481,9 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                   ),
                 ),
                 child: Text(
-                  'Fechar',
+                  l10n.fechar,
                   style: AppTextStyles.buttonMedium.copyWith(
-                    color: AppColors.gray600,
+                    color: palette.textBody,
                   ),
                 ),
               ),
@@ -476,24 +495,27 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
   }
 
   Widget _buildRoleSection() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.gray50,
+        color: palette.background,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.gray200),
+        border: Border.all(color: palette.borderStrong),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.admin_panel_settings_outlined, size: 20, color: AppColors.gold),
-              const SizedBox(width: 10),
-              Text(
-                'Função',
-                style: AppTextStyles.bodyMediumBold,
+              Icon(
+                Icons.admin_panel_settings_outlined,
+                size: 20,
+                color: AppColors.gold,
               ),
+              const SizedBox(width: 10),
+              Text(l10n.funcao, style: AppTextStyles.bodyMediumBold),
             ],
           ),
           const SizedBox(height: 12),
@@ -501,32 +523,43 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
             initialValue: _selectedRole,
             isExpanded: true,
             decoration: InputDecoration(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 12,
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: AppColors.gray200),
+                borderSide: BorderSide(color: palette.borderStrong),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: AppColors.gray200),
+                borderSide: BorderSide(color: palette.borderStrong),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
                 borderSide: const BorderSide(color: AppColors.gold, width: 1.5),
               ),
               filled: true,
-              fillColor: AppColors.white,
+              fillColor: palette.inputFill,
             ),
-            items: const [
-              DropdownMenuItem(value: UserRole.client, child: Text('Cliente')),
-              DropdownMenuItem(value: UserRole.agent, child: Text('Agente')),
-              DropdownMenuItem(value: UserRole.admin, child: Text('Administrador')),
+            items: [
+              DropdownMenuItem(
+                value: UserRole.client,
+                child: Text(l10n.cliente),
+              ),
+              DropdownMenuItem(value: UserRole.agent, child: Text(l10n.agente)),
+              DropdownMenuItem(
+                value: UserRole.admin,
+                child: Text(l10n.administrador),
+              ),
             ],
-            onChanged: _isUpdating ? null : (value) {
-              if (value != null && value != _selectedRole) {
-                _confirmRoleChange(value);
-              }
-            },
+            onChanged: _isUpdating
+                ? null
+                : (value) {
+                    if (value != null && value != _selectedRole) {
+                      _confirmRoleChange(value);
+                    }
+                  },
           ),
           if (_isUpdating)
             const Padding(
@@ -541,6 +574,8 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
   }
 
   Widget _buildDeleteSection() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -556,11 +591,16 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Remover utilizador', style: AppTextStyles.bodyMediumBold),
+                Text(
+                  l10n.removerUtilizador,
+                  style: AppTextStyles.bodyMediumBold,
+                ),
                 const SizedBox(height: 2),
                 Text(
-                  'Ação irreversível',
-                  style: AppTextStyles.bodyTiny.copyWith(color: AppColors.gray500),
+                  l10n.acaoIrreversivel,
+                  style: AppTextStyles.bodyTiny.copyWith(
+                    color: palette.textSecondary,
+                  ),
                 ),
               ],
             ),
@@ -574,7 +614,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text('Remover'),
+            child: Text(l10n.remover),
           ),
         ],
       ),
@@ -582,26 +622,27 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
   }
 
   Future<void> _confirmRoleChange(UserRole newRole) async {
+    final l10n = AppLocalizations.of(context);
     final (newLabel, newColor) = switch (newRole) {
-      UserRole.admin => ('Administrador', AppColors.error),
-      UserRole.agent => ('Agente Imobiliário', AppColors.gold),
-      UserRole.client => ('Cliente', AppColors.info),
+      UserRole.admin => (l10n.administrador, AppColors.error),
+      UserRole.agent => (l10n.agenteImobiliario, AppColors.gold),
+      UserRole.client => (l10n.cliente, AppColors.info),
     };
 
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Alterar função'),
-        content: Text('Alterar a função de ${widget.user.name} para "$newLabel"?'),
+        title: Text(l10n.alterarFuncao),
+        content: Text(l10n.alterarFuncaoDe(widget.user.name, newLabel)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancelar'),
+            child: Text(l10n.cancelar),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: FilledButton.styleFrom(backgroundColor: AppColors.navy),
-            child: const Text('Confirmar'),
+            child: Text(l10n.confirmar),
           ),
         ],
       ),
@@ -622,14 +663,14 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Função alterada para $newLabel'),
+          content: Text(l10n.funcaoAlterada(newLabel)),
           backgroundColor: AppColors.success,
         ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Erro ao alterar função'),
+        SnackBar(
+          content: Text(l10n.erroAlterarFuncao),
           backgroundColor: AppColors.error,
         ),
       );
@@ -637,22 +678,21 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
   }
 
   Future<void> _confirmDelete() async {
+    final l10n = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Remover utilizador'),
-        content: Text(
-          'Tem certeza que deseja remover ${widget.user.name}? Esta ação não pode ser desfeita.',
-        ),
+        title: Text(l10n.removerUtilizador),
+        content: Text(l10n.temCertezaRemover(widget.user.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancelar'),
+            child: Text(l10n.cancelar),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: FilledButton.styleFrom(backgroundColor: AppColors.error),
-            child: const Text('Remover'),
+            child: Text(l10n.remover),
           ),
         ],
       ),
@@ -669,16 +709,16 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
     if (success) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Utilizador removido'),
+        SnackBar(
+          content: Text(l10n.utilizadorRemovido),
           backgroundColor: AppColors.success,
         ),
       );
     } else {
       setState(() => _isUpdating = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Erro ao remover utilizador'),
+        SnackBar(
+          content: Text(l10n.erroRemoverUtilizador),
           backgroundColor: AppColors.error,
         ),
       );
@@ -690,10 +730,11 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
     required String label,
     required String value,
   }) {
+    final palette = context.palette;
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.gray50,
+        color: palette.background,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -707,7 +748,7 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
                 Text(
                   label,
                   style: AppTextStyles.bodyTiny.copyWith(
-                    color: AppColors.gray500,
+                    color: palette.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 2),

@@ -106,7 +106,7 @@ void main() {
       final b = BookingModel.fromJson(<String, dynamic>{});
       expect(b.id, '');
       expect(b.propertyId, '');
-      expect(b.userId, '');
+      expect(b.userId, isNull);
       expect(b.userName, '');
       expect(b.userPhone, '');
       expect(b.time, '');
@@ -154,6 +154,22 @@ void main() {
       expect(json.containsKey('user_name'), isTrue);
       expect(json.containsKey('user_phone'), isTrue);
       expect(json.containsKey('created_at'), isTrue);
+    });
+
+    test('omits user_id for guest bookings', () {
+      final json = BookingModel(
+        id: 'b1',
+        propertyId: 'p1',
+        userName: 'Carlos',
+        userPhone: '+244900000000',
+        date: fixedDate,
+        time: '10:00',
+        status: BookingStatus.pending,
+        notes: '',
+        createdAt: fixedCreatedAt,
+      ).toJson();
+      expect(json.containsKey('user_id'), isFalse);
+      expect(json.length, 9);
     });
 
     test('has 10 keys', () {

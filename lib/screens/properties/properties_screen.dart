@@ -5,7 +5,9 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/models/property_model.dart';
 import '../../core/providers/property_provider.dart';
+import '../../core/theme/app_palette.dart';
 import '../../core/utils/routes.dart';
+import '../../l10n/app_localizations.dart';
 import '../../widgets/property_card.dart';
 import '../../widgets/loading_widget.dart';
 
@@ -19,17 +21,8 @@ class PropertiesScreen extends StatefulWidget {
 class _PropertiesScreenState extends State<PropertiesScreen> {
   final ScrollController _scrollController = ScrollController();
   int _selectedFilterIndex = 0;
-  String _sortOption = 'Mais recentes';
+  String _sortOption = 'recent';
   bool _showSortOptions = false;
-
-  static const List<String> _filterLabels = [
-    'Todos',
-    'Casas',
-    'Apartamentos',
-    'Escritórios',
-    'Armazéns',
-    'Lojas',
-  ];
 
   static const List<String> _filterKeys = [
     '',
@@ -39,6 +32,22 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
     'warehouse',
     'shop',
   ];
+
+  List<String> _filterLabels(AppLocalizations l10n) => [
+    l10n.todos,
+    l10n.casas,
+    l10n.apartamentos,
+    l10n.escritorios,
+    l10n.armazens,
+    l10n.lojas,
+  ];
+
+  String _sortLabel(String key, AppLocalizations l10n) => switch (key) {
+    'priceAsc' => l10n.menorPreco,
+    'priceDesc' => l10n.maiorPreco,
+    'areaDesc' => l10n.maiorArea,
+    _ => l10n.maisRecentes,
+  };
 
   @override
   void initState() {
@@ -101,16 +110,16 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
   List<PropertyModel> _sortProperties(List<PropertyModel> list) {
     final sorted = List<PropertyModel>.from(list);
     switch (_sortOption) {
-      case 'Menor preço':
+      case 'priceAsc':
         sorted.sort((a, b) => a.price.compareTo(b.price));
         break;
-      case 'Maior preço':
+      case 'priceDesc':
         sorted.sort((a, b) => b.price.compareTo(a.price));
         break;
-      case 'Maior área':
+      case 'areaDesc':
         sorted.sort((a, b) => b.area.compareTo(a.area));
         break;
-      case 'Mais recentes':
+      case 'recent':
       default:
         sorted.sort((a, b) => b.createdAt.compareTo(a.createdAt));
         break;
@@ -120,11 +129,12 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: AppColors.offWhite,
+      backgroundColor: context.palette.background,
       appBar: AppBar(
         title: Text(
-          'Imóveis',
+          l10n.imoveis,
           style: AppTextStyles.h5.copyWith(color: AppColors.white),
         ),
         backgroundColor: AppColors.navy,
@@ -162,16 +172,18 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
   }
 
   Widget _buildFilterBar() {
+    final palette = context.palette;
+    final labels = _filterLabels(AppLocalizations.of(context));
     return Container(
       height: 60,
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: const BoxDecoration(
-        color: AppColors.white,
-        border: Border(bottom: BorderSide(color: AppColors.gray200)),
+      decoration: BoxDecoration(
+        color: palette.surface,
+        border: Border(bottom: BorderSide(color: palette.borderStrong)),
       ),
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        itemCount: _filterLabels.length,
+        itemCount: labels.length,
         separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (_, index) {
           final isSelected = _selectedFilterIndex == index;
@@ -188,13 +200,13 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
                   color: isSelected ? AppColors.navy : Colors.transparent,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: isSelected ? AppColors.navy : AppColors.gray300,
+                    color: isSelected ? AppColors.navy : palette.textMuted,
                   ),
                 ),
                 child: Text(
-                  _filterLabels[index],
+                  labels[index],
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: isSelected ? AppColors.white : AppColors.gray600,
+                    color: isSelected ? AppColors.white : palette.textBody,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -207,6 +219,8 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
   }
 
   Widget _buildSortBar() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -214,7 +228,7 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
           child: Row(
             children: [
-              const Icon(Icons.sort_rounded, size: 20, color: AppColors.gray500),
+              Icon(Icons.sort_rounded, size: 20, color: palette.textSecondary),
               const SizedBox(width: 6),
               GestureDetector(
                 onTap: () {
@@ -225,9 +239,9 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
                 child: Row(
                   children: [
                     Text(
-                      _sortOption,
+                      _sortLabel(_sortOption, l10n),
                       style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.gray600,
+                        color: palette.textBody,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -237,7 +251,7 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
                           ? Icons.keyboard_arrow_up_rounded
                           : Icons.keyboard_arrow_down_rounded,
                       size: 18,
-                      color: AppColors.gray500,
+                      color: palette.textSecondary,
                     ),
                   ],
                 ),
@@ -249,9 +263,9 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: palette.surface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.gray200),
+              border: Border.all(color: palette.borderStrong),
               boxShadow: [
                 BoxShadow(
                   color: AppColors.navy.withValues(alpha: 0.08),
@@ -263,10 +277,10 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                _buildSortOption('Mais recentes'),
-                _buildSortOption('Menor preço'),
-                _buildSortOption('Maior preço'),
-                _buildSortOption('Maior área'),
+                _buildSortOption('recent'),
+                _buildSortOption('priceAsc'),
+                _buildSortOption('priceDesc'),
+                _buildSortOption('areaDesc'),
               ],
             ),
           ),
@@ -274,12 +288,14 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
     );
   }
 
-  Widget _buildSortOption(String label) {
-    final isSelected = _sortOption == label;
+  Widget _buildSortOption(String key) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
+    final isSelected = _sortOption == key;
     return GestureDetector(
       onTap: () {
         setState(() {
-          _sortOption = label;
+          _sortOption = key;
           _showSortOptions = false;
         });
       },
@@ -294,13 +310,13 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
             Icon(
               isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
               size: 18,
-              color: isSelected ? AppColors.gold : AppColors.gray400,
+              color: isSelected ? AppColors.gold : palette.textMuted,
             ),
             const SizedBox(width: 10),
             Text(
-              label,
+              _sortLabel(key, l10n),
               style: AppTextStyles.bodyMedium.copyWith(
-                color: isSelected ? AppColors.navy : AppColors.gray600,
+                color: isSelected ? palette.textTitle : palette.textBody,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
               ),
             ),
@@ -325,6 +341,8 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
   }
 
   Widget _buildErrorState(PropertyProvider provider) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -346,13 +364,15 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
             ),
             const SizedBox(height: 20),
             Text(
-              'Algo correu mal',
-              style: AppTextStyles.h6.copyWith(color: AppColors.navy),
+              l10n.algoCorreuMal,
+              style: AppTextStyles.h6.copyWith(color: palette.textTitle),
             ),
             const SizedBox(height: 8),
             Text(
-              provider.error ?? 'Erro desconhecido',
-              style: AppTextStyles.bodySmall.copyWith(color: AppColors.gray500),
+              provider.error ?? l10n.erroDesconhecido,
+              style: AppTextStyles.bodySmall.copyWith(
+                color: palette.textSecondary,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
@@ -360,7 +380,7 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
               onPressed: _loadProperties,
               icon: const Icon(Icons.refresh_rounded, size: 18),
               label: Text(
-                'Tentar novamente',
+                l10n.tentarNovamente,
                 style: AppTextStyles.buttonMedium.copyWith(
                   color: AppColors.white,
                 ),
@@ -380,6 +400,8 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
   }
 
   Widget _buildEmptyState() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -393,22 +415,22 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
                 color: AppColors.navy.withValues(alpha: 0.06),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.home_outlined,
                 size: 48,
-                color: AppColors.gray400,
+                color: palette.textMuted,
               ),
             ),
             const SizedBox(height: 24),
             Text(
-              'Nenhum imóvel encontrado',
-              style: AppTextStyles.h5.copyWith(color: AppColors.navy),
+              l10n.nenhumImovelEncontrado,
+              style: AppTextStyles.h5.copyWith(color: palette.textTitle),
             ),
             const SizedBox(height: 8),
             Text(
-              'Não encontrámos imóveis nesta categoria. Tente outro filtro.',
+              l10n.sicategoria,
               style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.gray500,
+                color: palette.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -422,6 +444,8 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
     List<PropertyModel> properties,
     PropertyProvider provider,
   ) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return RefreshIndicator(
       onRefresh: () async => _loadProperties(),
       color: AppColors.gold,
@@ -483,9 +507,9 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 24),
                 child: Center(
                   child: Text(
-                    'Todos os imóveis carregados',
+                    l10n.todosImoveisCarregados,
                     style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.gray400,
+                      color: palette.textMuted,
                     ),
                   ),
                 ),

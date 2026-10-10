@@ -6,6 +6,8 @@ import '../../core/constants/app_text_styles.dart';
 import '../../core/models/partner_model.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/providers/partner_provider.dart';
+import '../../core/theme/app_palette.dart';
+import '../../l10n/app_localizations.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_input.dart';
 import '../../widgets/loading_widget.dart';
@@ -76,10 +78,11 @@ class _PartnerFormScreenState extends State<PartnerFormScreen> {
   Future<void> _handleSave() async {
     if (!_formKey.currentState!.validate()) return;
 
+    final l10n = AppLocalizations.of(context);
     final auth = context.read<AuthProvider>();
     final user = auth.user;
     if (user == null) {
-      _showMessage('Sessão expirada. Entre novamente.', AppColors.error);
+      _showMessage(l10n.sessaoExpirada, AppColors.error);
       return;
     }
 
@@ -108,13 +111,10 @@ class _PartnerFormScreenState extends State<PartnerFormScreen> {
     setState(() => _isSaving = false);
 
     if (success) {
-      _showMessage(
-        'Perfil de parceiro salvo com sucesso!',
-        AppColors.success,
-      );
+      _showMessage(l10n.perfilParceiroSalvo, AppColors.success);
       Navigator.of(context).pop();
     } else {
-      _showMessage(provider.error ?? 'Erro ao guardar', AppColors.error);
+      _showMessage(provider.error ?? l10n.erroAoGuardar, AppColors.error);
     }
   }
 
@@ -124,29 +124,29 @@ class _PartnerFormScreenState extends State<PartnerFormScreen> {
         content: Text(message),
         backgroundColor: color,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: palette.surface,
       appBar: AppBar(
         backgroundColor: AppColors.navy,
         elevation: 0,
         centerTitle: true,
         title: Text(
-          'Perfil de Parceiro',
+          l10n.perfilParceiro,
           style: AppTextStyles.h6.copyWith(color: AppColors.white),
         ),
         iconTheme: const IconThemeData(color: AppColors.gold),
       ),
       body: _isSaving
-          ? const LoadingWidget(isFullScreen: true, message: 'Guardando...')
+          ? LoadingWidget(isFullScreen: true, message: l10n.guardando)
           : SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Form(
@@ -154,22 +154,22 @@ class _PartnerFormScreenState extends State<PartnerFormScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Dados da Empresa', style: AppTextStyles.h6),
+                    Text(l10n.dadosEmpresa, style: AppTextStyles.h6),
                     const SizedBox(height: 16),
                     CustomInput(
-                      label: 'Nome da Empresa',
-                      hint: 'Ex: Luar Imobiliária Lda',
+                      label: l10n.nomeEmpresa,
+                      hint: l10n.exNomeEmpresa,
                       prefixIcon: Icons.business_outlined,
                       controller: _companyController,
                       validator: (v) =>
-                          (v == null || v.isEmpty) ? 'Obrigatório' : null,
+                          (v == null || v.isEmpty) ? l10n.obrigatorio : null,
                     ),
                     const SizedBox(height: 16),
                     Row(
                       children: [
                         Expanded(
                           child: CustomInput(
-                            label: 'NIF',
+                            label: l10n.nifLabel,
                             hint: '123456789',
                             prefixIcon: Icons.badge_outlined,
                             controller: _nifController,
@@ -180,17 +180,17 @@ class _PartnerFormScreenState extends State<PartnerFormScreen> {
                       ],
                     ),
                     const SizedBox(height: 24),
-                    Text('Contactos', style: AppTextStyles.h6),
+                    Text(l10n.contactos, style: AppTextStyles.h6),
                     const SizedBox(height: 16),
                     CustomInput(
-                      label: 'Endereço',
-                      hint: 'Rua, número, município...',
+                      label: l10n.endereco,
+                      hint: l10n.ruaNumeroMunicipio,
                       prefixIcon: Icons.place_outlined,
                       controller: _addressController,
                     ),
                     const SizedBox(height: 16),
                     CustomInput(
-                      label: 'WhatsApp',
+                      label: l10n.whatsappLabel,
                       hint: '+244 9XX XXX XXX',
                       prefixIcon: Icons.chat_bubble_outline_rounded,
                       keyboardType: TextInputType.phone,
@@ -198,14 +198,14 @@ class _PartnerFormScreenState extends State<PartnerFormScreen> {
                     ),
                     const SizedBox(height: 16),
                     CustomInput(
-                      label: 'Licença',
-                      hint: 'Número da licença de corretor (opcional)',
+                      label: l10n.licenca,
+                      hint: l10n.numeroLicenca,
                       prefixIcon: Icons.fact_check_outlined,
                       controller: _licenseController,
                     ),
                     const SizedBox(height: 32),
                     CustomButton(
-                      text: 'Guardar Perfil',
+                      text: l10n.guadarPerfil,
                       isFullWidth: true,
                       size: CustomButtonSize.large,
                       isLoading: _isSaving,
@@ -220,27 +220,32 @@ class _PartnerFormScreenState extends State<PartnerFormScreen> {
   }
 
   Widget _buildBusinessTypeDropdown() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return DropdownButtonFormField<String>(
       initialValue: _selectedBusinessType,
       decoration: InputDecoration(
-        labelText: 'Tipo de Negócio',
+        labelText: l10n.tipoNegocio,
         labelStyle: AppTextStyles.bodySmall.copyWith(
-          color: AppColors.gray500,
+          color: palette.textSecondary,
         ),
         prefixIcon: const Icon(Icons.category_outlined, size: 20),
         filled: true,
-        fillColor: AppColors.white,
+        fillColor: palette.inputFill,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.gray200),
+          borderSide: BorderSide(color: palette.borderStrong),
         ),
       ),
-      items: const [
-        DropdownMenuItem(value: 'imobiliaria', child: Text('Imobiliária')),
-        DropdownMenuItem(value: 'construtora', child: Text('Construtora')),
-        DropdownMenuItem(value: 'corretor', child: Text('Corretor')),
-        DropdownMenuItem(value: 'administrador', child: Text('Administrador')),
-        DropdownMenuItem(value: 'outro', child: Text('Outro')),
+      items: [
+        DropdownMenuItem(value: 'imobiliaria', child: Text(l10n.imobiliaria)),
+        DropdownMenuItem(value: 'construtora', child: Text(l10n.construtora)),
+        DropdownMenuItem(value: 'corretor', child: Text(l10n.corretor)),
+        DropdownMenuItem(
+          value: 'administrador',
+          child: Text(l10n.administrador),
+        ),
+        DropdownMenuItem(value: 'outro', child: Text(l10n.outro)),
       ],
       onChanged: (v) => setState(() => _selectedBusinessType = v ?? 'outro'),
     );

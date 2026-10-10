@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:luar_company/widgets/feature_chip.dart';
 
+import '../helpers/test_app.dart';
+
 void main() {
   group('FeatureChip', () {
     testWidgets('renders label text', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(home: Scaffold(body: FeatureChip(label: 'Piscina'))),
+        testApp(home: Scaffold(body: FeatureChip(label: 'Piscina'))),
       );
 
       expect(find.text('Piscina'), findsOneWidget);
@@ -14,7 +16,7 @@ void main() {
 
     testWidgets('renders icon when provided', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        testApp(
           home: Scaffold(
             body: FeatureChip(label: 'Garagem', icon: Icons.garage_outlined),
           ),
@@ -26,7 +28,7 @@ void main() {
 
     testWidgets('does not render icon when not provided', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(home: Scaffold(body: FeatureChip(label: 'Varanda'))),
+        testApp(home: Scaffold(body: FeatureChip(label: 'Varanda'))),
       );
 
       expect(find.byIcon(Icons.garage_outlined), findsNothing);
@@ -34,7 +36,7 @@ void main() {
 
     testWidgets('renders multiple chips in a row', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        testApp(
           home: Scaffold(
             body: Row(
               children: [

@@ -48,6 +48,6 @@ enabled = true
 [analytics]
 enabled = false
 
-[functions]
+[functions.send-notification]
 enabled = true
 verify_jwt = false

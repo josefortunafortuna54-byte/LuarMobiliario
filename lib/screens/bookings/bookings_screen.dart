@@ -6,7 +6,8 @@ import '../../core/constants/app_text_styles.dart';
 import '../../core/models/booking_model.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/providers/booking_provider.dart';
-import '../../core/utils/routes.dart';
+import '../../core/theme/app_palette.dart';
+import '../../l10n/app_localizations.dart';
 import '../../widgets/loading_widget.dart';
 
 class BookingsScreen extends StatefulWidget {
@@ -42,8 +43,8 @@ class _BookingsScreenState extends State<BookingsScreen>
     await context.read<BookingProvider>().loadBookings(userId);
   }
 
-  String _shortPropertyId(String id) {
-    if (id.isEmpty) return 'Imóvel';
+  String _shortPropertyId(AppLocalizations l10n, String id) {
+    if (id.isEmpty) return l10n.imovel;
     if (id.length > 8) return id.substring(0, 8);
     return id;
   }
@@ -53,29 +54,35 @@ class _BookingsScreenState extends State<BookingsScreen>
   }
 
   Future<void> _cancelBooking(BookingModel booking) async {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('Cancelar Agendamento', style: AppTextStyles.h6),
+        title: Text(l10n.cancelarAgendamento, style: AppTextStyles.h6),
         content: Text(
-          'Deseja cancelar o agendamento para "${booking.propertyTitle.isNotEmpty ? booking.propertyTitle : _shortPropertyId(booking.propertyId)}"?',
+          l10n.desejaCancelarAgendamento(
+            booking.propertyTitle.isNotEmpty
+                ? booking.propertyTitle
+                : _shortPropertyId(l10n, booking.propertyId),
+          ),
           style: AppTextStyles.bodyMedium,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
             child: Text(
-              'Não',
+              l10n.nao,
               style: AppTextStyles.buttonMedium.copyWith(
-                color: AppColors.gray600,
+                color: palette.textBody,
               ),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             child: Text(
-              'Sim, Cancelar',
+              l10n.simCancelar,
               style: AppTextStyles.buttonMedium.copyWith(
                 color: AppColors.error,
               ),
@@ -92,16 +99,18 @@ class _BookingsScreenState extends State<BookingsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final isGuest = context.watch<AuthProvider>().user == null;
 
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: palette.surface,
       appBar: AppBar(
         backgroundColor: AppColors.navy,
         elevation: 0,
         centerTitle: true,
         title: Text(
-          'Agendamentos',
+          l10n.agendamentos,
           style: AppTextStyles.h6.copyWith(color: AppColors.white),
         ),
         iconTheme: const IconThemeData(color: AppColors.gold),
@@ -112,12 +121,12 @@ class _BookingsScreenState extends State<BookingsScreen>
                 indicatorColor: AppColors.gold,
                 indicatorWeight: 3,
                 labelColor: AppColors.gold,
-                unselectedLabelColor: AppColors.gray400,
+                unselectedLabelColor: palette.textMuted,
                 labelStyle: AppTextStyles.labelLarge,
                 unselectedLabelStyle: AppTextStyles.labelLarge,
-                tabs: const [
-                  Tab(text: 'Próximas'),
-                  Tab(text: 'Histórico'),
+                tabs: [
+                  Tab(text: l10n.proximas),
+                  Tab(text: l10n.historico),
                 ],
               ),
       ),
@@ -126,8 +135,8 @@ class _BookingsScreenState extends State<BookingsScreen>
           : Consumer<BookingProvider>(
               builder: (context, provider, _) {
                 if (provider.isLoading) {
-                  return const Center(
-                    child: LoadingWidget(message: 'Carregando agendamentos...'),
+                  return Center(
+                    child: LoadingWidget(message: l10n.carregandoAgendamentos),
                   );
                 }
 
@@ -137,7 +146,10 @@ class _BookingsScreenState extends State<BookingsScreen>
 
                 return TabBarView(
                   controller: _tabController,
-                  children: [_buildUpcomingTab(provider), _buildHistoryTab(provider)],
+                  children: [
+                    _buildUpcomingTab(provider),
+                    _buildHistoryTab(provider),
+                  ],
                 );
               },
             ),
@@ -145,6 +157,8 @@ class _BookingsScreenState extends State<BookingsScreen>
   }
 
   Widget _buildGuestState() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 48),
@@ -170,34 +184,17 @@ class _BookingsScreenState extends State<BookingsScreen>
             ),
             const SizedBox(height: 24),
             Text(
-              'Crie uma conta',
+              l10n.osSeusAgendamentos,
               style: AppTextStyles.h5,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
-              'Registre-se para agendar visitas aos imóveis.',
-              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.gray500),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pushNamed(AppRoutes.register);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.gold,
-                  foregroundColor: AppColors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                ),
-                child: Text(
-                  'Criar Conta',
-                  style: AppTextStyles.buttonMedium.copyWith(color: AppColors.white),
-                ),
+              l10n.quandoAgenda,
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: palette.textSecondary,
               ),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
@@ -206,12 +203,13 @@ class _BookingsScreenState extends State<BookingsScreen>
   }
 
   Widget _buildUpcomingTab(BookingProvider provider) {
+    final l10n = AppLocalizations.of(context);
     final upcoming = provider.upcomingBookings;
     if (upcoming.isEmpty) {
       return _buildEmptyState(
         icon: Icons.calendar_today_outlined,
-        title: 'Sem agendamentos',
-        subtitle: 'Seus próximos agendamentos aparecerão aqui.',
+        title: l10n.semAgendamentos,
+        subtitle: l10n.seuProximoAgendamento,
       );
     }
 
@@ -234,12 +232,13 @@ class _BookingsScreenState extends State<BookingsScreen>
   }
 
   Widget _buildHistoryTab(BookingProvider provider) {
+    final l10n = AppLocalizations.of(context);
     final history = provider.historyBookings;
     if (history.isEmpty) {
       return _buildEmptyState(
         icon: Icons.history_rounded,
-        title: 'Sem histórico',
-        subtitle: 'Agendamentos anteriores aparecerão aqui.',
+        title: l10n.semHistorico,
+        subtitle: l10n.agendamentosAnteriores,
       );
     }
 
@@ -262,14 +261,16 @@ class _BookingsScreenState extends State<BookingsScreen>
     required BookingModel booking,
     required bool showCancel,
   }) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final formattedDate =
         '${booking.date.day.toString().padLeft(2, '0')}/${booking.date.month.toString().padLeft(2, '0')}/${booking.date.year}';
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: palette.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.gray100),
+        border: Border.all(color: palette.border),
         boxShadow: [
           BoxShadow(
             color: AppColors.navy.withValues(alpha: 0.06),
@@ -304,16 +305,20 @@ class _BookingsScreenState extends State<BookingsScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        booking.propertyTitle.isNotEmpty ? booking.propertyTitle : 'Imóvel #${_shortPropertyId(booking.propertyId)}',
+                        booking.propertyTitle.isNotEmpty
+                            ? booking.propertyTitle
+                            : l10n.imovelCurto(
+                                _shortPropertyId(l10n, booking.propertyId),
+                              ),
                         style: AppTextStyles.bodyMediumBold,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'Agendado por: ${booking.userName}',
+                        l10n.agendadoPor(booking.userName),
                         style: AppTextStyles.bodyTiny.copyWith(
-                          color: AppColors.gray500,
+                          color: palette.textSecondary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -328,42 +333,42 @@ class _BookingsScreenState extends State<BookingsScreen>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
-                color: AppColors.gray50,
+                color: palette.background,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.calendar_today_outlined,
                     size: 16,
-                    color: AppColors.navy,
+                    color: palette.textTitle,
                   ),
                   const SizedBox(width: 8),
                   Text(
                     formattedDate,
                     style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.gray700,
+                      color: palette.textBody,
                     ),
                   ),
                   const SizedBox(width: 16),
-                  const Icon(
+                  Icon(
                     Icons.access_time_rounded,
                     size: 16,
-                    color: AppColors.navy,
+                    color: palette.textTitle,
                   ),
                   const SizedBox(width: 8),
                   Text(
                     booking.time,
                     style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.gray700,
+                      color: palette.textBody,
                     ),
                   ),
                   const Spacer(),
                   if (booking.notes.isNotEmpty)
-                    const Icon(
+                    Icon(
                       Icons.notes_rounded,
                       size: 16,
-                      color: AppColors.gray400,
+                      color: palette.textMuted,
                     ),
                 ],
               ),
@@ -380,7 +385,7 @@ class _BookingsScreenState extends State<BookingsScreen>
                     color: AppColors.error,
                   ),
                   label: Text(
-                    'Cancelar Agendamento',
+                    l10n.cancelarAgendamento,
                     style: AppTextStyles.bodySmallBold.copyWith(
                       color: AppColors.error,
                     ),
@@ -402,11 +407,12 @@ class _BookingsScreenState extends State<BookingsScreen>
   }
 
   Widget _buildStatusBadge(BookingStatus status) {
+    final l10n = AppLocalizations.of(context);
     final (label, color) = switch (status) {
-      BookingStatus.pending => ('Pendente', AppColors.gold),
-      BookingStatus.confirmed => ('Confirmada', AppColors.success),
-      BookingStatus.cancelled => ('Cancelada', AppColors.error),
-      BookingStatus.completed => ('Concluída', AppColors.info),
+      BookingStatus.pending => (l10n.pendente, AppColors.gold),
+      BookingStatus.confirmed => (l10n.confirmada, AppColors.success),
+      BookingStatus.cancelled => (l10n.cancelada, AppColors.error),
+      BookingStatus.completed => (l10n.concluida, AppColors.info),
     };
 
     return Container(
@@ -457,7 +463,7 @@ class _BookingsScreenState extends State<BookingsScreen>
             Text(
               subtitle,
               style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.gray500,
+                color: context.palette.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -468,6 +474,8 @@ class _BookingsScreenState extends State<BookingsScreen>
   }
 
   Widget _buildErrorState(String message) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 48),
@@ -481,21 +489,23 @@ class _BookingsScreenState extends State<BookingsScreen>
             ),
             const SizedBox(height: 16),
             Text(
-              'Erro ao carregar',
+              l10n.erroAoCarregar,
               style: AppTextStyles.h6,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
               message,
-              style: AppTextStyles.bodySmall.copyWith(color: AppColors.gray500),
+              style: AppTextStyles.bodySmall.copyWith(
+                color: palette.textSecondary,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
             TextButton(
               onPressed: _loadBookings,
               child: Text(
-                'Tentar novamente',
+                l10n.tentarNovamente,
                 style: AppTextStyles.buttonMedium.copyWith(
                   color: AppColors.gold,
                 ),

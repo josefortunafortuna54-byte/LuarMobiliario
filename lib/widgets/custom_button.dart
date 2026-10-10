@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../core/constants/app_colors.dart';
 import '../core/constants/app_text_styles.dart';
+import '../core/theme/app_palette.dart';
 
 enum CustomButtonVariant { primary, secondary, outline, text }
 
@@ -37,13 +38,13 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final child = isLoading ? _buildLoading() : _buildContent();
+    final child = isLoading ? _buildLoading() : _buildContent(context);
 
     final button = switch (variant) {
       CustomButtonVariant.primary => _buildPrimary(child),
       CustomButtonVariant.secondary => _buildSecondary(child),
-      CustomButtonVariant.outline => _buildOutline(child),
-      CustomButtonVariant.text => _buildText(child),
+      CustomButtonVariant.outline => _buildOutline(child, context),
+      CustomButtonVariant.text => _buildText(child, context),
     };
 
     if (isFullWidth) {
@@ -52,23 +53,27 @@ class CustomButton extends StatelessWidget {
     return button;
   }
 
-  Widget _buildContent() {
+  Widget _buildContent(BuildContext context) {
     final content = <Widget>[];
 
     if (icon != null && iconPosition == IconPosition.start) {
-      content.add(Icon(icon, size: _iconSize, color: _iconColor));
+      content.add(Icon(icon, size: _iconSize, color: _iconColor(context)));
       content.add(SizedBox(width: _iconSpacing));
     }
 
     content.add(
       Flexible(
-        child: Text(text, style: _textStyle, overflow: TextOverflow.ellipsis),
+        child: Text(
+          text,
+          style: _textStyle(context),
+          overflow: TextOverflow.ellipsis,
+        ),
       ),
     );
 
     if (icon != null && iconPosition == IconPosition.end) {
       content.add(SizedBox(width: _iconSpacing));
-      content.add(Icon(icon, size: _iconSize, color: _iconColor));
+      content.add(Icon(icon, size: _iconSize, color: _iconColor(context)));
     }
 
     return Row(
@@ -132,14 +137,16 @@ class CustomButton extends StatelessWidget {
     );
   }
 
-  Widget _buildOutline(Widget child) {
+  Widget _buildOutline(Widget child, BuildContext context) {
     return OutlinedButton(
       onPressed: _onPressed,
       style: OutlinedButton.styleFrom(
-        foregroundColor: _isEnabled ? AppColors.navy : AppColors.gray400,
+        foregroundColor: _isEnabled
+            ? context.palette.textTitle
+            : AppColors.gray400,
         disabledForegroundColor: AppColors.gray400,
         side: BorderSide(
-          color: _isEnabled ? AppColors.navy : AppColors.gray300,
+          color: _isEnabled ? context.palette.textTitle : AppColors.gray300,
           width: 1.5,
         ),
         padding: _padding,
@@ -151,7 +158,7 @@ class CustomButton extends StatelessWidget {
     );
   }
 
-  Widget _buildText(Widget child) {
+  Widget _buildText(Widget child, BuildContext context) {
     return TextButton(
       onPressed: _onPressed,
       style: TextButton.styleFrom(
@@ -187,29 +194,32 @@ class CustomButton extends StatelessWidget {
     ),
   };
 
-  TextStyle get _textStyle => switch (size) {
-    CustomButtonSize.small => AppTextStyles.buttonSmall.copyWith(
-      color:
-          variant == CustomButtonVariant.primary ||
-              variant == CustomButtonVariant.secondary
-          ? AppColors.white
-          : AppColors.navy,
-    ),
-    CustomButtonSize.medium => AppTextStyles.buttonMedium.copyWith(
-      color:
-          variant == CustomButtonVariant.primary ||
-              variant == CustomButtonVariant.secondary
-          ? AppColors.white
-          : AppColors.navy,
-    ),
-    CustomButtonSize.large => AppTextStyles.buttonLarge.copyWith(
-      color:
-          variant == CustomButtonVariant.primary ||
-              variant == CustomButtonVariant.secondary
-          ? AppColors.white
-          : AppColors.navy,
-    ),
-  };
+  TextStyle _textStyle(BuildContext context) {
+    final navy = context.palette.textTitle;
+    return switch (size) {
+      CustomButtonSize.small => AppTextStyles.buttonSmall.copyWith(
+        color:
+            variant == CustomButtonVariant.primary ||
+                variant == CustomButtonVariant.secondary
+            ? AppColors.white
+            : navy,
+      ),
+      CustomButtonSize.medium => AppTextStyles.buttonMedium.copyWith(
+        color:
+            variant == CustomButtonVariant.primary ||
+                variant == CustomButtonVariant.secondary
+            ? AppColors.white
+            : navy,
+      ),
+      CustomButtonSize.large => AppTextStyles.buttonLarge.copyWith(
+        color:
+            variant == CustomButtonVariant.primary ||
+                variant == CustomButtonVariant.secondary
+            ? AppColors.white
+            : navy,
+      ),
+    };
+  }
 
   double get _iconSize => switch (size) {
     CustomButtonSize.small => 16,
@@ -223,10 +233,10 @@ class CustomButton extends StatelessWidget {
     CustomButtonSize.large => 10,
   };
 
-  Color? get _iconColor => switch (variant) {
+  Color? _iconColor(BuildContext context) => switch (variant) {
     CustomButtonVariant.primary ||
     CustomButtonVariant.secondary => AppColors.white,
-    _ => AppColors.navy,
+    _ => context.palette.textTitle,
   };
 }
 

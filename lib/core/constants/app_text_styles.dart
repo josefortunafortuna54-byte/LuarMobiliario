@@ -9,7 +9,7 @@ abstract final class AppTextStyles {
     required FontWeight fontWeight,
     double? letterSpacing,
     double? height,
-    Color color = AppColors.navy,
+    Color? color,
   }) {
     return GoogleFonts.playfairDisplay(
       fontSize: fontSize,
@@ -25,7 +25,7 @@ abstract final class AppTextStyles {
     required FontWeight fontWeight,
     double? letterSpacing,
     double? height,
-    Color color = AppColors.gray800,
+    Color? color,
   }) {
     return GoogleFonts.dmSans(
       fontSize: fontSize,

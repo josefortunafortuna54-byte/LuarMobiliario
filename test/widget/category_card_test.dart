@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:luar_company/widgets/category_card.dart';
 
+import '../helpers/test_app.dart';
+
 void main() {
   group('CategoryCard', () {
     testWidgets('renders title, icon and count', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        testApp(
           home: Scaffold(body: CategoryCard(icon: Icons.home, title: 'Casas', count: 5)),
         ),
       );
@@ -18,7 +20,7 @@ void main() {
 
     testWidgets('uses singular for count of 1', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        testApp(
           home: Scaffold(body: CategoryCard(icon: Icons.home, title: 'Casas', count: 1)),
         ),
       );
@@ -30,7 +32,7 @@ void main() {
       var tapped = false;
 
       await tester.pumpWidget(
-        MaterialApp(
+        testApp(
           home: Scaffold(
             body: CategoryCard(
               icon: Icons.landscape,
@@ -48,12 +50,12 @@ void main() {
 
     testWidgets('does not throw when onTap is null', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        testApp(
           home: Scaffold(body: CategoryCard(icon: Icons.grid_view, title: 'Todas', count: 0)),
         ),
       );
 
-      expect(find.text('0 imóveis'), findsOneWidget);
+      expect(find.text('0 imóvel'), findsOneWidget);
     });
   });
 }

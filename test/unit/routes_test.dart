@@ -5,8 +5,6 @@ void main() {
   group('AppRoutes', () {
     test('has all expected route constants', () {
       expect(AppRoutes.splash, isNotEmpty);
-      expect(AppRoutes.login, isNotEmpty);
-      expect(AppRoutes.register, isNotEmpty);
       expect(AppRoutes.home, isNotEmpty);
       expect(AppRoutes.search, isNotEmpty);
       expect(AppRoutes.properties, isNotEmpty);
@@ -24,8 +22,6 @@ void main() {
 
     test('route constants start with /', () {
       expect(AppRoutes.splash, startsWith('/'));
-      expect(AppRoutes.login, startsWith('/'));
-      expect(AppRoutes.register, startsWith('/'));
       expect(AppRoutes.home, startsWith('/'));
       expect(AppRoutes.search, startsWith('/'));
       expect(AppRoutes.properties, startsWith('/'));
@@ -48,8 +44,6 @@ void main() {
 
     test('non-detail routes do not contain :id pattern', () {
       expect(AppRoutes.splash.contains(':id'), isFalse);
-      expect(AppRoutes.login.contains(':id'), isFalse);
-      expect(AppRoutes.register.contains(':id'), isFalse);
       expect(AppRoutes.home.contains(':id'), isFalse);
       expect(AppRoutes.search.contains(':id'), isFalse);
       expect(AppRoutes.properties.contains(':id'), isFalse);

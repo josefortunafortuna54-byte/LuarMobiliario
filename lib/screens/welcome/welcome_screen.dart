@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/constants/app_text_styles.dart';
+import '../../core/theme/app_palette.dart';
 import '../../core/utils/responsive.dart';
 import '../../core/utils/routes.dart';
+import '../../l10n/app_localizations.dart';
 import '../../widgets/custom_button.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -18,7 +20,7 @@ class WelcomeScreen extends StatelessWidget {
     final screenHeight = Responsive.height(context);
 
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: context.palette.surface,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -46,21 +48,19 @@ class WelcomeScreen extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: padding),
       child: Row(
         children: [
-          Expanded(
-            flex: 1,
-            child: _buildHeaderSection(context, isDesktop),
-          ),
+          Expanded(flex: 1, child: _buildHeaderSection(context, isDesktop)),
           SizedBox(width: isDesktop ? 64 : 40),
-          Expanded(
-            flex: 1,
-            child: _buildContentSection(context, isDesktop),
-          ),
+          Expanded(flex: 1, child: _buildContentSection(context, isDesktop)),
         ],
       ),
     );
   }
 
-  Widget _buildMobileLayout(BuildContext context, double padding, double screenHeight) {
+  Widget _buildMobileLayout(
+    BuildContext context,
+    double padding,
+    double screenHeight,
+  ) {
     return Column(
       children: [
         _buildHeaderSection(context, false),
@@ -71,6 +71,8 @@ class WelcomeScreen extends StatelessWidget {
   }
 
   Widget _buildHeaderSection(BuildContext context, bool isDesktop) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final logoSize = isDesktop ? 140.0 : 120.0;
 
     return Container(
@@ -107,7 +109,7 @@ class WelcomeScreen extends StatelessWidget {
           ),
           const SizedBox(height: 32),
           Text(
-            'Luar Mobiliario',
+            l10n.appName,
             style: AppTextStyles.h2White.copyWith(
               letterSpacing: 2,
               fontWeight: FontWeight.w700,
@@ -116,9 +118,9 @@ class WelcomeScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            AppConstants.appTagline,
+            l10n.appTagline,
             style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.gray400,
+              color: palette.textMuted,
               fontSize: Responsive.fontSize(context, 15),
             ),
             textAlign: TextAlign.center,
@@ -129,44 +131,34 @@ class WelcomeScreen extends StatelessWidget {
   }
 
   Widget _buildContentSection(BuildContext context, bool isDesktop) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: isDesktop ? 0 : 32),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          const SizedBox(height: 8),
+          Text(
+            l10n.welcomeDesc,
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: palette.textSecondary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 24),
           CustomButton(
-            text: 'Entrar',
+            text: l10n.explorarImoveis,
             isFullWidth: true,
             size: CustomButtonSize.large,
             onPressed: () {
-              Navigator.of(context).pushNamed(AppRoutes.login);
+              Navigator.of(context).pushReplacementNamed(AppRoutes.home);
             },
-          ),
-          const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: () {
-                Navigator.of(context).pushNamed(AppRoutes.register);
-              },
-              icon: const Icon(Icons.person_add_outlined, size: 20),
-              label: Text(
-                'Criar Conta',
-                style: AppTextStyles.buttonLarge.copyWith(color: AppColors.navy),
-              ),
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                side: const BorderSide(color: AppColors.navy, width: 1.5),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppConstants.radiusMd),
-                ),
-              ),
-            ),
           ),
           const SizedBox(height: 32),
           Text(
-            'Versão ${AppConstants.appVersion}',
-            style: AppTextStyles.bodyTiny.copyWith(color: AppColors.gray400),
+            l10n.versao(AppConstants.appVersion),
+            style: AppTextStyles.bodyTiny.copyWith(color: palette.textMuted),
           ),
         ],
       ),

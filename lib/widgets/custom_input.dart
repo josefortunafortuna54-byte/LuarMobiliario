@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../core/constants/app_colors.dart';
 import '../core/constants/app_text_styles.dart';
+import '../core/theme/app_palette.dart';
 
 class CustomInput extends StatefulWidget {
   const CustomInput({
@@ -77,11 +78,12 @@ class _CustomInputState extends State<CustomInput> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     final borderColor = _hasError
         ? AppColors.error
         : _isFocused
         ? AppColors.gold
-        : AppColors.gray200;
+        : palette.borderStrong;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -91,7 +93,7 @@ class _CustomInputState extends State<CustomInput> {
           Text(
             widget.label!,
             style: AppTextStyles.labelMedium.copyWith(
-              color: _isFocused ? AppColors.navy : AppColors.gray600,
+              color: _isFocused ? palette.textTitle : palette.textBody,
             ),
           ),
           const SizedBox(height: 8),
@@ -129,7 +131,7 @@ class _CustomInputState extends State<CustomInput> {
             decoration: InputDecoration(
               hintText: widget.hint,
               hintStyle: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.gray400,
+                color: palette.textMuted,
               ),
               prefixIcon: widget.prefixIcon != null
                   ? Padding(
@@ -137,7 +139,7 @@ class _CustomInputState extends State<CustomInput> {
                       child: Icon(
                         widget.prefixIcon,
                         size: 20,
-                        color: _isFocused ? AppColors.gold : AppColors.gray400,
+                        color: _isFocused ? AppColors.gold : palette.textMuted,
                       ),
                     )
                   : null,
@@ -145,13 +147,14 @@ class _CustomInputState extends State<CustomInput> {
                 minWidth: 0,
                 minHeight: 0,
               ),
-              suffixIcon: _buildSuffixIcon(),
+              suffixIcon: _buildSuffixIcon(context),
               errorText: widget.errorText,
               errorStyle: AppTextStyles.bodyTiny.copyWith(
                 color: AppColors.error,
               ),
               filled: true,
-              fillColor: widget.enabled ? AppColors.white : AppColors.gray100,
+              fillColor:
+                  widget.enabled ? palette.inputFill : palette.surfaceAlt,
               contentPadding: EdgeInsets.symmetric(
                 horizontal: 14,
                 vertical: widget.maxLines > 1 ? 16 : 14,
@@ -162,10 +165,7 @@ class _CustomInputState extends State<CustomInput> {
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(
-                  color: AppColors.gray200,
-                  width: 1,
-                ),
+                borderSide: BorderSide(color: palette.borderStrong, width: 1),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -184,10 +184,7 @@ class _CustomInputState extends State<CustomInput> {
               ),
               disabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(
-                  color: AppColors.gray200,
-                  width: 1,
-                ),
+                borderSide: BorderSide(color: palette.border, width: 1),
               ),
             ),
           ),
@@ -196,7 +193,7 @@ class _CustomInputState extends State<CustomInput> {
     );
   }
 
-  Widget? _buildSuffixIcon() {
+  Widget? _buildSuffixIcon(BuildContext context) {
     if (widget.obscureText) {
       return GestureDetector(
         onTap: () => setState(() => _obscureText = !_obscureText),
@@ -207,7 +204,7 @@ class _CustomInputState extends State<CustomInput> {
                 ? Icons.visibility_off_outlined
                 : Icons.visibility_outlined,
             size: 20,
-            color: AppColors.gray400,
+            color: context.palette.textMuted,
           ),
         ),
       );

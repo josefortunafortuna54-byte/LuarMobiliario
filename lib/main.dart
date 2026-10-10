@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'app.dart';
 import 'core/providers/auth_provider.dart';
 import 'core/providers/booking_provider.dart';
+import 'core/providers/locale_provider.dart';
 import 'core/providers/message_provider.dart';
 import 'core/providers/admin_provider.dart';
 import 'core/providers/favorite_provider.dart';
@@ -13,6 +14,7 @@ import 'core/providers/land_provider.dart';
 import 'core/providers/property_provider.dart';
 import 'core/providers/partner_provider.dart';
 import 'core/providers/search_provider.dart';
+import 'core/providers/theme_provider.dart';
 import 'core/services/notification_service.dart';
 import 'core/services/supabase_service.dart';
 
@@ -38,6 +40,9 @@ Future<void> main() async {
 
   await NotificationService().initialize();
 
+  final themeProvider = await ThemeProvider.load();
+  final localeProvider = await LocaleProvider.load();
+
   runApp(
     MultiProvider(
       providers: [
@@ -50,6 +55,8 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => MessageProvider()),
         ChangeNotifierProvider(create: (_) => AdminProvider()),
         ChangeNotifierProvider(create: (_) => PartnerProvider()),
+        ChangeNotifierProvider.value(value: themeProvider),
+        ChangeNotifierProvider.value(value: localeProvider),
       ],
       child: const LuarCompanyApp(),
     ),

@@ -8,6 +8,8 @@ import '../../core/models/land_model.dart';
 import '../../core/providers/land_provider.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/services/storage_service.dart';
+import '../../core/theme/app_palette.dart';
+import '../../l10n/app_localizations.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_input.dart';
 import '../../widgets/loading_widget.dart';
@@ -96,18 +98,18 @@ class _LandFormScreenState extends State<LandFormScreen> {
     }
   }
 
-  void _removeNewImage(int index) => setState(() => _selectedImages.removeAt(index));
-  void _removeExistingImage(int index) => setState(() => _existingImages.removeAt(index));
+  void _removeNewImage(int index) =>
+      setState(() => _selectedImages.removeAt(index));
+  void _removeExistingImage(int index) =>
+      setState(() => _existingImages.removeAt(index));
 
   Future<void> _handleSubmit() async {
+    final l10n = AppLocalizations.of(context);
     if (!_formKey.currentState!.validate()) return;
 
     if (!_isEditing && _selectedImages.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Adicione pelo menos uma imagem'),
-          backgroundColor: AppColors.error,
-        ),
+        SnackBar(content: Text(l10n.addImg), backgroundColor: AppColors.error),
       );
       return;
     }
@@ -132,7 +134,7 @@ class _LandFormScreenState extends State<LandFormScreen> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Erro ao enviar imagem: $e'),
+                content: Text(l10n.erroEnviarImagem('$e')),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -146,7 +148,9 @@ class _LandFormScreenState extends State<LandFormScreen> {
         title: _titleController.text.trim(),
         description: _descController.text.trim(),
         type: LandType.values.firstWhere((t) => t.name == _selectedType),
-        transactionType: LandTransactionType.values.firstWhere((t) => t.name == _selectedTransaction),
+        transactionType: LandTransactionType.values.firstWhere(
+          (t) => t.name == _selectedTransaction,
+        ),
         price: double.tryParse(_priceController.text.replaceAll('.', '')) ?? 0,
         area: double.tryParse(_areaController.text.replaceAll('.', '')) ?? 0,
         address: _addressController.text.trim(),
@@ -177,14 +181,19 @@ class _LandFormScreenState extends State<LandFormScreen> {
         if (success) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(_isEditing ? 'Terreno atualizado!' : 'Terreno criado!'),
+              content: Text(
+                _isEditing ? l10n.terrenoAtualizado : l10n.terrenoCriado,
+              ),
               backgroundColor: AppColors.success,
             ),
           );
           Navigator.pop(context);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(landProvider.error ?? 'Erro'), backgroundColor: AppColors.error),
+            SnackBar(
+              content: Text(landProvider.error ?? l10n.erro),
+              backgroundColor: AppColors.error,
+            ),
           );
         }
       }
@@ -195,20 +204,22 @@ class _LandFormScreenState extends State<LandFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: palette.surface,
       appBar: AppBar(
         backgroundColor: AppColors.navy,
         elevation: 0,
         centerTitle: true,
         title: Text(
-          _isEditing ? 'Editar Terreno' : 'Novo Terreno',
+          _isEditing ? l10n.editarTerreno : l10n.novoTerreno,
           style: AppTextStyles.h6.copyWith(color: AppColors.white),
         ),
         iconTheme: const IconThemeData(color: AppColors.gold),
       ),
       body: _isSubmitting
-          ? const LoadingWidget(isFullScreen: true, message: 'Guardando...')
+          ? LoadingWidget(isFullScreen: true, message: l10n.guardando)
           : SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Form(
@@ -218,23 +229,25 @@ class _LandFormScreenState extends State<LandFormScreen> {
                   children: [
                     _buildImageSection(),
                     const SizedBox(height: 24),
-                    Text('Informações Básicas', style: AppTextStyles.h6),
+                    Text(l10n.informacoesBasicas, style: AppTextStyles.h6),
                     const SizedBox(height: 16),
                     CustomInput(
-                      label: 'Título',
-                      hint: 'Ex: Terreno Urbano na Talatona',
+                      label: l10n.titulo,
+                      hint: l10n.exTituloTerreno,
                       prefixIcon: Icons.title,
                       controller: _titleController,
-                      validator: (v) => (v == null || v.isEmpty) ? 'Obrigatório' : null,
+                      validator: (v) =>
+                          (v == null || v.isEmpty) ? l10n.obrigatorio : null,
                     ),
                     const SizedBox(height: 16),
                     CustomInput(
-                      label: 'Descrição',
-                      hint: 'Descreva o terreno...',
+                      label: l10n.descricao,
+                      hint: l10n.descrevaTerreno,
                       prefixIcon: Icons.description_outlined,
                       controller: _descController,
                       maxLines: 4,
-                      validator: (v) => (v == null || v.isEmpty) ? 'Obrigatório' : null,
+                      validator: (v) =>
+                          (v == null || v.isEmpty) ? l10n.obrigatorio : null,
                     ),
                     const SizedBox(height: 16),
                     Row(
@@ -245,71 +258,87 @@ class _LandFormScreenState extends State<LandFormScreen> {
                       ],
                     ),
                     const SizedBox(height: 24),
-                    Text('Dimensões', style: AppTextStyles.h6),
+                    Text(l10n.dimensoes, style: AppTextStyles.h6),
                     const SizedBox(height: 16),
                     Row(
                       children: [
-                        Expanded(child: CustomInput(
-                          label: 'Preço (AOA)',
-                          hint: '0',
-                          prefixIcon: Icons.attach_money,
-                          keyboardType: TextInputType.number,
-                          controller: _priceController,
-                          validator: (v) => (v == null || v.isEmpty) ? 'Obrigatório' : null,
-                        )),
+                        Expanded(
+                          child: CustomInput(
+                            label: l10n.preco,
+                            hint: '0',
+                            prefixIcon: Icons.attach_money,
+                            keyboardType: TextInputType.number,
+                            controller: _priceController,
+                            validator: (v) => (v == null || v.isEmpty)
+                                ? l10n.obrigatorio
+                                : null,
+                          ),
+                        ),
                         const SizedBox(width: 12),
-                        Expanded(child: CustomInput(
-                          label: 'Área (m²)',
-                          hint: '0',
-                          prefixIcon: Icons.square_foot_outlined,
-                          keyboardType: TextInputType.number,
-                          controller: _areaController,
-                          validator: (v) => (v == null || v.isEmpty) ? 'Obrigatório' : null,
-                        )),
+                        Expanded(
+                          child: CustomInput(
+                            label: l10n.areaM2,
+                            hint: '0',
+                            prefixIcon: Icons.square_foot_outlined,
+                            keyboardType: TextInputType.number,
+                            controller: _areaController,
+                            validator: (v) => (v == null || v.isEmpty)
+                                ? l10n.obrigatorio
+                                : null,
+                          ),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 24),
-                    Text('Características', style: AppTextStyles.h6),
+                    Text(l10n.caracteristicas, style: AppTextStyles.h6),
                     const SizedBox(height: 12),
                     _buildFeaturesChips(),
                     const SizedBox(height: 24),
-                    Text('Localização', style: AppTextStyles.h6),
+                    Text(l10n.localizacao, style: AppTextStyles.h6),
                     const SizedBox(height: 16),
                     CustomInput(
-                      label: 'Endereço',
-                      hint: 'Rua, número...',
+                      label: l10n.endereco,
+                      hint: l10n.ruaNumero,
                       prefixIcon: Icons.home_outlined,
                       controller: _addressController,
                     ),
                     const SizedBox(height: 16),
                     Row(
                       children: [
-                        Expanded(child: CustomInput(
-                          label: 'Cidade',
-                          hint: 'Luanda',
-                          prefixIcon: Icons.location_city_outlined,
-                          controller: _cityController,
-                          validator: (v) => (v == null || v.isEmpty) ? 'Obrigatório' : null,
-                        )),
+                        Expanded(
+                          child: CustomInput(
+                            label: l10n.cidade,
+                            hint: 'Luanda',
+                            prefixIcon: Icons.location_city_outlined,
+                            controller: _cityController,
+                            validator: (v) => (v == null || v.isEmpty)
+                                ? l10n.obrigatorio
+                                : null,
+                          ),
+                        ),
                         const SizedBox(width: 12),
-                        Expanded(child: CustomInput(
-                          label: 'Município',
-                          hint: 'Talatona',
-                          prefixIcon: Icons.map_outlined,
-                          controller: _municipalityController,
-                        )),
+                        Expanded(
+                          child: CustomInput(
+                            label: l10n.municipio,
+                            hint: 'Talatona',
+                            prefixIcon: Icons.map_outlined,
+                            controller: _municipalityController,
+                          ),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 16),
                     CustomInput(
-                      label: 'Bairro',
+                      label: l10n.bairro,
                       hint: 'Kilamba',
                       prefixIcon: Icons.place_outlined,
                       controller: _neighborhoodController,
                     ),
                     const SizedBox(height: 32),
                     CustomButton(
-                      text: _isEditing ? 'Atualizar Terreno' : 'Criar Terreno',
+                      text: _isEditing
+                          ? l10n.atualizarTerreno
+                          : l10n.criarTerreno,
                       isFullWidth: true,
                       size: CustomButtonSize.large,
                       isLoading: _isSubmitting,
@@ -324,17 +353,19 @@ class _LandFormScreenState extends State<LandFormScreen> {
   }
 
   Widget _buildImageSection() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Fotos', style: AppTextStyles.h6),
+            Text(l10n.fotos, style: AppTextStyles.h6),
             TextButton.icon(
               onPressed: _pickImages,
               icon: const Icon(Icons.add_photo_alternate_outlined, size: 20),
-              label: const Text('Adicionar'),
+              label: Text(l10n.adicionar),
             ),
           ],
         ),
@@ -343,16 +374,25 @@ class _LandFormScreenState extends State<LandFormScreen> {
             width: double.infinity,
             height: 120,
             decoration: BoxDecoration(
-              color: AppColors.gray50,
+              color: palette.background,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.gray200),
+              border: Border.all(color: palette.borderStrong),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.add_photo_alternate_outlined, size: 32, color: AppColors.gray400),
+                Icon(
+                  Icons.add_photo_alternate_outlined,
+                  size: 32,
+                  color: palette.textMuted,
+                ),
                 const SizedBox(height: 8),
-                Text('Nenhuma imagem selecionada', style: AppTextStyles.bodySmall.copyWith(color: AppColors.gray400)),
+                Text(
+                  l10n.nenhumaImagemSelecionada,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: palette.textMuted,
+                  ),
+                ),
               ],
             ),
           )
@@ -362,14 +402,18 @@ class _LandFormScreenState extends State<LandFormScreen> {
             child: ListView(
               scrollDirection: Axis.horizontal,
               children: [
-                ..._existingImages.asMap().entries.map((e) => _buildImageThumbnail(
-                  imageUrl: e.value,
-                  onRemove: () => _removeExistingImage(e.key),
-                )),
-                ..._selectedImages.asMap().entries.map((e) => _buildImageThumbnail(
-                  file: e.value,
-                  onRemove: () => _removeNewImage(e.key),
-                )),
+                ..._existingImages.asMap().entries.map(
+                  (e) => _buildImageThumbnail(
+                    imageUrl: e.value,
+                    onRemove: () => _removeExistingImage(e.key),
+                  ),
+                ),
+                ..._selectedImages.asMap().entries.map(
+                  (e) => _buildImageThumbnail(
+                    file: e.value,
+                    onRemove: () => _removeNewImage(e.key),
+                  ),
+                ),
               ],
             ),
           ),
@@ -377,23 +421,38 @@ class _LandFormScreenState extends State<LandFormScreen> {
     );
   }
 
-  Widget _buildImageThumbnail({String? imageUrl, XFile? file, required VoidCallback onRemove}) {
+  Widget _buildImageThumbnail({
+    String? imageUrl,
+    XFile? file,
+    required VoidCallback onRemove,
+  }) {
     return Stack(
       children: [
         Container(
-          width: 100, height: 100,
+          width: 100,
+          height: 100,
           margin: const EdgeInsets.only(right: 8),
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: AppColors.gray200),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: context.palette.surfaceAlt,
+          ),
           clipBehavior: Clip.antiAlias,
-          child: imageUrl != null ? Image.network(imageUrl, fit: BoxFit.cover) : XFileThumbnail(file: file!),
+          child: imageUrl != null
+              ? Image.network(imageUrl, fit: BoxFit.cover)
+              : XFileThumbnail(file: file!),
         ),
         Positioned(
-          top: 4, right: 12,
+          top: 4,
+          right: 12,
           child: GestureDetector(
             onTap: onRemove,
             child: Container(
-              width: 24, height: 24,
-              decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColors.error),
+              width: 24,
+              height: 24,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.error,
+              ),
               child: const Icon(Icons.close, size: 14, color: AppColors.white),
             ),
           ),
@@ -403,58 +462,95 @@ class _LandFormScreenState extends State<LandFormScreen> {
   }
 
   Widget _buildTypeDropdown() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return DropdownButtonFormField<String>(
       initialValue: _selectedType,
       decoration: InputDecoration(
-        labelText: 'Tipo',
-        labelStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.gray500),
+        labelText: l10n.tipo,
+        labelStyle: AppTextStyles.bodySmall.copyWith(
+          color: palette.textSecondary,
+        ),
         prefixIcon: const Icon(Icons.category_outlined, size: 20),
         filled: true,
-        fillColor: AppColors.white,
+        fillColor: palette.inputFill,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.gray200),
+          borderSide: BorderSide(color: palette.borderStrong),
         ),
       ),
-      items: const [
-        DropdownMenuItem(value: 'urban', child: Text('Urbano')),
-        DropdownMenuItem(value: 'agricultural', child: Text('Agrícola')),
-        DropdownMenuItem(value: 'industrial', child: Text('Industrial')),
-        DropdownMenuItem(value: 'commercial', child: Text('Comercial')),
-        DropdownMenuItem(value: 'lot', child: Text('Lote')),
-        DropdownMenuItem(value: 'farm', child: Text('Fazenda')),
+      items: [
+        DropdownMenuItem(value: 'urban', child: Text(l10n.urbano)),
+        DropdownMenuItem(value: 'agricultural', child: Text(l10n.agricola)),
+        DropdownMenuItem(value: 'industrial', child: Text(l10n.industrial)),
+        DropdownMenuItem(value: 'commercial', child: Text(l10n.comercial)),
+        DropdownMenuItem(value: 'lot', child: Text(l10n.lote)),
+        DropdownMenuItem(value: 'farm', child: Text(l10n.fazenda)),
       ],
       onChanged: (v) => setState(() => _selectedType = v ?? 'urban'),
     );
   }
 
   Widget _buildTransactionDropdown() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return DropdownButtonFormField<String>(
       initialValue: _selectedTransaction,
       decoration: InputDecoration(
-        labelText: 'Transação',
-        labelStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.gray500),
+        labelText: l10n.transacao,
+        labelStyle: AppTextStyles.bodySmall.copyWith(
+          color: palette.textSecondary,
+        ),
         prefixIcon: const Icon(Icons.swap_horiz, size: 20),
         filled: true,
-        fillColor: AppColors.white,
+        fillColor: palette.inputFill,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.gray200),
+          borderSide: BorderSide(color: palette.borderStrong),
         ),
       ),
-      items: const [
-        DropdownMenuItem(value: 'sale', child: Text('Venda')),
-        DropdownMenuItem(value: 'rent', child: Text('Arrendamento')),
+      items: [
+        DropdownMenuItem(value: 'sale', child: Text(l10n.venda)),
+        DropdownMenuItem(value: 'rent', child: Text(l10n.arrendamento)),
       ],
       onChanged: (v) => setState(() => _selectedTransaction = v ?? 'sale'),
     );
   }
 
+  String _featureLabel(AppLocalizations l10n, String feature) {
+    return switch (feature) {
+      'Cercado' => l10n.cercado,
+      'Água' => l10n.agua,
+      'Eletricidade' => l10n.eletricidade,
+      'Estrada Acessível' => l10n.estradaAcessivel,
+      'Close à Praia' => l10n.closePraia,
+      'Vista Panorâmica' => l10n.vistaPanoramica,
+      'Flat' => l10n.flat,
+      'Inclinação Suave' => l10n.inclinacaoSuave,
+      'Solo Fértil' => l10n.soloFertil,
+      'Árvore Frutífera' => l10n.arvoreFrutifera,
+      'Poço' => l10n.poco,
+      'Tanque de Água' => l10n.tanqueAgua,
+      _ => feature,
+    };
+  }
+
   Widget _buildFeaturesChips() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     const availableFeatures = [
-      'Cercado', 'Água', 'Eletricidade', 'Estrada Acessível',
-      'Close à Praia', 'Vista Panorâmica', 'Flat', 'Inclinação Suave',
-      'Solo Fértil', 'Árvore Frutífera', 'Poço', 'Tanque de Água',
+      'Cercado',
+      'Água',
+      'Eletricidade',
+      'Estrada Acessível',
+      'Close à Praia',
+      'Vista Panorâmica',
+      'Flat',
+      'Inclinação Suave',
+      'Solo Fértil',
+      'Árvore Frutífera',
+      'Poço',
+      'Tanque de Água',
     ];
 
     return Wrap(
@@ -464,17 +560,17 @@ class _LandFormScreenState extends State<LandFormScreen> {
         final isSelected = _selectedFeatures.contains(feature);
         return FilterChip(
           label: Text(
-            feature,
+            _featureLabel(l10n, feature),
             style: AppTextStyles.bodySmall.copyWith(
-              color: isSelected ? AppColors.white : AppColors.gray700,
+              color: isSelected ? AppColors.white : palette.textBody,
             ),
           ),
           selected: isSelected,
           selectedColor: AppColors.gold,
-          backgroundColor: AppColors.gray50,
+          backgroundColor: palette.background,
           checkmarkColor: AppColors.white,
           side: BorderSide(
-            color: isSelected ? AppColors.gold : AppColors.gray200,
+            color: isSelected ? AppColors.gold : palette.borderStrong,
           ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),

@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:luar_company/widgets/loading_widget.dart';
 
+import '../helpers/test_app.dart';
+
 void main() {
   Widget wrapInApp(Widget child) {
-    return MaterialApp(home: child);
+    return testApp(home: child);
   }
 
   group('LoadingWidget', () {

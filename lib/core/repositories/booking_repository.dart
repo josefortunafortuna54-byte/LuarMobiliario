@@ -1,6 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/booking_model.dart';
+import '../models/user_model.dart';
 import '../services/supabase_service.dart';
 
 class BookingRepository {
@@ -35,5 +36,21 @@ class BookingRepository {
         .from('bookings')
         .update({'status': BookingStatus.cancelled.name})
         .eq('id', bookingId);
+  }
+
+  Future<UserModel> registerGuestClient({
+    required String name,
+    required String phone,
+    required String bookingId,
+  }) async {
+    final response = await _client
+        .rpc('register_guest_client', params: {
+          'p_name': name,
+          'p_phone': phone,
+          'p_booking_id': bookingId,
+        })
+        .single();
+
+    return UserModel.fromJson(response);
   }
 }

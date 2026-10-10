@@ -8,6 +8,8 @@ import '../../core/models/property_model.dart';
 import '../../core/providers/property_provider.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/services/storage_service.dart';
+import '../../core/theme/app_palette.dart';
+import '../../l10n/app_localizations.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_input.dart';
 import '../../widgets/loading_widget.dart';
@@ -117,14 +119,12 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
   }
 
   Future<void> _handleSubmit() async {
+    final l10n = AppLocalizations.of(context);
     if (!_formKey.currentState!.validate()) return;
 
     if (!_isEditing && _selectedImages.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Adicione pelo menos uma imagem'),
-          backgroundColor: AppColors.error,
-        ),
+        SnackBar(content: Text(l10n.addImg), backgroundColor: AppColors.error),
       );
       return;
     }
@@ -150,7 +150,7 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Erro ao enviar imagem: $e'),
+                content: Text(l10n.erroEnviarImagem(e)),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -164,7 +164,9 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
         title: _titleController.text.trim(),
         description: _descController.text.trim(),
         type: PropertyType.values.firstWhere((t) => t.name == _selectedType),
-        transactionType: TransactionType.values.firstWhere((t) => t.name == _selectedTransaction),
+        transactionType: TransactionType.values.firstWhere(
+          (t) => t.name == _selectedTransaction,
+        ),
         price: double.tryParse(_priceController.text.replaceAll('.', '')) ?? 0,
         area: double.tryParse(_areaController.text.replaceAll('.', '')) ?? 0,
         bedrooms: int.tryParse(_bedroomsController.text) ?? 0,
@@ -198,7 +200,9 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
         if (success) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(_isEditing ? 'Imóvel atualizado!' : 'Imóvel criado!'),
+              content: Text(
+                _isEditing ? l10n.imovelAtualizado : l10n.imovelCriado,
+              ),
               backgroundColor: AppColors.success,
             ),
           );
@@ -206,7 +210,7 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(propertyProvider.error ?? 'Erro ao guardar'),
+              content: Text(propertyProvider.error ?? l10n.erroAoGuardar),
               backgroundColor: AppColors.error,
             ),
           );
@@ -219,20 +223,22 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: palette.surface,
       appBar: AppBar(
         backgroundColor: AppColors.navy,
         elevation: 0,
         centerTitle: true,
         title: Text(
-          _isEditing ? 'Editar Imóvel' : 'Novo Imóvel',
+          _isEditing ? l10n.editarImovel : l10n.novoImovel,
           style: AppTextStyles.h6.copyWith(color: AppColors.white),
         ),
         iconTheme: const IconThemeData(color: AppColors.gold),
       ),
       body: _isSubmitting
-          ? const LoadingWidget(isFullScreen: true, message: 'Guardando...')
+          ? LoadingWidget(isFullScreen: true, message: l10n.guardando)
           : SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Form(
@@ -242,23 +248,25 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
                   children: [
                     _buildImageSection(),
                     const SizedBox(height: 24),
-                    Text('Informações Básicas', style: AppTextStyles.h6),
+                    Text(l10n.informacoesBasicas, style: AppTextStyles.h6),
                     const SizedBox(height: 16),
                     CustomInput(
-                      label: 'Título',
-                      hint: 'Ex: Apartamento T3 na Talatona',
+                      label: l10n.titulo,
+                      hint: l10n.exTituloImovel,
                       prefixIcon: Icons.title,
                       controller: _titleController,
-                      validator: (v) => (v == null || v.isEmpty) ? 'Obrigatório' : null,
+                      validator: (v) =>
+                          (v == null || v.isEmpty) ? l10n.obrigatorio : null,
                     ),
                     const SizedBox(height: 16),
                     CustomInput(
-                      label: 'Descrição',
-                      hint: 'Descreva o imóvel...',
+                      label: l10n.descricao,
+                      hint: l10n.descrevaImovel,
                       prefixIcon: Icons.description_outlined,
                       controller: _descController,
                       maxLines: 4,
-                      validator: (v) => (v == null || v.isEmpty) ? 'Obrigatório' : null,
+                      validator: (v) =>
+                          (v == null || v.isEmpty) ? l10n.obrigatorio : null,
                     ),
                     const SizedBox(height: 16),
                     Row(
@@ -269,99 +277,121 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
                       ],
                     ),
                     const SizedBox(height: 24),
-                    Text('Detalhes', style: AppTextStyles.h6),
+                    Text(l10n.detalhes, style: AppTextStyles.h6),
                     const SizedBox(height: 16),
                     Row(
                       children: [
-                        Expanded(child: CustomInput(
-                          label: 'Preço (AOA)',
-                          hint: '0',
-                          prefixIcon: Icons.attach_money,
-                          keyboardType: TextInputType.number,
-                          controller: _priceController,
-                          validator: (v) => (v == null || v.isEmpty) ? 'Obrigatório' : null,
-                        )),
+                        Expanded(
+                          child: CustomInput(
+                            label: l10n.precoAOA,
+                            hint: '0',
+                            prefixIcon: Icons.attach_money,
+                            keyboardType: TextInputType.number,
+                            controller: _priceController,
+                            validator: (v) => (v == null || v.isEmpty)
+                                ? l10n.obrigatorio
+                                : null,
+                          ),
+                        ),
                         const SizedBox(width: 12),
-                        Expanded(child: CustomInput(
-                          label: 'Área (m²)',
-                          hint: '0',
-                          prefixIcon: Icons.square_foot_outlined,
-                          keyboardType: TextInputType.number,
-                          controller: _areaController,
-                          validator: (v) => (v == null || v.isEmpty) ? 'Obrigatório' : null,
-                        )),
+                        Expanded(
+                          child: CustomInput(
+                            label: l10n.areaM2,
+                            hint: '0',
+                            prefixIcon: Icons.square_foot_outlined,
+                            keyboardType: TextInputType.number,
+                            controller: _areaController,
+                            validator: (v) => (v == null || v.isEmpty)
+                                ? l10n.obrigatorio
+                                : null,
+                          ),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 16),
                     Row(
                       children: [
-                        Expanded(child: CustomInput(
-                          label: 'Quartos',
-                          hint: '0',
-                          prefixIcon: Icons.king_bed_outlined,
-                          keyboardType: TextInputType.number,
-                          controller: _bedroomsController,
-                        )),
+                        Expanded(
+                          child: CustomInput(
+                            label: l10n.quartosLabel,
+                            hint: '0',
+                            prefixIcon: Icons.king_bed_outlined,
+                            keyboardType: TextInputType.number,
+                            controller: _bedroomsController,
+                          ),
+                        ),
                         const SizedBox(width: 12),
-                        Expanded(child: CustomInput(
-                          label: 'WC',
-                          hint: '0',
-                          prefixIcon: Icons.bathroom_outlined,
-                          keyboardType: TextInputType.number,
-                          controller: _bathroomsController,
-                        )),
+                        Expanded(
+                          child: CustomInput(
+                            label: l10n.wc,
+                            hint: '0',
+                            prefixIcon: Icons.bathroom_outlined,
+                            keyboardType: TextInputType.number,
+                            controller: _bathroomsController,
+                          ),
+                        ),
                         const SizedBox(width: 12),
-                        Expanded(child: CustomInput(
-                          label: 'Garagem',
-                          hint: '0',
-                          prefixIcon: Icons.garage_outlined,
-                          keyboardType: TextInputType.number,
-                          controller: _garageController,
-                        )),
+                        Expanded(
+                          child: CustomInput(
+                            label: l10n.garagemLabel,
+                            hint: '0',
+                            prefixIcon: Icons.garage_outlined,
+                            keyboardType: TextInputType.number,
+                            controller: _garageController,
+                          ),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 24),
-                    Text('Características', style: AppTextStyles.h6),
+                    Text(l10n.caracteristicas, style: AppTextStyles.h6),
                     const SizedBox(height: 12),
                     _buildFeaturesChips(),
                     const SizedBox(height: 24),
-                    Text('Localização', style: AppTextStyles.h6),
+                    Text(l10n.localizacao, style: AppTextStyles.h6),
                     const SizedBox(height: 16),
                     CustomInput(
-                      label: 'Endereço',
-                      hint: 'Rua, número...',
+                      label: l10n.endereco,
+                      hint: l10n.ruaNumero,
                       prefixIcon: Icons.home_outlined,
                       controller: _addressController,
                     ),
                     const SizedBox(height: 16),
                     Row(
                       children: [
-                        Expanded(child: CustomInput(
-                          label: 'Cidade',
-                          hint: 'Luanda',
-                          prefixIcon: Icons.location_city_outlined,
-                          controller: _cityController,
-                          validator: (v) => (v == null || v.isEmpty) ? 'Obrigatório' : null,
-                        )),
+                        Expanded(
+                          child: CustomInput(
+                            label: l10n.cidade,
+                            hint: 'Luanda',
+                            prefixIcon: Icons.location_city_outlined,
+                            controller: _cityController,
+                            validator: (v) => (v == null || v.isEmpty)
+                                ? l10n.obrigatorio
+                                : null,
+                          ),
+                        ),
                         const SizedBox(width: 12),
-                        Expanded(child: CustomInput(
-                          label: 'Município',
-                          hint: 'Talatona',
-                          prefixIcon: Icons.map_outlined,
-                          controller: _municipalityController,
-                        )),
+                        Expanded(
+                          child: CustomInput(
+                            label: l10n.municipio,
+                            hint: 'Talatona',
+                            prefixIcon: Icons.map_outlined,
+                            controller: _municipalityController,
+                          ),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 16),
                     CustomInput(
-                      label: 'Bairro',
+                      label: l10n.bairro,
                       hint: 'Kilamba',
                       prefixIcon: Icons.place_outlined,
                       controller: _neighborhoodController,
                     ),
                     const SizedBox(height: 32),
                     CustomButton(
-                      text: _isEditing ? 'Atualizar Imóvel' : 'Criar Imóvel',
+                      text: _isEditing
+                          ? l10n.atualizarImovel
+                          : l10n.criarImovel,
                       isFullWidth: true,
                       size: CustomButtonSize.large,
                       isLoading: _isSubmitting,
@@ -376,17 +406,19 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
   }
 
   Widget _buildImageSection() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Fotos', style: AppTextStyles.h6),
+            Text(l10n.fotos, style: AppTextStyles.h6),
             TextButton.icon(
               onPressed: _pickImages,
               icon: const Icon(Icons.add_photo_alternate_outlined, size: 20),
-              label: const Text('Adicionar'),
+              label: Text(l10n.adicionar),
             ),
           ],
         ),
@@ -395,16 +427,28 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
             width: double.infinity,
             height: 120,
             decoration: BoxDecoration(
-              color: AppColors.gray50,
+              color: palette.background,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.gray200, style: BorderStyle.solid),
+              border: Border.all(
+                color: palette.borderStrong,
+                style: BorderStyle.solid,
+              ),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.add_photo_alternate_outlined, size: 32, color: AppColors.gray400),
+                Icon(
+                  Icons.add_photo_alternate_outlined,
+                  size: 32,
+                  color: palette.textMuted,
+                ),
                 const SizedBox(height: 8),
-                Text('Nenhuma imagem selecionada', style: AppTextStyles.bodySmall.copyWith(color: AppColors.gray400)),
+                Text(
+                  l10n.nenhumaImagemSelecionada,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: palette.textMuted,
+                  ),
+                ),
               ],
             ),
           )
@@ -414,14 +458,18 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
             child: ListView(
               scrollDirection: Axis.horizontal,
               children: [
-                ..._existingImages.asMap().entries.map((entry) => _buildImageThumbnail(
-                  imageUrl: entry.value,
-                  onRemove: () => _removeExistingImage(entry.key),
-                )),
-                ..._selectedImages.asMap().entries.map((entry) => _buildImageThumbnail(
-                  file: entry.value,
-                  onRemove: () => _removeNewImage(entry.key),
-                )),
+                ..._existingImages.asMap().entries.map(
+                  (entry) => _buildImageThumbnail(
+                    imageUrl: entry.value,
+                    onRemove: () => _removeExistingImage(entry.key),
+                  ),
+                ),
+                ..._selectedImages.asMap().entries.map(
+                  (entry) => _buildImageThumbnail(
+                    file: entry.value,
+                    onRemove: () => _removeNewImage(entry.key),
+                  ),
+                ),
               ],
             ),
           ),
@@ -429,7 +477,11 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
     );
   }
 
-  Widget _buildImageThumbnail({String? imageUrl, XFile? file, required VoidCallback onRemove}) {
+  Widget _buildImageThumbnail({
+    String? imageUrl,
+    XFile? file,
+    required VoidCallback onRemove,
+  }) {
     return Stack(
       children: [
         Container(
@@ -438,7 +490,7 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
           margin: const EdgeInsets.only(right: 8),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            color: AppColors.gray200,
+            color: context.palette.surfaceAlt,
           ),
           clipBehavior: Clip.antiAlias,
           child: imageUrl != null
@@ -466,59 +518,103 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
   }
 
   Widget _buildTypeDropdown() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return DropdownButtonFormField<String>(
       initialValue: _selectedType,
       decoration: InputDecoration(
-        labelText: 'Tipo',
-        labelStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.gray500),
+        labelText: l10n.tipo,
+        labelStyle: AppTextStyles.bodySmall.copyWith(
+          color: palette.textSecondary,
+        ),
         prefixIcon: const Icon(Icons.category_outlined, size: 20),
         filled: true,
-        fillColor: AppColors.white,
+        fillColor: palette.inputFill,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.gray200),
+          borderSide: BorderSide(color: palette.borderStrong),
         ),
       ),
-      items: const [
-        DropdownMenuItem(value: 'house', child: Text('Casa')),
-        DropdownMenuItem(value: 'apartment', child: Text('Apartamento')),
-        DropdownMenuItem(value: 'office', child: Text('Escritório')),
-        DropdownMenuItem(value: 'warehouse', child: Text('Armazém')),
-        DropdownMenuItem(value: 'condo', child: Text('Condomínio')),
-        DropdownMenuItem(value: 'shop', child: Text('Loja')),
+      items: [
+        DropdownMenuItem(value: 'house', child: Text(l10n.casa)),
+        DropdownMenuItem(value: 'apartment', child: Text(l10n.apartamento)),
+        DropdownMenuItem(value: 'office', child: Text(l10n.escritorio)),
+        DropdownMenuItem(value: 'warehouse', child: Text(l10n.armazem)),
+        DropdownMenuItem(value: 'condo', child: Text(l10n.condominio)),
+        DropdownMenuItem(value: 'shop', child: Text(l10n.loja)),
       ],
       onChanged: (v) => setState(() => _selectedType = v ?? 'house'),
     );
   }
 
   Widget _buildTransactionDropdown() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return DropdownButtonFormField<String>(
       initialValue: _selectedTransaction,
       decoration: InputDecoration(
-        labelText: 'Transação',
-        labelStyle: AppTextStyles.bodySmall.copyWith(color: AppColors.gray500),
+        labelText: l10n.transacao,
+        labelStyle: AppTextStyles.bodySmall.copyWith(
+          color: palette.textSecondary,
+        ),
         prefixIcon: const Icon(Icons.swap_horiz, size: 20),
         filled: true,
-        fillColor: AppColors.white,
+        fillColor: palette.inputFill,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.gray200),
+          borderSide: BorderSide(color: palette.borderStrong),
         ),
       ),
-      items: const [
-        DropdownMenuItem(value: 'sale', child: Text('Venda')),
-        DropdownMenuItem(value: 'rent', child: Text('Arrendamento')),
+      items: [
+        DropdownMenuItem(value: 'sale', child: Text(l10n.venda)),
+        DropdownMenuItem(value: 'rent', child: Text(l10n.arrendamento)),
       ],
       onChanged: (v) => setState(() => _selectedTransaction = v ?? 'sale'),
     );
   }
 
+  String _featureLabel(AppLocalizations l10n, String feature) {
+    return switch (feature) {
+      'Piscina' => l10n.piscina,
+      'Churrasqueira' => l10n.churrasqueira,
+      'Ar Condicionado' => l10n.arCondicionado,
+      'Portão Eletrónico' => l10n.portaoEletronico,
+      'Segurança 24h' => l10n.seguranca24h,
+      'Elevador' => l10n.elevador,
+      'Varanda' => l10n.varanda,
+      'Lareira' => l10n.lareira,
+      'Jardim' => l10n.jardim,
+      'Área de Serviço' => l10n.areaServico,
+      'Despensa' => l10n.despensa,
+      'Escritório' => l10n.escritorio,
+      'Closet' => l10n.closet,
+      'Suíte' => l10n.suite,
+      'Varanda Gourmet' => l10n.varandaGourmet,
+      'Condomínio Fechado' => l10n.condominioFechado,
+      _ => feature,
+    };
+  }
+
   Widget _buildFeaturesChips() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     const availableFeatures = [
-      'Piscina', 'Churrasqueira', 'Ar Condicionado', 'Portão Eletrónico',
-      'Segurança 24h', 'Elevador', 'Varanda', 'Lareira',
-      'Jardim', 'Área de Serviço', 'Despensa', 'Escritório',
-      'Closet', 'Suíte', 'Varanda Gourmet', 'Condomínio Fechado',
+      'Piscina',
+      'Churrasqueira',
+      'Ar Condicionado',
+      'Portão Eletrónico',
+      'Segurança 24h',
+      'Elevador',
+      'Varanda',
+      'Lareira',
+      'Jardim',
+      'Área de Serviço',
+      'Despensa',
+      'Escritório',
+      'Closet',
+      'Suíte',
+      'Varanda Gourmet',
+      'Condomínio Fechado',
     ];
 
     return Wrap(
@@ -528,17 +624,17 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
         final isSelected = _selectedFeatures.contains(feature);
         return FilterChip(
           label: Text(
-            feature,
+            _featureLabel(l10n, feature),
             style: AppTextStyles.bodySmall.copyWith(
-              color: isSelected ? AppColors.white : AppColors.gray700,
+              color: isSelected ? AppColors.white : palette.textBody,
             ),
           ),
           selected: isSelected,
           selectedColor: AppColors.gold,
-          backgroundColor: AppColors.gray50,
+          backgroundColor: palette.background,
           checkmarkColor: AppColors.white,
           side: BorderSide(
-            color: isSelected ? AppColors.gold : AppColors.gray200,
+            color: isSelected ? AppColors.gold : palette.borderStrong,
           ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),

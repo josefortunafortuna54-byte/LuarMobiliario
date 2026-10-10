@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:luar_company/widgets/search_widget.dart';
 
+import '../helpers/test_app.dart';
+
 void main() {
   Widget wrapInApp(Widget child) {
-    return MaterialApp(home: Scaffold(body: child));
+    return testApp(home: Scaffold(body: child));
   }
 
   group('SearchWidget', () {

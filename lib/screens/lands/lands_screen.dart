@@ -5,7 +5,9 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/models/land_model.dart';
 import '../../core/providers/land_provider.dart';
+import '../../core/theme/app_palette.dart';
 import '../../core/utils/routes.dart';
+import '../../l10n/app_localizations.dart';
 import '../../widgets/land_card.dart';
 import '../../widgets/loading_widget.dart';
 
@@ -19,17 +21,17 @@ class LandsScreen extends StatefulWidget {
 class _LandsScreenState extends State<LandsScreen> {
   final ScrollController _scrollController = ScrollController();
   int _selectedFilterIndex = 0;
-  String _sortOption = 'Mais recentes';
+  String _sortOption = 'recent';
   bool _showSortOptions = false;
 
-  static const List<String> _filterLabels = [
-    'Todos',
-    'Urbanos',
-    'Agrícolas',
-    'Industriais',
-    'Comerciais',
-    'Lotes',
-    'Fazendas',
+  List<String> _filterLabels(AppLocalizations l10n) => [
+    l10n.todos,
+    l10n.urbanos,
+    l10n.agricolas,
+    l10n.industriais,
+    l10n.comerciais,
+    l10n.lotes,
+    l10n.fazendas,
   ];
 
   static const List<String> _filterKeys = [
@@ -42,12 +44,19 @@ class _LandsScreenState extends State<LandsScreen> {
     'farm',
   ];
 
-  static const List<String> _sortLabels = [
-    'Mais recentes',
-    'Menor preço',
-    'Maior preço',
-    'Maior área',
+  static const List<String> _sortKeys = [
+    'recent',
+    'priceAsc',
+    'priceDesc',
+    'areaDesc',
   ];
+
+  String _sortLabel(AppLocalizations l10n, String key) => switch (key) {
+    'priceAsc' => l10n.menorPreco,
+    'priceDesc' => l10n.maiorPreco,
+    'areaDesc' => l10n.maiorArea,
+    _ => l10n.maisRecentes,
+  };
 
   @override
   void initState() {
@@ -117,16 +126,16 @@ class _LandsScreenState extends State<LandsScreen> {
   List<LandModel> _sortLands(List<LandModel> list) {
     final sorted = List<LandModel>.from(list);
     switch (_sortOption) {
-      case 'Menor preço':
+      case 'priceAsc':
         sorted.sort((a, b) => a.price.compareTo(b.price));
         break;
-      case 'Maior preço':
+      case 'priceDesc':
         sorted.sort((a, b) => b.price.compareTo(a.price));
         break;
-      case 'Maior área':
+      case 'areaDesc':
         sorted.sort((a, b) => b.area.compareTo(a.area));
         break;
-      case 'Mais recentes':
+      case 'recent':
       default:
         sorted.sort((a, b) => b.createdAt.compareTo(a.createdAt));
         break;
@@ -134,24 +143,25 @@ class _LandsScreenState extends State<LandsScreen> {
     return sorted;
   }
 
-  String _landTypeLabel(LandType type) {
+  String _landTypeLabel(AppLocalizations l10n, LandType type) {
     return switch (type) {
-      LandType.urban => 'Urbano',
-      LandType.agricultural => 'Agrícola',
-      LandType.industrial => 'Industrial',
-      LandType.commercial => 'Comercial',
-      LandType.lot => 'Lote',
-      LandType.farm => 'Fazenda',
+      LandType.urban => l10n.urbano,
+      LandType.agricultural => l10n.agricola,
+      LandType.industrial => l10n.industrial,
+      LandType.commercial => l10n.comercial,
+      LandType.lot => l10n.lote,
+      LandType.farm => l10n.fazenda,
     };
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: AppColors.offWhite,
+      backgroundColor: context.palette.background,
       appBar: AppBar(
         title: Text(
-          'Terrenos',
+          l10n.terrenos,
           style: AppTextStyles.h5.copyWith(color: AppColors.white),
         ),
         backgroundColor: AppColors.navy,
@@ -190,16 +200,19 @@ class _LandsScreenState extends State<LandsScreen> {
   }
 
   Widget _buildFilterBar() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
+    final labels = _filterLabels(l10n);
     return Container(
       height: 60,
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: const BoxDecoration(
-        color: AppColors.white,
-        border: Border(bottom: BorderSide(color: AppColors.gray200)),
+      decoration: BoxDecoration(
+        color: palette.surface,
+        border: Border(bottom: BorderSide(color: palette.borderStrong)),
       ),
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        itemCount: _filterLabels.length,
+        itemCount: labels.length,
         separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (_, index) {
           final isSelected = _selectedFilterIndex == index;
@@ -216,13 +229,13 @@ class _LandsScreenState extends State<LandsScreen> {
                   color: isSelected ? AppColors.navy : Colors.transparent,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: isSelected ? AppColors.navy : AppColors.gray300,
+                    color: isSelected ? AppColors.navy : palette.textMuted,
                   ),
                 ),
                 child: Text(
-                  _filterLabels[index],
+                  labels[index],
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: isSelected ? AppColors.white : AppColors.gray600,
+                    color: isSelected ? AppColors.white : palette.textBody,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -235,11 +248,13 @@ class _LandsScreenState extends State<LandsScreen> {
   }
 
   Widget _buildSortBar() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
       child: Row(
         children: [
-          const Icon(Icons.sort_rounded, size: 20, color: AppColors.gray500),
+          Icon(Icons.sort_rounded, size: 20, color: palette.textSecondary),
           const SizedBox(width: 6),
           GestureDetector(
             onTap: () {
@@ -250,9 +265,9 @@ class _LandsScreenState extends State<LandsScreen> {
             child: Row(
               children: [
                 Text(
-                  _sortOption,
+                  _sortLabel(l10n, _sortOption),
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.gray600,
+                    color: palette.textBody,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -262,7 +277,7 @@ class _LandsScreenState extends State<LandsScreen> {
                       ? Icons.keyboard_arrow_up_rounded
                       : Icons.keyboard_arrow_down_rounded,
                   size: 18,
-                  color: AppColors.gray500,
+                  color: palette.textSecondary,
                 ),
               ],
             ),
@@ -273,13 +288,15 @@ class _LandsScreenState extends State<LandsScreen> {
   }
 
   Widget _buildSortDropdown() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: palette.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.gray200),
+        border: Border.all(color: palette.borderStrong),
         boxShadow: [
           BoxShadow(
             color: AppColors.navy.withValues(alpha: 0.08),
@@ -289,10 +306,10 @@ class _LandsScreenState extends State<LandsScreen> {
         ],
       ),
       child: Column(
-        children: _sortLabels.map((label) {
-          final isSelected = _sortOption == label;
+        children: _sortKeys.map((key) {
+          final isSelected = _sortOption == key;
           return InkWell(
-            onTap: () => _onSortSelected(label),
+            onTap: () => _onSortSelected(key),
             borderRadius: BorderRadius.circular(8),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -306,9 +323,11 @@ class _LandsScreenState extends State<LandsScreen> {
                 children: [
                   Expanded(
                     child: Text(
-                      label,
+                      _sortLabel(l10n, key),
                       style: AppTextStyles.bodySmall.copyWith(
-                        color: isSelected ? AppColors.navy : AppColors.gray700,
+                        color: isSelected
+                            ? palette.textTitle
+                            : palette.textBody,
                         fontWeight: isSelected
                             ? FontWeight.w700
                             : FontWeight.w500,
@@ -345,6 +364,8 @@ class _LandsScreenState extends State<LandsScreen> {
   }
 
   Widget _buildErrorState(LandProvider provider) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -366,13 +387,15 @@ class _LandsScreenState extends State<LandsScreen> {
             ),
             const SizedBox(height: 20),
             Text(
-              'Algo correu mal',
-              style: AppTextStyles.h6.copyWith(color: AppColors.navy),
+              l10n.algoCorreuMal,
+              style: AppTextStyles.h6.copyWith(color: palette.textTitle),
             ),
             const SizedBox(height: 8),
             Text(
-              provider.error ?? 'Erro desconhecido',
-              style: AppTextStyles.bodySmall.copyWith(color: AppColors.gray500),
+              provider.error ?? l10n.erroDesconhecido,
+              style: AppTextStyles.bodySmall.copyWith(
+                color: palette.textSecondary,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
@@ -380,7 +403,7 @@ class _LandsScreenState extends State<LandsScreen> {
               onPressed: _loadLands,
               icon: const Icon(Icons.refresh_rounded, size: 18),
               label: Text(
-                'Tentar novamente',
+                l10n.tentarNovamente,
                 style: AppTextStyles.buttonMedium.copyWith(
                   color: AppColors.white,
                 ),
@@ -400,6 +423,8 @@ class _LandsScreenState extends State<LandsScreen> {
   }
 
   Widget _buildEmptyState() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -413,22 +438,22 @@ class _LandsScreenState extends State<LandsScreen> {
                 color: AppColors.navy.withValues(alpha: 0.06),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.landscape_rounded,
                 size: 48,
-                color: AppColors.gray400,
+                color: palette.textMuted,
               ),
             ),
             const SizedBox(height: 24),
             Text(
-              'Nenhum terreno encontrado',
-              style: AppTextStyles.h5.copyWith(color: AppColors.navy),
+              l10n.nenhumTerrenoEncontrado,
+              style: AppTextStyles.h5.copyWith(color: palette.textTitle),
             ),
             const SizedBox(height: 8),
             Text(
-              'Não encontrámos terrenos nesta categoria. Tente outro filtro.',
+              l10n.terrenoCategoriaVazio,
               style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.gray500,
+                color: palette.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -439,6 +464,8 @@ class _LandsScreenState extends State<LandsScreen> {
   }
 
   Widget _buildLandGrid(List<LandModel> lands, LandProvider provider) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return RefreshIndicator(
       onRefresh: () async => _loadLands(),
       color: AppColors.gold,
@@ -462,7 +489,7 @@ class _LandsScreenState extends State<LandsScreen> {
                   location: '${land.neighborhood}, ${land.city}',
                   area: land.area,
                   price: land.price,
-                  badgeLabel: _landTypeLabel(land.type),
+                  badgeLabel: _landTypeLabel(l10n, land.type),
                   features: land.features,
                   onTap: () => Navigator.pushNamed(
                     context,
@@ -495,9 +522,9 @@ class _LandsScreenState extends State<LandsScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 24),
                 child: Center(
                   child: Text(
-                    'Todos os terrenos carregados',
+                    l10n.todosTerrenosCarregados,
                     style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.gray400,
+                      color: palette.textMuted,
                     ),
                   ),
                 ),

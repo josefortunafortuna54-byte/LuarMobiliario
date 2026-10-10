@@ -23,6 +23,17 @@ abstract final class AppColors {
   static const Color gray800 = Color(0xFF1F2937);
   static const Color gray900 = Color(0xFF111827);
 
+  // ── Dark theme neutrals ─────────────────────────────────────────────
+  static const Color darkBackground = Color(0xFF0B1220);
+  static const Color darkSurface = Color(0xFF121A2B);
+  static const Color darkCard = Color(0xFF1A2438);
+  static const Color darkBorder = Color(0xFF232F47);
+  static const Color darkBorderStrong = Color(0xFF2C3A55);
+  static const Color darkTextMuted = Color(0xFF6B7280);
+  static const Color darkTextSecondary = Color(0xFF9CA3AF);
+  static const Color darkTextBody = Color(0xFFE5E7EB);
+  static const Color darkTextTitle = Color(0xFFF9FAFB);
+
   static const Color whatsapp = Color(0xFF25D366);
   static const Color whatsappDark = Color(0xFF128C7E);
   static const Color black = Color(0xFF000000);

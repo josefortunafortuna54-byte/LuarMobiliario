@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:luar_company/widgets/price_tag.dart';
 
+import '../helpers/test_app.dart';
+
 void main() {
   group('PriceTag', () {
     testWidgets('renders formatted price with default currency',
         (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(home: Scaffold(body: PriceTag(price: 1500000))),
+        testApp(home: Scaffold(body: PriceTag(price: 1500000))),
       );
 
       expect(find.text('AOA 1.500.000'), findsOneWidget);
@@ -16,7 +18,7 @@ void main() {
 
     testWidgets('shows /mes suffix when isRent is true', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        testApp(
           home: Scaffold(body: PriceTag(price: 250000, isRent: true)),
         ),
       );
@@ -27,7 +29,7 @@ void main() {
 
     testWidgets('hides currency when showCurrency is false', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        testApp(
           home: Scaffold(body: PriceTag(price: 5000, showCurrency: false)),
         ),
       );
@@ -38,7 +40,7 @@ void main() {
 
     testWidgets('formats large numbers with dots', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        testApp(
           home: Scaffold(body: PriceTag(price: 123456789)),
         ),
       );
@@ -48,7 +50,7 @@ void main() {
 
     testWidgets('handles zero price', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(home: Scaffold(body: PriceTag(price: 0))),
+        testApp(home: Scaffold(body: PriceTag(price: 0))),
       );
 
       expect(find.text('AOA 0'), findsOneWidget);
@@ -56,7 +58,7 @@ void main() {
 
     testWidgets('applies different fontSize per size variant', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        testApp(
           home: Scaffold(body: PriceTag(price: 100, size: PriceTagSize.large)),
         ),
       );

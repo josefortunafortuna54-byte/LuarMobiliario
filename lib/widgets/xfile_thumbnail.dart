@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../core/constants/app_colors.dart';
+import '../core/theme/app_palette.dart';
 
 class XFileThumbnail extends StatelessWidget {
   final XFile file;
@@ -12,6 +12,7 @@ class XFileThumbnail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     return FutureBuilder<Uint8List>(
       future: file.readAsBytes(),
       builder: (context, snapshot) {
@@ -20,16 +21,16 @@ class XFileThumbnail extends StatelessWidget {
         }
         if (snapshot.hasError) {
           return Container(
-            color: AppColors.gray200,
+            color: palette.surfaceAlt,
             alignment: Alignment.center,
             child: Icon(
               Icons.broken_image_outlined,
-              color: AppColors.gray400,
+              color: palette.textMuted,
             ),
           );
         }
         return Container(
-          color: AppColors.gray100,
+          color: palette.border,
           alignment: Alignment.center,
           child: const SizedBox(
             width: 20,

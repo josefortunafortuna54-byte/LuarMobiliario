@@ -7,7 +7,9 @@ import '../../core/models/property_model.dart';
 import '../../core/models/land_model.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/providers/favorite_provider.dart';
+import '../../core/theme/app_palette.dart';
 import '../../core/utils/routes.dart';
+import '../../l10n/app_localizations.dart';
 import '../../widgets/loading_widget.dart';
 import '../../widgets/property_card.dart';
 import '../../widgets/land_card.dart';
@@ -68,15 +70,17 @@ class _FavoritesScreenState extends State<FavoritesScreen>
   @override
   Widget build(BuildContext context) {
     final isGuest = context.watch<AuthProvider>().user == null;
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: palette.surface,
       appBar: AppBar(
         backgroundColor: AppColors.navy,
         elevation: 0,
         centerTitle: true,
         title: Text(
-          'Favoritos',
+          l10n.favoritos,
           style: AppTextStyles.h6.copyWith(color: AppColors.white),
         ),
         iconTheme: const IconThemeData(color: AppColors.gold),
@@ -87,12 +91,12 @@ class _FavoritesScreenState extends State<FavoritesScreen>
                 indicatorColor: AppColors.gold,
                 indicatorWeight: 3,
                 labelColor: AppColors.gold,
-                unselectedLabelColor: AppColors.gray400,
+                unselectedLabelColor: palette.textMuted,
                 labelStyle: AppTextStyles.labelLarge,
                 unselectedLabelStyle: AppTextStyles.labelLarge,
-                tabs: const [
-                  Tab(text: 'Imóveis'),
-                  Tab(text: 'Terrenos'),
+                tabs: [
+                  Tab(text: l10n.imoveis),
+                  Tab(text: l10n.terrenos),
                 ],
               ),
       ),
@@ -101,8 +105,8 @@ class _FavoritesScreenState extends State<FavoritesScreen>
           : Consumer<FavoriteProvider>(
               builder: (context, provider, _) {
                 if (provider.isLoading && _isLoadingDetails) {
-                  return const Center(
-                    child: LoadingWidget(message: 'Carregando favoritos...'),
+                  return Center(
+                    child: LoadingWidget(message: l10n.carregandoFavoritos),
                   );
                 }
 
@@ -116,6 +120,8 @@ class _FavoritesScreenState extends State<FavoritesScreen>
   }
 
   Widget _buildGuestState() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 48),
@@ -141,38 +147,17 @@ class _FavoritesScreenState extends State<FavoritesScreen>
             ),
             const SizedBox(height: 24),
             Text(
-              'Crie uma conta',
+              l10n.favoritosDisponiveisConta,
               style: AppTextStyles.h5,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
-              'Registre-se para salvar seus imóveis e terrenos favoritos.',
+              l10n.guardeImoveisConta,
               style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.gray500,
+                color: palette.textSecondary,
               ),
               textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pushNamed(AppRoutes.register);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.gold,
-                  foregroundColor: AppColors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                ),
-                child: Text(
-                  'Criar Conta',
-                  style: AppTextStyles.buttonMedium.copyWith(color: AppColors.white),
-                ),
-              ),
             ),
           ],
         ),
@@ -181,11 +166,12 @@ class _FavoritesScreenState extends State<FavoritesScreen>
   }
 
   Widget _buildPropertiesTab() {
+    final l10n = AppLocalizations.of(context);
     if (_favoriteProperties.isEmpty) {
       return _buildEmptyState(
         icon: Icons.favorite_border_rounded,
-        title: 'Sem favoritos',
-        subtitle: 'Adicione imóveis aos seus favoritos para vê-los aqui.',
+        title: l10n.semFavoritos,
+        subtitle: l10n.adicioneImoveisFavoritos,
       );
     }
 
@@ -229,10 +215,14 @@ class _FavoritesScreenState extends State<FavoritesScreen>
                 bathrooms: property.bathrooms,
                 area: property.area,
                 onTap: () {
-                  Navigator.of(context).pushNamed(AppRoutes.propertyDetail, arguments: property.id);
+                  Navigator.of(
+                    context,
+                  ).pushNamed(AppRoutes.propertyDetail, arguments: property.id);
                 },
                 onDetailsTap: () {
-                  Navigator.of(context).pushNamed(AppRoutes.propertyDetail, arguments: property.id);
+                  Navigator.of(
+                    context,
+                  ).pushNamed(AppRoutes.propertyDetail, arguments: property.id);
                 },
               );
             },
@@ -243,11 +233,12 @@ class _FavoritesScreenState extends State<FavoritesScreen>
   }
 
   Widget _buildLandsTab() {
+    final l10n = AppLocalizations.of(context);
     if (_favoriteLands.isEmpty) {
       return _buildEmptyState(
         icon: Icons.favorite_border_rounded,
-        title: 'Sem favoritos',
-        subtitle: 'Adicione terrenos aos seus favoritos para vê-los aqui.',
+        title: l10n.semFavoritos,
+        subtitle: l10n.adicioneTerrenosFavoritos,
       );
     }
 
@@ -284,7 +275,9 @@ class _FavoritesScreenState extends State<FavoritesScreen>
                 badgeLabel: land.type.name.toUpperCase(),
                 features: land.features,
                 onTap: () {
-                  Navigator.of(context).pushNamed(AppRoutes.landDetail, arguments: land.id);
+                  Navigator.of(
+                    context,
+                  ).pushNamed(AppRoutes.landDetail, arguments: land.id);
                 },
               );
             },
@@ -299,6 +292,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
     required String title,
     required String subtitle,
   }) {
+    final palette = context.palette;
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 48),
@@ -328,7 +322,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
             Text(
               subtitle,
               style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.gray500,
+                color: palette.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),

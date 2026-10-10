@@ -8,7 +8,9 @@ import '../../core/constants/app_constants.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/models/property_model.dart';
 import '../../core/providers/search_provider.dart';
+import '../../core/theme/app_palette.dart';
 import '../../core/utils/routes.dart';
+import '../../l10n/app_localizations.dart';
 import '../../widgets/property_card.dart';
 import '../../widgets/land_card.dart';
 import '../../widgets/loading_widget.dart';
@@ -52,11 +54,13 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: AppColors.offWhite,
+      backgroundColor: palette.background,
       appBar: AppBar(
         title: Text(
-          'Pesquisar',
+          l10n.pesquisar,
           style: AppTextStyles.h5.copyWith(color: AppColors.white),
         ),
         backgroundColor: AppColors.navy,
@@ -65,7 +69,7 @@ class _SearchScreenState extends State<SearchScreen> {
         centerTitle: true,
         actions: [
           Consumer<SearchProvider>(
-              builder: (_, provider, _) {
+            builder: (_, provider, _) {
               if (provider.activeFilterCount == 0) {
                 return const SizedBox.shrink();
               }
@@ -75,7 +79,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   _searchController.clear();
                 },
                 child: Text(
-                  'Limpar',
+                  l10n.limparTudo,
                   style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.gold,
                     fontWeight: FontWeight.w600,
@@ -99,7 +103,7 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
             child: SearchWidget(
               controller: _searchController,
-              hintText: 'Pesquisar imóveis e terrenos...',
+              hintText: l10n.pesquisarTudo,
               autofocus: false,
               onChanged: _onSearchChanged,
               onSearch: (value) {
@@ -113,7 +117,7 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
           Expanded(
             child: Consumer<SearchProvider>(
-            builder: (_, provider, _) {
+              builder: (_, provider, _) {
                 return Column(
                   children: [
                     if (provider.activeFilterCount > 0)
@@ -130,6 +134,8 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildActiveFilters(SearchProvider provider) {
+    final l10n = AppLocalizations.of(context);
+    final palette = context.palette;
     final chips = <_FilterChipData>[];
 
     if (provider.query.isNotEmpty) {
@@ -144,7 +150,7 @@ class _SearchScreenState extends State<SearchScreen> {
     if (provider.transactionType != null) {
       chips.add(
         _FilterChipData(
-          provider.transactionType == 'sale' ? 'Venda' : 'Arrendamento',
+          provider.transactionType == 'sale' ? l10n.venda : l10n.arrendamento,
           () => _removeFilter(provider, 'transactionType'),
         ),
       );
@@ -176,7 +182,7 @@ class _SearchScreenState extends State<SearchScreen> {
     if (provider.minPrice != null) {
       chips.add(
         _FilterChipData(
-          'Min: AOA ${provider.minPrice!.toStringAsFixed(0)}',
+          l10n.minPreco(provider.minPrice!.toStringAsFixed(0)),
           () => _removeFilter(provider, 'minPrice'),
         ),
       );
@@ -184,7 +190,7 @@ class _SearchScreenState extends State<SearchScreen> {
     if (provider.maxPrice != null) {
       chips.add(
         _FilterChipData(
-          'Max: AOA ${provider.maxPrice!.toStringAsFixed(0)}',
+          l10n.maxPreco(provider.maxPrice!.toStringAsFixed(0)),
           () => _removeFilter(provider, 'maxPrice'),
         ),
       );
@@ -192,7 +198,7 @@ class _SearchScreenState extends State<SearchScreen> {
     if (provider.bedrooms != null) {
       chips.add(
         _FilterChipData(
-          '${provider.bedrooms} quartos',
+          '${provider.bedrooms} ${l10n.quartos}',
           () => _removeFilter(provider, 'bedrooms'),
         ),
       );
@@ -200,7 +206,7 @@ class _SearchScreenState extends State<SearchScreen> {
     if (provider.bathrooms != null) {
       chips.add(
         _FilterChipData(
-          '${provider.bathrooms} WC',
+          '${provider.bathrooms} ${l10n.wc}',
           () => _removeFilter(provider, 'bathrooms'),
         ),
       );
@@ -208,7 +214,7 @@ class _SearchScreenState extends State<SearchScreen> {
     if (provider.garage != null) {
       chips.add(
         _FilterChipData(
-          '${provider.garage} garagem',
+          '${provider.garage} ${l10n.garagem}',
           () => _removeFilter(provider, 'garage'),
         ),
       );
@@ -228,15 +234,11 @@ class _SearchScreenState extends State<SearchScreen> {
               label: Text(
                 chip.label,
                 style: AppTextStyles.bodyTiny.copyWith(
-                  color: AppColors.navy,
+                  color: palette.textTitle,
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              deleteIcon: const Icon(
-                Icons.close,
-                size: 16,
-                color: AppColors.navy,
-              ),
+              deleteIcon: Icon(Icons.close, size: 16, color: palette.textTitle),
               onDeleted: chip.onRemove,
               backgroundColor: AppColors.goldLight.withValues(alpha: 0.25),
               side: BorderSide(color: AppColors.gold.withValues(alpha: 0.4)),
@@ -304,6 +306,8 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildEmptyState() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -317,22 +321,22 @@ class _SearchScreenState extends State<SearchScreen> {
                 color: AppColors.navy.withValues(alpha: 0.06),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.search_off_rounded,
                 size: 48,
-                color: AppColors.gray400,
+                color: palette.textMuted,
               ),
             ),
             const SizedBox(height: 24),
             Text(
-              'Nenhum resultado encontrado',
-              style: AppTextStyles.h5.copyWith(color: AppColors.navy),
+              l10n.nenhumResultado,
+              style: AppTextStyles.h5.copyWith(color: palette.textTitle),
             ),
             const SizedBox(height: 8),
             Text(
-              'Tente ajustar os filtros ou pesquisar por outro termo.',
+              l10n.ajustarFiltros,
               style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.gray500,
+                color: palette.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -343,6 +347,8 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildResultsGrid(SearchProvider provider) {
+    final l10n = AppLocalizations.of(context);
+    final palette = context.palette;
     final properties = provider.propertyResults;
     final lands = provider.landResults;
 
@@ -351,8 +357,8 @@ class _SearchScreenState extends State<SearchScreen> {
       children: [
         if (properties.isNotEmpty) ...[
           Text(
-            'Imóveis (${properties.length})',
-            style: AppTextStyles.h6.copyWith(color: AppColors.navy),
+            l10n.contarImoveis(properties.length),
+            style: AppTextStyles.h6.copyWith(color: palette.textTitle),
           ),
           const SizedBox(height: 12),
           ...properties.map(
@@ -380,8 +386,8 @@ class _SearchScreenState extends State<SearchScreen> {
         ],
         if (lands.isNotEmpty) ...[
           Text(
-            'Terrenos (${lands.length})',
-            style: AppTextStyles.h6.copyWith(color: AppColors.navy),
+            l10n.terrenosCount(lands.length),
+            style: AppTextStyles.h6.copyWith(color: palette.textTitle),
           ),
           const SizedBox(height: 12),
           ...lands.map(
@@ -478,11 +484,12 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
-      decoration: const BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: context.palette.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
         children: [
@@ -494,31 +501,31 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildSectionTitle('Tipo de Transação'),
+                  _buildSectionTitle(l10n.tipoTransacao),
                   const SizedBox(height: 10),
                   _buildTransactionChips(),
                   const SizedBox(height: 24),
-                  _buildSectionTitle('Tipo de Imóvel'),
+                  _buildSectionTitle(l10n.tipoImovel),
                   const SizedBox(height: 10),
                   _buildPropertyTypeChips(),
                   const SizedBox(height: 24),
-                  _buildSectionTitle('Tipo de Terreno'),
+                  _buildSectionTitle(l10n.tipoTerreno),
                   const SizedBox(height: 10),
                   _buildLandTypeChips(),
                   const SizedBox(height: 24),
-                  _buildSectionTitle('Cidade'),
+                  _buildSectionTitle(l10n.cidade),
                   const SizedBox(height: 10),
                   _buildCityDropdown(),
                   const SizedBox(height: 24),
-                  _buildSectionTitle('Faixa de Preço'),
+                  _buildSectionTitle(l10n.faixaPreco),
                   const SizedBox(height: 10),
                   _buildPriceRange(),
                   const SizedBox(height: 24),
-                  _buildSectionTitle('Área (m²)'),
+                  _buildSectionTitle(l10n.areaM2),
                   const SizedBox(height: 10),
                   _buildAreaRange(),
                   const SizedBox(height: 24),
-                  _buildSectionTitle('Quartos'),
+                  _buildSectionTitle(l10n.quartosLabel),
                   const SizedBox(height: 10),
                   _buildOptionsRow(
                     options: AppConstants.bedroomOptions,
@@ -534,7 +541,7 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
                     },
                   ),
                   const SizedBox(height: 24),
-                  _buildSectionTitle('Casas de Banho'),
+                  _buildSectionTitle(l10n.casasDeBanhoLabel),
                   const SizedBox(height: 10),
                   _buildOptionsRow(
                     options: AppConstants.bedroomOptions,
@@ -550,7 +557,7 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
                     },
                   ),
                   const SizedBox(height: 24),
-                  _buildSectionTitle('Garagem'),
+                  _buildSectionTitle(l10n.garagemLabel),
                   const SizedBox(height: 10),
                   _buildOptionsRow(
                     options: AppConstants.parkingOptions,
@@ -577,13 +584,14 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
   }
 
   Widget _buildHandle() {
+    final palette = context.palette;
     return Center(
       child: Container(
         margin: const EdgeInsets.only(top: 12),
         width: 40,
         height: 4,
         decoration: BoxDecoration(
-          color: AppColors.gray300,
+          color: palette.textMuted,
           borderRadius: BorderRadius.circular(2),
         ),
       ),
@@ -591,13 +599,15 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
   }
 
   Widget _buildHeader() {
+    final l10n = AppLocalizations.of(context);
+    final palette = context.palette;
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
       child: Row(
         children: [
           Text(
-            'Filtros',
-            style: AppTextStyles.h5.copyWith(color: AppColors.navy),
+            l10n.aplicarFiltros,
+            style: AppTextStyles.h5.copyWith(color: palette.textTitle),
           ),
           const Spacer(),
           TextButton(
@@ -617,7 +627,7 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
               });
             },
             child: Text(
-              'Limpar tudo',
+              l10n.limparTudo,
               style: AppTextStyles.bodySmall.copyWith(
                 color: AppColors.gold,
                 fontWeight: FontWeight.w600,
@@ -632,13 +642,17 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: AppTextStyles.labelLarge.copyWith(color: AppColors.navy),
+      style: AppTextStyles.labelLarge.copyWith(
+        color: context.palette.textTitle,
+      ),
     );
   }
 
   Widget _buildTransactionChips() {
     final types = ['sale', 'rent'];
-    final labels = ['Venda', 'Arrendamento'];
+    final l10n = AppLocalizations.of(context);
+    final palette = context.palette;
+    final labels = [l10n.venda, l10n.arrendamento];
 
     return Wrap(
       spacing: 8,
@@ -655,16 +669,16 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
             decoration: BoxDecoration(
-              color: isSelected ? AppColors.navy : AppColors.gray100,
+              color: isSelected ? AppColors.navy : palette.border,
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: isSelected ? AppColors.navy : AppColors.gray200,
+                color: isSelected ? AppColors.navy : palette.borderStrong,
               ),
             ),
             child: Text(
               labels[i],
               style: AppTextStyles.bodySmall.copyWith(
-                color: isSelected ? AppColors.white : AppColors.gray700,
+                color: isSelected ? AppColors.white : palette.textBody,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -676,7 +690,15 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
 
   Widget _buildPropertyTypeChips() {
     final types = ['house', 'apartment', 'office', 'warehouse', 'shop'];
-    final labels = ['Casa', 'Apartamento', 'Escritório', 'Armazém', 'Loja'];
+    final l10n = AppLocalizations.of(context);
+    final palette = context.palette;
+    final labels = [
+      l10n.casa,
+      l10n.apartamento,
+      l10n.escritorio,
+      l10n.armazem,
+      l10n.loja,
+    ];
 
     return Wrap(
       spacing: 8,
@@ -693,16 +715,16 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
             decoration: BoxDecoration(
-              color: isSelected ? AppColors.navy : AppColors.gray100,
+              color: isSelected ? AppColors.navy : palette.border,
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: isSelected ? AppColors.navy : AppColors.gray200,
+                color: isSelected ? AppColors.navy : palette.borderStrong,
               ),
             ),
             child: Text(
               labels[i],
               style: AppTextStyles.bodySmall.copyWith(
-                color: isSelected ? AppColors.white : AppColors.gray700,
+                color: isSelected ? AppColors.white : palette.textBody,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -721,13 +743,15 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
       'lot',
       'farm',
     ];
+    final l10n = AppLocalizations.of(context);
+    final palette = context.palette;
     final labels = [
-      'Urbano',
-      'Agrícola',
-      'Industrial',
-      'Comercial',
-      'Lote',
-      'Fazenda',
+      l10n.urbano,
+      l10n.agricola,
+      l10n.industrial,
+      l10n.comercial,
+      l10n.lote,
+      l10n.fazenda,
     ];
 
     return Wrap(
@@ -745,16 +769,16 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
             decoration: BoxDecoration(
-              color: isSelected ? AppColors.navy : AppColors.gray100,
+              color: isSelected ? AppColors.navy : palette.border,
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: isSelected ? AppColors.navy : AppColors.gray200,
+                color: isSelected ? AppColors.navy : palette.borderStrong,
               ),
             ),
             child: Text(
               labels[i],
               style: AppTextStyles.bodySmall.copyWith(
-                color: isSelected ? AppColors.white : AppColors.gray700,
+                color: isSelected ? AppColors.white : palette.textBody,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -765,20 +789,22 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
   }
 
   Widget _buildCityDropdown() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: palette.inputFill,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.gray200),
+        border: Border.all(color: palette.borderStrong),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           isExpanded: true,
           value: _selectedCity,
           hint: Text(
-            'Selecione a cidade',
-            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.gray400),
+            l10n.selecioneCidade,
+            style: AppTextStyles.bodyMedium.copyWith(color: palette.textMuted),
           ),
           items: _cities.map((city) {
             return DropdownMenuItem(
@@ -797,6 +823,7 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
   }
 
   Widget _buildPriceRange() {
+    final palette = context.palette;
     final minLabel = _minPrice == 0
         ? 'Min'
         : 'AOA ${_formatCompact(_minPrice)}';
@@ -811,11 +838,11 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
           children: [
             Text(
               minLabel,
-              style: AppTextStyles.bodySmall.copyWith(color: AppColors.gray600),
+              style: AppTextStyles.bodySmall.copyWith(color: palette.textBody),
             ),
             Text(
               maxLabel,
-              style: AppTextStyles.bodySmall.copyWith(color: AppColors.gray600),
+              style: AppTextStyles.bodySmall.copyWith(color: palette.textBody),
             ),
           ],
         ),
@@ -825,7 +852,7 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
           max: 50000000,
           divisions: 50,
           activeColor: AppColors.gold,
-          inactiveColor: AppColors.gray200,
+          inactiveColor: palette.borderStrong,
           onChanged: (values) {
             setState(() {
               _minPrice = values.start;
@@ -838,6 +865,7 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
   }
 
   Widget _buildAreaRange() {
+    final palette = context.palette;
     final minLabel = _minArea == 0
         ? 'Min'
         : '${_minArea.toStringAsFixed(0)} m²';
@@ -852,11 +880,11 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
           children: [
             Text(
               minLabel,
-              style: AppTextStyles.bodySmall.copyWith(color: AppColors.gray600),
+              style: AppTextStyles.bodySmall.copyWith(color: palette.textBody),
             ),
             Text(
               maxLabel,
-              style: AppTextStyles.bodySmall.copyWith(color: AppColors.gray600),
+              style: AppTextStyles.bodySmall.copyWith(color: palette.textBody),
             ),
           ],
         ),
@@ -866,7 +894,7 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
           max: 10000,
           divisions: 100,
           activeColor: AppColors.gold,
-          inactiveColor: AppColors.gray200,
+          inactiveColor: palette.borderStrong,
           onChanged: (values) {
             setState(() {
               _minArea = values.start;
@@ -883,6 +911,7 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
     required int? selectedIndex,
     required ValueChanged<int> onSelected,
   }) {
+    final palette = context.palette;
     return Row(
       children: List.generate(options.length, (i) {
         final isSelected = selectedIndex == i;
@@ -894,17 +923,17 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
               margin: EdgeInsets.only(right: i < options.length - 1 ? 8 : 0),
               padding: const EdgeInsets.symmetric(vertical: 12),
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.navy : AppColors.gray100,
+                color: isSelected ? AppColors.navy : palette.border,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: isSelected ? AppColors.navy : AppColors.gray200,
+                  color: isSelected ? AppColors.navy : palette.borderStrong,
                 ),
               ),
               alignment: Alignment.center,
               child: Text(
                 options[i],
                 style: AppTextStyles.bodySmall.copyWith(
-                  color: isSelected ? AppColors.white : AppColors.gray700,
+                  color: isSelected ? AppColors.white : palette.textBody,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -916,11 +945,13 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
   }
 
   Widget _buildBottomBar() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
-      decoration: const BoxDecoration(
-        color: AppColors.white,
-        border: Border(top: BorderSide(color: AppColors.gray200)),
+      decoration: BoxDecoration(
+        color: palette.surface,
+        border: Border(top: BorderSide(color: palette.borderStrong)),
       ),
       child: SizedBox(
         width: double.infinity,
@@ -954,7 +985,7 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
             shadowColor: AppColors.gold.withValues(alpha: 0.4),
           ),
           child: Text(
-            'Aplicar Filtros',
+            l10n.aplicarFiltros,
             style: AppTextStyles.buttonLarge.copyWith(color: AppColors.white),
           ),
         ),

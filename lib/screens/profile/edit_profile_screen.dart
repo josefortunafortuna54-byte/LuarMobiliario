@@ -6,6 +6,8 @@ import '../../core/constants/app_constants.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/services/storage_service.dart';
+import '../../core/theme/app_palette.dart';
+import '../../l10n/app_localizations.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_input.dart';
 import '../../widgets/avatar_widget.dart';
@@ -64,7 +66,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erro ao enviar avatar: $e'),
+            content: Text(AppLocalizations.of(context).erroEnviarAvatar('$e')),
             backgroundColor: AppColors.error,
           ),
         );
@@ -86,8 +88,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Perfil atualizado com sucesso!'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context).perfilAtualizado),
           backgroundColor: AppColors.success,
         ),
       );
@@ -101,13 +103,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: palette.surface,
       appBar: AppBar(
         backgroundColor: AppColors.navy,
         elevation: 0,
         centerTitle: true,
-        title: Text('Editar Perfil', style: AppTextStyles.h6.copyWith(color: AppColors.white)),
+        title: Text(
+          l10n.editarPerfil,
+          style: AppTextStyles.h6.copyWith(color: AppColors.white),
+        ),
         iconTheme: const IconThemeData(color: AppColors.gold),
       ),
       body: SingleChildScrollView(
@@ -150,16 +157,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   ),
                   const SizedBox(height: 32),
                   CustomInput(
-                    label: 'Nome Completo',
-                    hint: 'O seu nome',
+                    label: l10n.nomeCompleto,
+                    hint: l10n.oSeuNome,
                     prefixIcon: Icons.person_outline,
                     controller: _nameController,
-                    validator: (v) => (v == null || v.isEmpty) ? 'Insira o seu nome' : null,
+                    validator: (v) =>
+                        (v == null || v.isEmpty) ? l10n.insiraNome : null,
                     enabled: !auth.isLoading,
                   ),
                   const SizedBox(height: 16),
                   CustomInput(
-                    label: 'Telefone',
+                    label: l10n.telefone,
                     hint: '+244 9XX XXX XXX',
                     prefixIcon: Icons.phone_outlined,
                     keyboardType: TextInputType.phone,
@@ -168,14 +176,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   ),
                   const SizedBox(height: 12),
                   CustomInput(
-                    label: 'E-mail',
+                    label: l10n.email,
                     prefixIcon: Icons.email_outlined,
                     controller: _emailController,
                     enabled: false,
                   ),
                   const SizedBox(height: 32),
                   CustomButton(
-                    text: 'Guardar Alterações',
+                    text: l10n.guardarAlteracoes,
                     isFullWidth: true,
                     size: CustomButtonSize.large,
                     isLoading: auth.isLoading,

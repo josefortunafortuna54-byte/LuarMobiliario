@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../core/constants/app_colors.dart';
 import '../core/constants/app_text_styles.dart';
+import '../core/theme/app_palette.dart';
 import '../core/utils/formatters.dart';
+import '../l10n/app_localizations.dart';
 
 class LandCard extends StatelessWidget {
   const LandCard({
@@ -35,7 +37,7 @@ class LandCard extends StatelessWidget {
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: context.palette.surface,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -53,13 +55,14 @@ class LandCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [_buildImage(), _buildContent()],
+          children: [_buildImage(context), _buildContent(context)],
         ),
       ),
     );
   }
 
-  Widget _buildImage() {
+  Widget _buildImage(BuildContext context) {
+    final palette = context.palette;
     return Stack(
       children: [
         SizedBox(
@@ -69,11 +72,11 @@ class LandCard extends StatelessWidget {
             imageUrl,
             fit: BoxFit.cover,
             errorBuilder: (_, _, _) => Container(
-              color: AppColors.gray200,
-              child: const Icon(
+              color: palette.surfaceAlt,
+              child: Icon(
                 Icons.landscape_rounded,
                 size: 56,
-                color: AppColors.gray400,
+                color: palette.textMuted,
               ),
             ),
           ),
@@ -134,7 +137,9 @@ class LandCard extends StatelessWidget {
     );
   }
 
-  Widget _buildContent() {
+  Widget _buildContent(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final palette = context.palette;
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -159,7 +164,7 @@ class LandCard extends StatelessWidget {
                 child: Text(
                   location,
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.gray500,
+                    color: palette.textSecondary,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -180,13 +185,13 @@ class LandCard extends StatelessWidget {
                         vertical: 5,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.gray100,
+                        color: palette.border,
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
                         f,
                         style: AppTextStyles.bodyTiny.copyWith(
-                          color: AppColors.gray600,
+                          color: palette.textBody,
                         ),
                       ),
                     ),
@@ -215,7 +220,7 @@ class LandCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    'Detalhes',
+                    l10n.detalhes,
                     style: AppTextStyles.buttonSmall.copyWith(
                       color: AppColors.white,
                     ),

@@ -7,22 +7,27 @@ import '../../core/models/partner_model.dart';
 import '../../core/models/user_model.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/providers/partner_provider.dart';
+import '../../core/theme/app_palette.dart';
 import '../../core/utils/routes.dart';
+import '../../l10n/app_localizations.dart';
 import '../../widgets/empty_state.dart';
 import '../../widgets/loading_widget.dart';
 
-String partnerBusinessTypeLabel(PartnerBusinessType type) {
+String partnerBusinessTypeLabel(
+  PartnerBusinessType type,
+  AppLocalizations l10n,
+) {
   switch (type) {
     case PartnerBusinessType.imobiliaria:
-      return 'Imobiliária';
+      return l10n.imobiliaria;
     case PartnerBusinessType.construtora:
-      return 'Construtora';
+      return l10n.construtora;
     case PartnerBusinessType.corretor:
-      return 'Corretor';
+      return l10n.corretor;
     case PartnerBusinessType.administrador:
-      return 'Administrador';
+      return l10n.administrador;
     case PartnerBusinessType.outro:
-      return 'Outro';
+      return l10n.outro;
   }
 }
 
@@ -60,21 +65,23 @@ class _PartnersScreenState extends State<PartnersScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: palette.surface,
       appBar: AppBar(
         backgroundColor: AppColors.navy,
         elevation: 0,
         centerTitle: true,
         title: Text(
-          'Parceiros',
+          l10n.parceiros,
           style: AppTextStyles.h6.copyWith(color: AppColors.white),
         ),
         iconTheme: const IconThemeData(color: AppColors.gold),
         actions: [
           if (_canManage)
             IconButton(
-              tooltip: 'Meu perfil de parceiro',
+              tooltip: l10n.meuPerfilParceiro,
               icon: const Icon(Icons.badge_outlined),
               onPressed: () => _openPartnerForm(context),
             ),
@@ -84,13 +91,13 @@ class _PartnersScreenState extends State<PartnersScreen> {
           ? FloatingActionButton.extended(
               onPressed: () => _openPartnerForm(context),
               icon: const Icon(Icons.add),
-              label: const Text('Meu Perfil'),
+              label: Text(l10n.meuPerfil),
             )
           : null,
       body: Consumer<PartnerProvider>(
         builder: (context, provider, _) {
           if (provider.isLoading && provider.partners.isEmpty) {
-            return const LoadingWidget(message: 'Carregando parceiros...');
+            return LoadingWidget(message: l10n.carregandoParceiros);
           }
 
           if (provider.error != null && provider.partners.isEmpty) {
@@ -100,8 +107,8 @@ class _PartnersScreenState extends State<PartnersScreen> {
           if (provider.partners.isEmpty) {
             return EmptyState(
               icon: Icons.handshake_outlined,
-              title: 'Nenhum parceiro encontrado',
-              subtitle: 'Os parceiros da Luar Mobiliário aparecerão aqui.',
+              title: l10n.nenhumParceiro,
+              subtitle: l10n.osParceirosAqui,
             );
           }
 
@@ -123,17 +130,22 @@ class _PartnersScreenState extends State<PartnersScreen> {
   }
 
   Widget _buildErrorState(String error) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline_rounded,
-                size: 48, color: AppColors.error),
+            const Icon(
+              Icons.error_outline_rounded,
+              size: 48,
+              color: AppColors.error,
+            ),
             const SizedBox(height: 16),
             Text(
-              'Não foi possível carregar',
+              l10n.naoFoiPossivelCarregar,
               style: AppTextStyles.h5,
               textAlign: TextAlign.center,
             ),
@@ -141,7 +153,7 @@ class _PartnersScreenState extends State<PartnersScreen> {
             Text(
               error,
               style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.gray500,
+                color: palette.textSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -152,7 +164,7 @@ class _PartnersScreenState extends State<PartnersScreen> {
                 backgroundColor: AppColors.gold,
                 foregroundColor: AppColors.white,
               ),
-              child: const Text('Tentar novamente'),
+              child: Text(l10n.tentarNovamente),
             ),
           ],
         ),
@@ -161,10 +173,12 @@ class _PartnersScreenState extends State<PartnersScreen> {
   }
 
   Widget _buildPartnerCard(PartnerModel partner) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: palette.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -173,7 +187,7 @@ class _PartnersScreenState extends State<PartnersScreen> {
             offset: const Offset(0, 4),
           ),
         ],
-        border: Border.all(color: AppColors.gray100),
+        border: Border.all(color: palette.border),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -199,7 +213,7 @@ class _PartnersScreenState extends State<PartnersScreen> {
                 Text(
                   partner.companyName.isNotEmpty
                       ? partner.companyName
-                      : 'Parceiro',
+                      : l10n.parceiro,
                   style: AppTextStyles.bodyMediumBold,
                 ),
                 const SizedBox(height: 6),
@@ -207,9 +221,11 @@ class _PartnersScreenState extends State<PartnersScreen> {
                   spacing: 6,
                   runSpacing: 6,
                   children: [
-                    _buildChip(partnerBusinessTypeLabel(partner.businessType)),
+                    _buildChip(
+                      partnerBusinessTypeLabel(partner.businessType, l10n),
+                    ),
                     if (partner.nif.isNotEmpty)
-                      _buildChip('NIF: ${partner.nif}'),
+                      _buildChip(l10n.nif(partner.nif)),
                   ],
                 ),
                 if (partner.address.isNotEmpty) ...[
@@ -218,8 +234,10 @@ class _PartnersScreenState extends State<PartnersScreen> {
                 ],
                 if (partner.whatsapp.isNotEmpty) ...[
                   const SizedBox(height: 4),
-                  _buildInfoRow(Icons.chat_bubble_outline_rounded,
-                      'WhatsApp: ${partner.whatsapp}'),
+                  _buildInfoRow(
+                    Icons.chat_bubble_outline_rounded,
+                    l10n.whatsapp(partner.whatsapp),
+                  ),
                 ],
               ],
             ),
@@ -230,6 +248,7 @@ class _PartnersScreenState extends State<PartnersScreen> {
   }
 
   Widget _buildChip(String label) {
+    final palette = context.palette;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
@@ -238,22 +257,21 @@ class _PartnersScreenState extends State<PartnersScreen> {
       ),
       child: Text(
         label,
-        style: AppTextStyles.bodyTiny.copyWith(color: AppColors.navy),
+        style: AppTextStyles.bodyTiny.copyWith(color: palette.textTitle),
       ),
     );
   }
 
   Widget _buildInfoRow(IconData icon, String text) {
+    final palette = context.palette;
     return Row(
       children: [
-        Icon(icon, size: 16, color: AppColors.gray500),
+        Icon(icon, size: 16, color: palette.textSecondary),
         const SizedBox(width: 6),
         Expanded(
           child: Text(
             text,
-            style: AppTextStyles.bodySmall.copyWith(
-              color: AppColors.gray600,
-            ),
+            style: AppTextStyles.bodySmall.copyWith(color: palette.textBody),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),

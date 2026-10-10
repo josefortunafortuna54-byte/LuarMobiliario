@@ -5,7 +5,9 @@ import '../../core/constants/app_text_styles.dart';
 import '../../core/models/user_model.dart';
 import '../../core/providers/admin_provider.dart';
 import '../../core/providers/auth_provider.dart';
+import '../../core/theme/app_palette.dart';
 import '../../core/utils/routes.dart';
+import '../../l10n/app_localizations.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -20,12 +22,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final user = context.read<AuthProvider>().user;
-      final isAgentOrAdmin = user?.role == UserRole.agent || user?.role == UserRole.admin;
+      final isAgentOrAdmin =
+          user?.role == UserRole.agent || user?.role == UserRole.admin;
       if (!isAgentOrAdmin && mounted) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Acesso restrito a agentes e administradores'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context).acessoRestritoAgentes),
             backgroundColor: AppColors.error,
           ),
         );
@@ -37,14 +40,16 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: AppColors.gray50,
+      backgroundColor: palette.background,
       appBar: AppBar(
         backgroundColor: AppColors.navy,
         elevation: 0,
         centerTitle: true,
         title: Text(
-          'Painel Admin',
+          l10n.painelAdmin,
           style: AppTextStyles.h6.copyWith(color: AppColors.white),
         ),
         iconTheme: const IconThemeData(color: AppColors.gold),
@@ -66,6 +71,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }
 
   Widget _buildHeader() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
@@ -79,11 +86,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Bem-vindo, Admin', style: AppTextStyles.h4White),
+          Text(l10n.bemVindoAdmin, style: AppTextStyles.h4White),
           const SizedBox(height: 6),
           Text(
-            'Gestão completa da sua imobiliária',
-            style: AppTextStyles.bodySmall.copyWith(color: AppColors.gray400),
+            l10n.gestaoCompleta,
+            style: AppTextStyles.bodySmall.copyWith(color: palette.textMuted),
           ),
         ],
       ),
@@ -91,6 +98,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }
 
   Widget _buildStatsSection() {
+    final l10n = AppLocalizations.of(context);
     return Consumer<AdminProvider>(
       builder: (context, admin, _) {
         return Padding(
@@ -98,7 +106,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Visão Geral', style: AppTextStyles.h6),
+              Text(l10n.visaoGeral, style: AppTextStyles.h6),
               const SizedBox(height: 16),
               GridView.count(
                 crossAxisCount: 2,
@@ -110,25 +118,25 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 children: [
                   _buildStatCard(
                     icon: Icons.apartment_rounded,
-                    title: 'Total Imóveis',
+                    title: l10n.totalImoveis,
                     value: '${admin.totalProperties}',
                     color: AppColors.navy,
                   ),
                   _buildStatCard(
                     icon: Icons.landscape_rounded,
-                    title: 'Total Terrenos',
+                    title: l10n.totalTerrenos,
                     value: '${admin.totalLands}',
                     color: AppColors.gold,
                   ),
                   _buildStatCard(
                     icon: Icons.people_outline_rounded,
-                    title: 'Total Utilizadores',
+                    title: l10n.totalUtilizadores,
                     value: '${admin.totalUsers}',
                     color: AppColors.info,
                   ),
                   _buildStatCard(
                     icon: Icons.mark_email_unread_outlined,
-                    title: 'Mensagens Não Lidas',
+                    title: l10n.totalMensagens,
                     value: '${admin.totalUnreadMessages}',
                     color: AppColors.error,
                   ),
@@ -147,10 +155,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
     required String value,
     required Color color,
   }) {
+    final palette = context.palette;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: palette.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -178,7 +187,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
           const SizedBox(height: 2),
           Text(
             title,
-            style: AppTextStyles.bodyTiny.copyWith(color: AppColors.gray500),
+            style: AppTextStyles.bodyTiny.copyWith(
+              color: palette.textSecondary,
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -188,27 +199,29 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }
 
   Widget _buildQuickActions(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Ações Rápidas', style: AppTextStyles.h6),
+          Text(l10n.acoesRapidas, style: AppTextStyles.h6),
           const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
                 child: _buildActionCard(
                   icon: Icons.add_home_work_outlined,
-                  title: 'Cadastrar\nImóvel',
-                  onTap: () => Navigator.pushNamed(context, AppRoutes.propertyForm),
+                  title: l10n.cadastroImovel,
+                  onTap: () =>
+                      Navigator.pushNamed(context, AppRoutes.propertyForm),
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: _buildActionCard(
                   icon: Icons.add_location_alt_outlined,
-                  title: 'Cadastrar\nTerreno',
+                  title: l10n.cadastroTerreno,
                   onTap: () => Navigator.pushNamed(context, AppRoutes.landForm),
                 ),
               ),
@@ -220,35 +233,38 @@ class _AdminDashboardState extends State<AdminDashboard> {
               Expanded(
                 child: _buildActionCard(
                   icon: Icons.people_alt_outlined,
-                  title: 'Ver\nUtilizadores',
-                  onTap: () => Navigator.pushNamed(context, AppRoutes.adminUsers),
+                  title: l10n.verUtilizadores,
+                  onTap: () =>
+                      Navigator.pushNamed(context, AppRoutes.adminUsers),
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: _buildActionCard(
                   icon: Icons.apartment_rounded,
-                  title: 'Gerir\nImóveis',
-                  onTap: () => Navigator.pushNamed(context, AppRoutes.adminProperties),
+                  title: l10n.gerir,
+                  onTap: () =>
+                      Navigator.pushNamed(context, AppRoutes.adminProperties),
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: _buildActionCard(
                   icon: Icons.landscape_rounded,
-                  title: 'Gerir\nTerrenos',
-                  onTap: () => Navigator.pushNamed(context, AppRoutes.adminLands),
+                  title: l10n.gerirTerrenosCard,
+                  onTap: () =>
+                      Navigator.pushNamed(context, AppRoutes.adminLands),
                 ),
               ),
             ],
           ),
-        const SizedBox(height: 12),
+          const SizedBox(height: 12),
           Row(
             children: [
               Expanded(
                 child: _buildActionCard(
                   icon: Icons.handshake_outlined,
-                  title: 'Ver\nParceiros',
+                  title: l10n.verParceiros,
                   onTap: () => Navigator.pushNamed(context, AppRoutes.partners),
                 ),
               ),
@@ -293,7 +309,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
             const SizedBox(height: 10),
             Text(
               title,
-              style: AppTextStyles.bodySmallBold.copyWith(color: AppColors.white),
+              style: AppTextStyles.bodySmallBold.copyWith(
+                color: AppColors.white,
+              ),
               textAlign: TextAlign.center,
             ),
           ],

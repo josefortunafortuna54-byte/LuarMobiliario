@@ -4,6 +4,8 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/providers/message_provider.dart';
+import '../../core/theme/app_palette.dart';
+import '../../l10n/app_localizations.dart';
 import '../../widgets/avatar_widget.dart';
 import '../../widgets/loading_widget.dart';
 
@@ -24,7 +26,8 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final args = ModalRoute.of(context)?.settings.arguments as Map<String, String>?;
+      final args =
+          ModalRoute.of(context)?.settings.arguments as Map<String, String>?;
       if (args != null) {
         _partnerId = args['partnerId'] ?? '';
         _partnerName = args['partnerName'] ?? '';
@@ -62,8 +65,10 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: AppColors.offWhite,
+      backgroundColor: palette.background,
       appBar: AppBar(
         backgroundColor: AppColors.navy,
         elevation: 0,
@@ -93,7 +98,7 @@ class _ChatScreenState extends State<ChatScreen> {
             child: Consumer<MessageProvider>(
               builder: (context, provider, _) {
                 if (provider.isLoading && provider.messages.isEmpty) {
-                  return const LoadingWidget(message: 'Carregando mensagens...');
+                  return LoadingWidget(message: l10n.carregandoMensagens);
                 }
 
                 if (provider.messages.isEmpty) {
@@ -104,34 +109,47 @@ class _ChatScreenState extends State<ChatScreen> {
                         Icon(
                           Icons.chat_bubble_outline_rounded,
                           size: 64,
-                          color: AppColors.gray300,
+                          color: palette.textMuted,
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Inicie a conversa',
-                          style: AppTextStyles.h6.copyWith(color: AppColors.gray500),
+                          l10n.inicieConversa,
+                          style: AppTextStyles.h6.copyWith(
+                            color: palette.textSecondary,
+                          ),
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Envie uma mensagem para começar',
-                          style: AppTextStyles.bodySmall.copyWith(color: AppColors.gray400),
+                          l10n.envieMensagem,
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: palette.textMuted,
+                          ),
                         ),
                       ],
                     ),
                   );
                 }
 
-                WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+                WidgetsBinding.instance.addPostFrameCallback(
+                  (_) => _scrollToBottom(),
+                );
 
                 return ListView.builder(
                   controller: _scrollController,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   itemCount: provider.messages.length,
                   itemBuilder: (context, index) {
                     final msg = provider.messages[index];
                     final userId = context.read<AuthProvider>().user?.id ?? '';
                     final isMine = msg.senderId == userId;
-                    return _buildMessageBubble(msg.content, isMine, msg.createdAt);
+                    return _buildMessageBubble(
+                      msg.content,
+                      isMine,
+                      msg.createdAt,
+                    );
                   },
                 );
               },
@@ -144,6 +162,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget _buildMessageBubble(String content, bool isMine, DateTime time) {
+    final palette = context.palette;
     return Align(
       alignment: isMine ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
@@ -153,7 +172,7 @@ class _ChatScreenState extends State<ChatScreen> {
           maxWidth: MediaQuery.of(context).size.width * 0.75,
         ),
         decoration: BoxDecoration(
-          color: isMine ? AppColors.gold : AppColors.white,
+          color: isMine ? AppColors.gold : palette.surface,
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(16),
             topRight: const Radius.circular(16),
@@ -174,7 +193,7 @@ class _ChatScreenState extends State<ChatScreen> {
             Text(
               content,
               style: AppTextStyles.bodyMedium.copyWith(
-                color: isMine ? AppColors.white : AppColors.gray800,
+                color: isMine ? AppColors.white : palette.textBody,
               ),
             ),
             const SizedBox(height: 4),
@@ -183,7 +202,7 @@ class _ChatScreenState extends State<ChatScreen> {
               style: AppTextStyles.bodyTiny.copyWith(
                 color: isMine
                     ? AppColors.white.withValues(alpha: 0.7)
-                    : AppColors.gray400,
+                    : palette.textMuted,
                 fontSize: 10,
               ),
             ),
@@ -194,11 +213,13 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget _buildInputBar() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 8, 8, 12),
-      decoration: const BoxDecoration(
-        color: AppColors.white,
-        border: Border(top: BorderSide(color: AppColors.gray200)),
+      decoration: BoxDecoration(
+        color: palette.surface,
+        border: Border(top: BorderSide(color: palette.borderStrong)),
       ),
       child: SafeArea(
         top: false,
@@ -211,11 +232,16 @@ class _ChatScreenState extends State<ChatScreen> {
                 textInputAction: TextInputAction.send,
                 onSubmitted: (_) => _sendMessage(),
                 decoration: InputDecoration(
-                  hintText: 'Escreva uma mensagem...',
-                  hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.gray400),
+                  hintText: l10n.escrevaMensagem,
+                  hintStyle: AppTextStyles.bodyMedium.copyWith(
+                    color: palette.textMuted,
+                  ),
                   filled: true,
-                  fillColor: AppColors.gray50,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  fillColor: palette.inputFill,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(24),
                     borderSide: BorderSide.none,
@@ -233,7 +259,11 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
               child: IconButton(
                 onPressed: _sendMessage,
-                icon: const Icon(Icons.send_rounded, color: AppColors.white, size: 20),
+                icon: const Icon(
+                  Icons.send_rounded,
+                  color: AppColors.white,
+                  size: 20,
+                ),
               ),
             ),
           ],

@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:luar_company/widgets/empty_state.dart';
 
+import '../helpers/test_app.dart';
+
 void main() {
   group('EmptyState', () {
     testWidgets('renders icon, title and subtitle', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        testApp(
           home: Scaffold(
             body: EmptyState(
               icon: Icons.home_outlined,
@@ -25,7 +27,7 @@ void main() {
     testWidgets('does not show action button when actionLabel is null',
         (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        testApp(
           home: Scaffold(
             body: EmptyState(
               icon: Icons.star_outline,
@@ -44,7 +46,7 @@ void main() {
       var tapped = false;
 
       await tester.pumpWidget(
-        MaterialApp(
+        testApp(
           home: Scaffold(
             body: EmptyState(
               icon: Icons.refresh,
@@ -67,7 +69,7 @@ void main() {
 
     testWidgets('applies textAlign center to texts', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        testApp(
           home: Scaffold(
             body: EmptyState(
               icon: Icons.info_outline,

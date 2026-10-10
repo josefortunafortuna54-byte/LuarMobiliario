@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:luar_company/widgets/property_card.dart';
 
+import '../helpers/test_app.dart';
+
 // 1x1 transparent PNG
 final _kTransparentImage = Uint8List.fromList(<int>[
   0x89,
@@ -165,7 +167,7 @@ void main() {
   });
 
   Widget wrapInApp(Widget child) {
-    return MaterialApp(home: Scaffold(body: child));
+    return testApp(home: Scaffold(body: child));
   }
 
   PropertyCard createCard({

@@ -10,7 +10,9 @@ import '../../core/models/property_model.dart';
 import '../../core/providers/property_provider.dart';
 import '../../core/providers/favorite_provider.dart';
 import '../../core/providers/auth_provider.dart';
+import '../../core/theme/app_palette.dart';
 import '../../core/utils/routes.dart';
+import '../../l10n/app_localizations.dart';
 import '../../screens/bookings/booking_bottom_sheet.dart';
 import '../../widgets/loading_widget.dart';
 import '../../widgets/avatar_widget.dart';
@@ -41,26 +43,28 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Consumer<PropertyProvider>(
       builder: (_, provider, _) {
         if (provider.isLoading) {
-          return const Scaffold(
-            backgroundColor: AppColors.white,
+          return Scaffold(
+            backgroundColor: palette.surface,
             body: LoadingWidget(
               isFullScreen: true,
-              message: 'Carregando imóvel...',
+              message: l10n.carregandoImovel,
             ),
           );
         }
 
         if (provider.error != null || provider.selectedProperty == null) {
           return Scaffold(
-            backgroundColor: AppColors.white,
+            backgroundColor: palette.surface,
             appBar: AppBar(
               backgroundColor: AppColors.navy,
               foregroundColor: AppColors.white,
               title: Text(
-                'Erro',
+                l10n.erro,
                 style: AppTextStyles.h5.copyWith(color: AppColors.white),
               ),
             ),
@@ -75,9 +79,9 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    provider.error ?? 'Imóvel não encontrado',
+                    provider.error ?? l10n.imovelNaoEncontrado,
                     style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.gray600,
+                      color: palette.textBody,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -91,7 +95,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                       ),
                     ),
                     child: Text(
-                      'Voltar',
+                      l10n.voltar,
                       style: AppTextStyles.buttonMedium.copyWith(
                         color: AppColors.white,
                       ),
@@ -110,12 +114,13 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
   }
 
   Widget _buildDetailContent(PropertyModel property) {
+    final palette = context.palette;
     final isRent = property.transactionType == TransactionType.rent;
     final location =
         '${property.neighborhood}, ${property.city}, ${property.municipality}';
 
     return Scaffold(
-      backgroundColor: AppColors.offWhite,
+      backgroundColor: palette.background,
       body: CustomScrollView(
         slivers: [
           _buildAppBar(property, location),
@@ -140,6 +145,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
   }
 
   SliverAppBar _buildAppBar(PropertyModel property, String location) {
+    final l10n = AppLocalizations.of(context);
     final authProvider = context.watch<AuthProvider>();
     final favoriteProvider = context.watch<FavoriteProvider>();
     final userId = authProvider.user?.id ?? '';
@@ -158,7 +164,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
       foregroundColor: AppColors.white,
       elevation: 0,
       title: Text(
-        'Detalhes do Imóvel',
+        l10n.detalhesImovel,
         style: AppTextStyles.h6.copyWith(color: AppColors.white),
       ),
       centerTitle: true,
@@ -167,9 +173,10 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
           onPressed: () {
             SharePlus.instance.share(
               ShareParams(
-                text: '${property.title} - AOA ${property.price.toStringAsFixed(0)}\n'
-                    'Localização: $location\n'
-                    'Ver em Luar Mobiliario',
+                text:
+                    '${property.title} - AOA ${property.price.toStringAsFixed(0)}\n'
+                    '${l10n.localizacao}: $location\n'
+                    '${l10n.verEmLuar}',
               ),
             );
           },
@@ -197,6 +204,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
   }
 
   Widget _buildImageCarousel(List<String> images) {
+    final palette = context.palette;
     return Column(
       children: [
         SizedBox(
@@ -217,11 +225,11 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                           images[index],
                           fit: BoxFit.cover,
                           errorBuilder: (_, _, _) => Container(
-                            color: AppColors.gray200,
-                            child: const Icon(
+                            color: palette.surfaceAlt,
+                            child: Icon(
                               Icons.apartment_rounded,
                               size: 64,
-                              color: AppColors.gray400,
+                              color: palette.textMuted,
                             ),
                           ),
                         ),
@@ -242,12 +250,12 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                   },
                 )
               : Container(
-                  color: AppColors.gray200,
-                  child: const Center(
+                  color: palette.surfaceAlt,
+                  child: Center(
                     child: Icon(
                       Icons.apartment_rounded,
                       size: 80,
-                      color: AppColors.gray400,
+                      color: palette.textMuted,
                     ),
                   ),
                 ),
@@ -265,7 +273,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                   width: isActive ? 24 : 8,
                   height: 8,
                   decoration: BoxDecoration(
-                    color: isActive ? AppColors.gold : AppColors.gray300,
+                    color: isActive ? AppColors.gold : palette.textMuted,
                     borderRadius: BorderRadius.circular(4),
                   ),
                 );
@@ -299,6 +307,8 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
     bool isRent,
     String location,
   ) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -311,7 +321,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              isRent ? 'ALUGUEL' : 'VENDA',
+              isRent ? l10n.arrendamento : l10n.venda,
               style: AppTextStyles.labelMedium.copyWith(color: AppColors.white),
             ),
           ),
@@ -330,7 +340,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                 child: Text(
                   location,
                   style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.gray500,
+                    color: palette.textSecondary,
                   ),
                 ),
               ),
@@ -343,9 +353,9 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
           ),
           if (isRent)
             Text(
-              '/mês',
+              l10n.perMes,
               style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.gray500,
+                color: palette.textSecondary,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -355,11 +365,13 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
   }
 
   Widget _buildFeaturesRow(PropertyModel property) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: palette.surface,
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
@@ -375,25 +387,25 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
           _buildFeatureItem(
             icon: Icons.king_bed_outlined,
             value: '${property.bedrooms}',
-            label: 'Quartos',
+            label: l10n.quartosLabel,
           ),
-          Container(width: 1, height: 40, color: AppColors.gray200),
+          Container(width: 1, height: 40, color: palette.borderStrong),
           _buildFeatureItem(
             icon: Icons.bathroom_outlined,
             value: '${property.bathrooms}',
-            label: 'WC',
+            label: l10n.wc,
           ),
-          Container(width: 1, height: 40, color: AppColors.gray200),
+          Container(width: 1, height: 40, color: palette.borderStrong),
           _buildFeatureItem(
             icon: Icons.square_foot_outlined,
             value: '${property.area.toStringAsFixed(0)} m²',
-            label: 'Área',
+            label: l10n.areaLabel,
           ),
-          Container(width: 1, height: 40, color: AppColors.gray200),
+          Container(width: 1, height: 40, color: palette.borderStrong),
           _buildFeatureItem(
             icon: Icons.garage_outlined,
             value: '${property.garage}',
-            label: 'Garagem',
+            label: l10n.garagemLabel,
           ),
         ],
       ),
@@ -405,6 +417,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
     required String value,
     required String label,
   }) {
+    final palette = context.palette;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -412,32 +425,36 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
         const SizedBox(height: 6),
         Text(
           value,
-          style: AppTextStyles.bodyMediumBold.copyWith(color: AppColors.navy),
+          style: AppTextStyles.bodyMediumBold.copyWith(
+            color: palette.textTitle,
+          ),
         ),
         const SizedBox(height: 2),
         Text(
           label,
-          style: AppTextStyles.bodyTiny.copyWith(color: AppColors.gray500),
+          style: AppTextStyles.bodyTiny.copyWith(color: palette.textSecondary),
         ),
       ],
     );
   }
 
   Widget _buildDescriptionSection(PropertyModel property) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Descrição',
-            style: AppTextStyles.h6.copyWith(color: AppColors.navy),
+            l10n.descricao,
+            style: AppTextStyles.h6.copyWith(color: palette.textTitle),
           ),
           const SizedBox(height: 12),
           Text(
             property.description,
             style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.gray600,
+              color: palette.textBody,
               height: 1.6,
             ),
             maxLines: _descriptionExpanded ? null : 6,
@@ -453,7 +470,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
               child: Padding(
                 padding: const EdgeInsets.only(top: 8),
                 child: Text(
-                  _descriptionExpanded ? 'Ver menos' : 'Ver mais',
+                  _descriptionExpanded ? l10n.verMenos : l10n.verMais,
                   style: AppTextStyles.bodySmall.copyWith(
                     color: AppColors.gold,
                     fontWeight: FontWeight.w600,
@@ -464,8 +481,8 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
           if (property.features.isNotEmpty) ...[
             const SizedBox(height: 20),
             Text(
-              'Características',
-              style: AppTextStyles.h6.copyWith(color: AppColors.navy),
+              l10n.caracteristicas,
+              style: AppTextStyles.h6.copyWith(color: palette.textTitle),
             ),
             const SizedBox(height: 12),
             Wrap(
@@ -475,7 +492,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                 return FeatureChip(
                   label: feature,
                   backgroundColor: AppColors.navy.withValues(alpha: 0.06),
-                  foregroundColor: AppColors.navy,
+                  foregroundColor: palette.textTitle,
                 );
               }).toList(),
             ),
@@ -486,23 +503,25 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
   }
 
   Widget _buildLocationSection(PropertyModel property, String location) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Localização',
-            style: AppTextStyles.h6.copyWith(color: AppColors.navy),
+            l10n.localizacao,
+            style: AppTextStyles.h6.copyWith(color: palette.textTitle),
           ),
           const SizedBox(height: 12),
           Container(
             width: double.infinity,
             height: 160,
             decoration: BoxDecoration(
-              color: AppColors.gray100,
+              color: palette.surfaceAlt,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.gray200),
+              border: Border.all(color: palette.borderStrong),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -514,17 +533,17 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                     color: AppColors.navy.withValues(alpha: 0.08),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.map_outlined,
                     size: 28,
-                    color: AppColors.navy,
+                    color: palette.textTitle,
                   ),
                 ),
                 const SizedBox(height: 12),
                 Text(
                   property.address.isNotEmpty ? property.address : location,
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.gray500,
+                    color: palette.textSecondary,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -532,9 +551,9 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                 Text(
                   (property.latitude != 0.0 || property.longitude != 0.0)
                       ? '${property.latitude.toStringAsFixed(4)}, ${property.longitude.toStringAsFixed(4)}'
-                      : 'Coordenadas indisponíveis',
+                      : l10n.coordenadasIndisponiveis,
                   style: AppTextStyles.bodyTiny.copyWith(
-                    color: AppColors.gray400,
+                    color: palette.textMuted,
                   ),
                 ),
               ],
@@ -546,20 +565,24 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
   }
 
   Widget _buildAgentSection(PropertyModel property) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
+    final isGuest = context.watch<AuthProvider>().user == null;
+
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Consultor',
-            style: AppTextStyles.h6.copyWith(color: AppColors.navy),
+            l10n.consultor,
+            style: AppTextStyles.h6.copyWith(color: palette.textTitle),
           ),
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: palette.surface,
               borderRadius: BorderRadius.circular(14),
               boxShadow: [
                 BoxShadow(
@@ -580,14 +603,14 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                       Text(
                         property.agentName,
                         style: AppTextStyles.bodyLargeBold.copyWith(
-                          color: AppColors.navy,
+                          color: palette.textTitle,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         property.agentPhone,
                         style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.gray500,
+                          color: palette.textSecondary,
                         ),
                       ),
                     ],
@@ -613,7 +636,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                     ),
                   ),
                 ),
-                if (property.agentId != null) ...[
+                if (!isGuest && property.agentId != null) ...[
                   const SizedBox(width: 8),
                   IconButton(
                     onPressed: () {
@@ -648,11 +671,13 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
   }
 
   Widget _buildBottomActions(PropertyModel property) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
-      decoration: const BoxDecoration(
-        color: AppColors.white,
-        border: Border(top: BorderSide(color: AppColors.gray200)),
+      decoration: BoxDecoration(
+        color: palette.surface,
+        border: Border(top: BorderSide(color: palette.borderStrong)),
       ),
       child: SafeArea(
         child: Column(
@@ -675,7 +700,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                 },
                 icon: const Icon(Icons.calendar_month_rounded, size: 20),
                 label: Text(
-                  'Agendar Visita',
+                  l10n.agendarVisita,
                   style: AppTextStyles.buttonLarge.copyWith(
                     color: AppColors.white,
                   ),
@@ -700,7 +725,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                     child: ElevatedButton.icon(
                       onPressed: () async {
                         final message = Uri.encodeComponent(
-                          'Olá! Tenho interesse no imóvel "${property.title}".',
+                          l10n.mensagemInteresseImovel(property.title),
                         );
                         final uri = Uri.parse(
                           'https://wa.me/${property.agentPhone}?text=$message',
@@ -743,9 +768,9 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                       },
                       icon: const Icon(Icons.phone_rounded, size: 18),
                       label: Text(
-                        'Ligar',
+                        l10n.ligar,
                         style: AppTextStyles.buttonMedium.copyWith(
-                          color: AppColors.navy,
+                          color: palette.textTitle,
                         ),
                       ),
                       style: OutlinedButton.styleFrom(

@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_constants.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/providers/auth_provider.dart';
-import '../../core/services/supabase_service.dart';
 import '../../core/utils/routes.dart';
+import '../../l10n/app_localizations.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -61,23 +60,17 @@ class _SplashScreenState extends State<SplashScreen>
     await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
 
+    // Acesso livre: o utilizador entra diretamente no Home sem obrigação de login.
+    // Se existir sessão, restauramos o utilizador para funcionalidades autenticadas.
     try {
-      final session = SupabaseService.client.auth.currentSession;
-      if (session != null) {
-        final auth = context.read<AuthProvider>();
-        await auth.init();
-
-        if (!mounted) return;
-
-        Navigator.of(context).pushReplacementNamed(AppRoutes.home);
-        return;
-      }
+      final auth = context.read<AuthProvider>();
+      await auth.init();
     } catch (e) {
-      debugPrint('[Luar] Session check failed: $e');
+      debugPrint('[Luar] Session restore failed: $e');
     }
 
     if (!mounted) return;
-    Navigator.of(context).pushReplacementNamed(AppRoutes.welcome);
+    Navigator.of(context).pushReplacementNamed(AppRoutes.home);
   }
 
   @override
@@ -88,6 +81,7 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: AppColors.navy,
       body: Container(
@@ -116,7 +110,7 @@ class _SplashScreenState extends State<SplashScreen>
                     child: Column(
                       children: [
                         Text(
-                          AppConstants.appName,
+                          l10n.appName,
                           style: AppTextStyles.h2White.copyWith(
                             letterSpacing: 2,
                             fontWeight: FontWeight.w700,
@@ -132,7 +126,7 @@ class _SplashScreenState extends State<SplashScreen>
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          AppConstants.appTagline.toUpperCase(),
+                          l10n.appTagline.toUpperCase(),
                           style: AppTextStyles.overline.copyWith(
                             color: AppColors.goldLight,
                             letterSpacing: 3,
@@ -184,10 +178,7 @@ class _SplashScreenState extends State<SplashScreen>
         ],
       ),
       clipBehavior: Clip.antiAlias,
-      child: Image.asset(
-        'logo.png',
-        fit: BoxFit.cover,
-      ),
+      child: Image.asset('logo.png', fit: BoxFit.cover),
     );
   }
 }

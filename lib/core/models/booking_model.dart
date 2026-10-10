@@ -12,7 +12,7 @@ String _statusToString(BookingStatus status) => status.name;
 class BookingModel {
   final String id;
   final String propertyId;
-  final String userId;
+  final String? userId;
   final String userName;
   final String userPhone;
   final DateTime date;
@@ -25,7 +25,6 @@ class BookingModel {
   const BookingModel({
     required this.id,
     required this.propertyId,
-    required this.userId,
     required this.userName,
     required this.userPhone,
     required this.date,
@@ -33,6 +32,7 @@ class BookingModel {
     required this.status,
     required this.notes,
     required this.createdAt,
+    this.userId,
     this.propertyTitle = '',
   });
 
@@ -45,7 +45,7 @@ class BookingModel {
     return BookingModel(
       id: json['id'] as String? ?? '',
       propertyId: json['property_id'] as String? ?? '',
-      userId: json['user_id'] as String? ?? '',
+      userId: json['user_id'] as String?,
       userName: json['user_name'] as String? ?? '',
       userPhone: json['user_phone'] as String? ?? '',
       date: json['date'] != null
@@ -65,7 +65,7 @@ class BookingModel {
     return {
       'id': id,
       'property_id': propertyId,
-      'user_id': userId,
+      if (userId != null) 'user_id': userId,
       'user_name': userName,
       'user_phone': userPhone,
       'date': date.toIso8601String(),

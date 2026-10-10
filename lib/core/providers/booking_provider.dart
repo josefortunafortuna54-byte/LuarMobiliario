@@ -50,7 +50,7 @@ class BookingProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> createBooking(BookingModel booking) async {
+  Future<BookingModel?> createBooking(BookingModel booking) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
@@ -58,6 +58,32 @@ class BookingProvider extends ChangeNotifier {
     try {
       final newBooking = await _repository.create(booking);
       _bookings.insert(0, newBooking);
+      _isLoading = false;
+      notifyListeners();
+      return newBooking;
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return null;
+    }
+  }
+
+  Future<bool> registerGuestClient({
+    required String name,
+    required String phone,
+    required String bookingId,
+  }) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      await _repository.registerGuestClient(
+        name: name,
+        phone: phone,
+        bookingId: bookingId,
+      );
       _isLoading = false;
       notifyListeners();
       return true;

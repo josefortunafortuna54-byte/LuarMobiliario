@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:luar_company/widgets/avatar_widget.dart';
 
+import '../helpers/test_app.dart';
+
 void main() {
   group('AvatarWidget', () {
     testWidgets('renders initials when no image is provided', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        testApp(
           home: Scaffold(body: AvatarWidget(name: 'Carlos Menezes')),
         ),
       );
@@ -16,7 +18,7 @@ void main() {
 
     testWidgets('renders single initial for single name', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(home: Scaffold(body: AvatarWidget(name: 'Ana'))),
+        testApp(home: Scaffold(body: AvatarWidget(name: 'Ana'))),
       );
 
       expect(find.text('A'), findsOneWidget);
@@ -24,7 +26,7 @@ void main() {
 
     testWidgets('renders question mark when name is null', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(home: Scaffold(body: AvatarWidget())),
+        testApp(home: Scaffold(body: AvatarWidget())),
       );
 
       expect(find.text('?'), findsOneWidget);
@@ -32,7 +34,7 @@ void main() {
 
     testWidgets('renders question mark for empty name', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(home: Scaffold(body: AvatarWidget(name: '   '))),
+        testApp(home: Scaffold(body: AvatarWidget(name: '   '))),
       );
 
       expect(find.text('?'), findsOneWidget);
@@ -40,7 +42,7 @@ void main() {
 
     testWidgets('renders online indicator when enabled', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        testApp(
           home: Scaffold(
             body: AvatarWidget(
               name: 'Carlos',
@@ -57,7 +59,7 @@ void main() {
       var tapped = false;
 
       await tester.pumpWidget(
-        MaterialApp(
+        testApp(
           home: Scaffold(
             body: AvatarWidget(
               name: 'Carlos',
@@ -73,7 +75,7 @@ void main() {
 
     testWidgets('uses uppercase initials', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        testApp(
           home: Scaffold(body: AvatarWidget(name: 'joao silva')),
         ),
       );

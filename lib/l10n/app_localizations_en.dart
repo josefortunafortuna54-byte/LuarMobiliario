@@ -1,0 +1,1400 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for English (`en`).
+class AppLocalizationsEn extends AppLocalizations {
+  AppLocalizationsEn([String locale = 'en']) : super(locale);
+
+  @override
+  String get appName => 'Luar Mobiliario';
+
+  @override
+  String get appTagline => 'Your new home starts here';
+
+  @override
+  String versao(Object v) {
+    return 'Version $v';
+  }
+
+  @override
+  String get explorarImoveis => 'Explore Properties';
+
+  @override
+  String versaoApp(Object v) {
+    return 'Version $v';
+  }
+
+  @override
+  String get welcomeDesc =>
+      'Browse our properties and land. To book a visit, just provide your name and phone.';
+
+  @override
+  String get homeSearchHint => 'Search by location, type...';
+
+  @override
+  String get homeHeroTitle => 'Find your\nideal home';
+
+  @override
+  String get homeHeroSubtitle => 'Homes, apartments, land and more';
+
+  @override
+  String get categorias => 'Categories';
+
+  @override
+  String get verTodas => 'See all';
+
+  @override
+  String get verTodos => 'See all';
+
+  @override
+  String get verMais => 'See more';
+
+  @override
+  String get verMenos => 'See less';
+
+  @override
+  String get casas => 'Homes';
+
+  @override
+  String get apartamentos => 'Apartments';
+
+  @override
+  String get terrenos => 'Land';
+
+  @override
+  String get fazendas => 'Farms';
+
+  @override
+  String get armazens => 'Warehouses';
+
+  @override
+  String get terrenosDestaque => 'Featured Land';
+
+  @override
+  String get imoveisDestaque => 'Featured Properties';
+
+  @override
+  String get nenhumImovelDestaque => 'No featured properties right now';
+
+  @override
+  String get nenhumTerrenoDestaque => 'No featured land right now';
+
+  @override
+  String get servicos => 'Services';
+
+  @override
+  String get servicoCompra => 'Buy';
+
+  @override
+  String get servicoCompraDesc => 'Find the home of your dreams';
+
+  @override
+  String get servicoVenda => 'Sell';
+
+  @override
+  String get servicoVendaDesc => 'Sell safely and quickly';
+
+  @override
+  String get servicoArrendamento => 'Rental';
+
+  @override
+  String get servicoArrendamentoDesc => 'Rent under the best conditions';
+
+  @override
+  String get servicoConsultoria => 'Consulting';
+
+  @override
+  String get servicoConsultoriaDesc => 'Personalized guidance';
+
+  @override
+  String get porqueEscolher => 'Why choose us?';
+
+  @override
+  String get confiancaMercado => 'The trust the market recognizes';
+
+  @override
+  String get beneficioExperiencia => 'Market Experience';
+
+  @override
+  String get beneficioExperienciaDesc =>
+      'Over 10 years in the Angolan real estate market';
+
+  @override
+  String get beneficioAtendimento => 'Personalized Service';
+
+  @override
+  String get beneficioAtendimentoDesc =>
+      'Every client receives dedicated, tailor-made attention';
+
+  @override
+  String get beneficioDocumentacao => 'Safe Documentation';
+
+  @override
+  String get beneficioDocumentacaoDesc =>
+      'We handle all documentation with rigor and safety';
+
+  @override
+  String get beneficioPrecos => 'Best Prices';
+
+  @override
+  String get beneficioPrecosDesc =>
+      'Transparent negotiations and competitive prices';
+
+  @override
+  String get inicio => 'Home';
+
+  @override
+  String get pesquisar => 'Search';
+
+  @override
+  String get favoritos => 'Favorites';
+
+  @override
+  String get perfil => 'Profile';
+
+  @override
+  String get urbano => 'Urban';
+
+  @override
+  String get agricola => 'Agricultural';
+
+  @override
+  String get industrial => 'Industrial';
+
+  @override
+  String get comercial => 'Commercial';
+
+  @override
+  String get lote => 'Plot';
+
+  @override
+  String get fazenda => 'Farm';
+
+  @override
+  String get detalhes => 'Details';
+
+  @override
+  String get acessoAdmin => 'Admin Access';
+
+  @override
+  String get insiraEmailCodigo => 'Enter your email to receive the access code';
+
+  @override
+  String get emailAdmin => 'Admin e-mail';
+
+  @override
+  String get emailHint => 'example@email.com';
+
+  @override
+  String get enviarCodigo => 'Send Code';
+
+  @override
+  String codigoEnviado(Object email) {
+    return 'Code sent to $email';
+  }
+
+  @override
+  String get verifiqueCaixa => 'Check your inbox';
+
+  @override
+  String get codigoVerificacao => 'Verification code';
+
+  @override
+  String get codigoHint => '000000';
+
+  @override
+  String get reenviarCodigo => 'Resend code';
+
+  @override
+  String get verificarEntrar => 'Verify and Sign In';
+
+  @override
+  String get usarOutroEmail => 'Use another email';
+
+  @override
+  String get voltar => 'Back';
+
+  @override
+  String get emailNaoEncontrado => 'Email not found';
+
+  @override
+  String get semPermissoesAdmin => 'No administrator permissions';
+
+  @override
+  String get prepararAcessoErro => 'Could not prepare access. Contact support.';
+
+  @override
+  String get erroEnvioEmail =>
+      'Error sending email. Contact technical support.';
+
+  @override
+  String get muitasTentativas =>
+      'Too many attempts. Wait a few minutes and try again.';
+
+  @override
+  String get erroEnvioCodigo =>
+      'Error sending code. Check your internet connection.';
+
+  @override
+  String get codigoInvalido => 'Invalid or expired code';
+
+  @override
+  String get erroVerificarCodigo => 'Error verifying code. Try again.';
+
+  @override
+  String get insiraEmail => 'Enter your e-mail';
+
+  @override
+  String get emailInvalido => 'Invalid e-mail';
+
+  @override
+  String get insiraCodigo => 'Enter the code';
+
+  @override
+  String get codigo6Digitos => 'Code must have 6 digits';
+
+  @override
+  String get venda => 'Sale';
+
+  @override
+  String get arrendamento => 'Rental';
+
+  @override
+  String get quartos => 'bedrooms';
+
+  @override
+  String get casasDeBanho => 'Bathrooms';
+
+  @override
+  String get areaLabel => 'Area';
+
+  @override
+  String get areaM2 => 'Area (m²)';
+
+  @override
+  String get detalhesImovel => 'Property Details';
+
+  @override
+  String get detalhesTerreno => 'Land Details';
+
+  @override
+  String get imovel => 'Property';
+
+  @override
+  String get descricao => 'Description';
+
+  @override
+  String get caracteristicas => 'Features';
+
+  @override
+  String get localizacao => 'Location';
+
+  @override
+  String get municipio => 'Municipality';
+
+  @override
+  String get endereco => 'Address';
+
+  @override
+  String get precoAOA => 'Price (AOA)';
+
+  @override
+  String get tipoTransacao => 'Transaction Type';
+
+  @override
+  String get transacao => 'Transaction';
+
+  @override
+  String get tipoImovel => 'Property Type';
+
+  @override
+  String get casa => 'House';
+
+  @override
+  String get apartamento => 'Apartment';
+
+  @override
+  String get terreno => 'Land';
+
+  @override
+  String get escritorio => 'Office';
+
+  @override
+  String get escritorios => 'Offices';
+
+  @override
+  String get loja => 'Store';
+
+  @override
+  String get condominio => 'Condominium';
+
+  @override
+  String get armazem => 'Warehouse';
+
+  @override
+  String get imovelNaoEncontrado => 'Property not found';
+
+  @override
+  String get terrenoNaoEncontrado => 'Land not found';
+
+  @override
+  String get naoInformado => 'Not informed';
+
+  @override
+  String get naoEncontrado => 'Not found';
+
+  @override
+  String get coordenadasIndisponiveis => 'Coordinates unavailable';
+
+  @override
+  String get comprar => 'Buy';
+
+  @override
+  String get agendarVisita => 'Book a Visit';
+
+  @override
+  String get verEmLuar => 'View on Luar Mobiliario';
+
+  @override
+  String get tipoTerreno => 'Land Type';
+
+  @override
+  String get areaTotal => 'Total Area';
+
+  @override
+  String get dimensoes => 'Dimensions';
+
+  @override
+  String get agua => 'Water';
+
+  @override
+  String get poco => 'Well';
+
+  @override
+  String get soloFertil => 'Fertile Soil';
+
+  @override
+  String get inclinacaoSuave => 'Gentle Slope';
+
+  @override
+  String get estradaAcessivel => 'Accessible Road';
+
+  @override
+  String get portaoEletronico => 'Electronic Gate';
+
+  @override
+  String get tanqueAgua => 'Water Tank';
+
+  @override
+  String get condominioFechado => 'Gated Community';
+
+  @override
+  String get seguranca24h => '24h Security';
+
+  @override
+  String get vistaPanoramica => 'Panoramic View';
+
+  @override
+  String get areaServico => 'Service Area';
+
+  @override
+  String get varandaGourmet => 'Gourmet Balcony';
+
+  @override
+  String get suite => 'Suite';
+
+  @override
+  String get arvoreFrutifera => 'Fruit Tree';
+
+  @override
+  String get closePraia => 'Close to Beach';
+
+  @override
+  String get arCondicionado => 'Air Conditioning';
+
+  @override
+  String get pesquisarImoveis => 'Search properties...';
+
+  @override
+  String get pesquisarTerrenos => 'Search land...';
+
+  @override
+  String get pesquisarTudo => 'Search properties and land...';
+
+  @override
+  String get semResultados => 'No results';
+
+  @override
+  String get nenhumResultado => 'No results found';
+
+  @override
+  String get nenhumImovelEncontrado => 'No properties found';
+
+  @override
+  String get nenhumTerrenoEncontrado => 'No land found';
+
+  @override
+  String nenhumImovelBusca(Object q) {
+    return 'No properties found for \"$q\"';
+  }
+
+  @override
+  String nenhumTerrenoBusca(Object q) {
+    return 'No land found for \"$q\"';
+  }
+
+  @override
+  String get sicategoria =>
+      'We found no properties in this category. Try another filter.';
+
+  @override
+  String get terrenoCategoriaVazio =>
+      'We found no land in this category. Try another filter.';
+
+  @override
+  String get ajustarFiltros =>
+      'Try adjusting the filters or searching another term.';
+
+  @override
+  String get aplicarFiltros => 'Apply Filters';
+
+  @override
+  String get limparTudo => 'Clear all';
+
+  @override
+  String get faixaPreco => 'Price Range';
+
+  @override
+  String get maiorArea => 'Largest area';
+
+  @override
+  String get menorPreco => 'Lowest price';
+
+  @override
+  String get maiorPreco => 'Highest price';
+
+  @override
+  String get maisRecentes => 'Most recent';
+
+  @override
+  String get proximas => 'Upcoming';
+
+  @override
+  String get historico => 'History';
+
+  @override
+  String get todosImoveisCarregados => 'All properties loaded';
+
+  @override
+  String get todosTerrenosCarregados => 'All land loaded';
+
+  @override
+  String maxPreco(Object v) {
+    return 'Max: AOA $v';
+  }
+
+  @override
+  String minPreco(Object v) {
+    return 'Min: AOA $v';
+  }
+
+  @override
+  String get selecioneCidade => 'Select the city';
+
+  @override
+  String get cidadeLuandaNorte => 'Luanda Norte';
+
+  @override
+  String get icoloBengo => 'Icolo e Bengo';
+
+  @override
+  String get bie => 'Bié';
+
+  @override
+  String get cuanzaNorte => 'Cuanza Norte';
+
+  @override
+  String get cuanzaSul => 'Cuanza Sul';
+
+  @override
+  String get huila => 'Huíla';
+
+  @override
+  String get lundaNorte => 'Lunda Norte';
+
+  @override
+  String get lundaSul => 'Lunda Sul';
+
+  @override
+  String get uige => 'Uíge';
+
+  @override
+  String get ruaNumero => 'Street, number...';
+
+  @override
+  String get ruaNumeroMunicipio => 'Street, number, municipality...';
+
+  @override
+  String get semFavoritos => 'No favorites';
+
+  @override
+  String get adicioneImoveisFavoritos =>
+      'Add properties to your favorites to see them here.';
+
+  @override
+  String get adicioneTerrenosFavoritos =>
+      'Add land to your favorites to see them here.';
+
+  @override
+  String get favoritosDisponiveisConta => 'Favorites available with an account';
+
+  @override
+  String get guardeImoveisConta =>
+      'Save preferred properties and land after creating your account by booking a visit.';
+
+  @override
+  String get removerImovel => 'Remove Property';
+
+  @override
+  String get removerTerreno => 'Remove Land';
+
+  @override
+  String desejaRemoverImovel(Object title) {
+    return 'Remove \"$title\"? This action can be undone.';
+  }
+
+  @override
+  String desejaRemoverTerreno(Object title) {
+    return 'Remove \"$title\"? This action can be undone.';
+  }
+
+  @override
+  String get semAgendamentos => 'No bookings';
+
+  @override
+  String get seuProximoAgendamento =>
+      'Your upcoming bookings will appear here.';
+
+  @override
+  String get agendamentosAnteriores => 'Previous bookings will appear here.';
+
+  @override
+  String get cancelarAgendamento => 'Cancel Booking';
+
+  @override
+  String get confirmarAgendamento => 'Confirm Booking';
+
+  @override
+  String get simCancelar => 'Yes, Cancel';
+
+  @override
+  String get nao => 'No';
+
+  @override
+  String get cancelar => 'Cancel';
+
+  @override
+  String get remover => 'Remove';
+
+  @override
+  String desejaCancelarAgendamento(Object title) {
+    return 'Cancel the booking for \"$title\"?';
+  }
+
+  @override
+  String get agendamentoSolicitado => 'Booking requested successfully!';
+
+  @override
+  String get agendamentoRegistado => 'Booking registered successfully!';
+
+  @override
+  String get erroCriarAgendamento => 'Error creating the booking. Try again.';
+
+  @override
+  String agendadoPor(Object name) {
+    return 'Booked by: $name';
+  }
+
+  @override
+  String get quandoAgenda =>
+      'When you book a visit, your bookings will be available here.';
+
+  @override
+  String get osSeusAgendamentos => 'Your bookings';
+
+  @override
+  String get carregandoAgendamentos => 'Loading bookings...';
+
+  @override
+  String imovelCurto(Object id) {
+    return 'Property #$id';
+  }
+
+  @override
+  String get completeRegisto => 'Complete your registration';
+
+  @override
+  String get indiqueNomeTelefone =>
+      'Just provide your name and phone to register.';
+
+  @override
+  String get nomeCompleto => 'Full name';
+
+  @override
+  String get oSeuNome => 'Your name';
+
+  @override
+  String get erroRegistarDados => 'Error registering your details. Try again.';
+
+  @override
+  String get insiraNome => 'Enter your name';
+
+  @override
+  String get concluirRegisto => 'Complete Registration';
+
+  @override
+  String get dadosRegistados => 'Your details are registered';
+
+  @override
+  String get aoAgendarFicaRegistado =>
+      'When you book a visit to one of our properties, you are automatically registered with your name and phone.';
+
+  @override
+  String get naoInformadoPhone => 'Not informed';
+
+  @override
+  String get semMensagens => 'No messages';
+
+  @override
+  String get mensagensDisponiveisConta => 'Messages available with an account';
+
+  @override
+  String get converseCorretores =>
+      'Chat with agents and sellers after creating your account by booking a visit.';
+
+  @override
+  String get suasConversas =>
+      'Your chats with agents and sellers will appear here.';
+
+  @override
+  String get inicieConversa => 'Start the conversation';
+
+  @override
+  String get envieMensagem => 'Send a message to get started';
+
+  @override
+  String get escrevaMensagem => 'Write a message...';
+
+  @override
+  String get carregandoMensagens => 'Loading messages...';
+
+  @override
+  String get mensagensNaoLidas => 'Unread Messages';
+
+  @override
+  String get meuPerfil => 'My Profile';
+
+  @override
+  String get sair => 'Log out';
+
+  @override
+  String get sairDaConta => 'Log out of Account';
+
+  @override
+  String get temCertezaSair => 'Are you sure you want to log out?';
+
+  @override
+  String get editarPerfil => 'Edit Profile';
+
+  @override
+  String get agendamentos => 'Bookings';
+
+  @override
+  String get mensagens => 'Messages';
+
+  @override
+  String get parceiros => 'Partners';
+
+  @override
+  String get utilizador => 'User';
+
+  @override
+  String get admin => 'Admin';
+
+  @override
+  String get agente => 'Agent';
+
+  @override
+  String get cliente => 'Client';
+
+  @override
+  String get perfilAtualizado => 'Profile updated successfully!';
+
+  @override
+  String get guadarPerfil => 'Save Profile';
+
+  @override
+  String get guardarAlteracoes => 'Save Changes';
+
+  @override
+  String get erroAoGuardar => 'Error saving';
+
+  @override
+  String get erroAoCarregar => 'Error loading';
+
+  @override
+  String get naoFoiPossivelCarregar => 'Could not load';
+
+  @override
+  String get tentarNovamente => 'Try again';
+
+  @override
+  String get algoCorreuMal => 'Something went wrong';
+
+  @override
+  String get erroDesconhecido => 'Unknown error';
+
+  @override
+  String get registadoEm => 'Registered on';
+
+  @override
+  String get concluida => 'Completed';
+
+  @override
+  String get agenteImobiliario => 'Real Estate Agent';
+
+  @override
+  String get administrador => 'Administrator';
+
+  @override
+  String get aparencia => 'Appearance';
+
+  @override
+  String get tema => 'Theme';
+
+  @override
+  String get temaSistema => 'System';
+
+  @override
+  String get temaClaro => 'Light';
+
+  @override
+  String get temaEscuro => 'Dark';
+
+  @override
+  String get idioma => 'Language';
+
+  @override
+  String get portugues => 'Portuguese';
+
+  @override
+  String get ingles => 'English';
+
+  @override
+  String get telefone => 'Phone';
+
+  @override
+  String get nome => 'Name';
+
+  @override
+  String get avatar => 'Avatar';
+
+  @override
+  String get perfilParceiro => 'Partner Profile';
+
+  @override
+  String get nomeEmpresa => 'Company Name';
+
+  @override
+  String get tipoNegocio => 'Business Type';
+
+  @override
+  String nif(Object nif) {
+    return 'NIF: $nif';
+  }
+
+  @override
+  String whatsapp(Object wa) {
+    return 'WhatsApp: $wa';
+  }
+
+  @override
+  String get licenca => 'License';
+
+  @override
+  String get numeroLicenca => 'Broker license number (optional)';
+
+  @override
+  String get dadosEmpresa => 'Company Details';
+
+  @override
+  String get exNomeEmpresa => 'E.g.: Luar Imobiliária Lda';
+
+  @override
+  String get meuPerfilParceiro => 'My partner profile';
+
+  @override
+  String get perfilParceiroSalvo => 'Partner profile saved successfully!';
+
+  @override
+  String get nenhumParceiro => 'No partners found';
+
+  @override
+  String get osParceirosAqui => 'Luar Mobiliário partners will appear here.';
+
+  @override
+  String get carregandoParceiros => 'Loading partners...';
+
+  @override
+  String get semParceiros => 'No partners';
+
+  @override
+  String get observacoes => 'Notes (optional)';
+
+  @override
+  String get contacto => 'Contact';
+
+  @override
+  String get criarImovel => 'Create Property';
+
+  @override
+  String get criarTerreno => 'Create Land';
+
+  @override
+  String get editarImovel => 'Edit Property';
+
+  @override
+  String get editarTerreno => 'Edit Land';
+
+  @override
+  String get atualizarImovel => 'Update Property';
+
+  @override
+  String get atualizarTerreno => 'Update Land';
+
+  @override
+  String get novoImovel => 'New Property';
+
+  @override
+  String get novoTerreno => 'New Land';
+
+  @override
+  String get informacoesBasicas => 'Basic Information';
+
+  @override
+  String get titulo => 'Title';
+
+  @override
+  String get addImg => 'Add at least one image';
+
+  @override
+  String get nenhumaImagemSelecionada => 'No image selected';
+
+  @override
+  String get exTituloImovel => 'E.g.: T3 Apartment in Talatona';
+
+  @override
+  String get exTituloTerreno => 'E.g.: Urban Land in Talatona';
+
+  @override
+  String get descrevaImovel => 'Describe the property...';
+
+  @override
+  String get descrevaTerreno => 'Describe the land...';
+
+  @override
+  String get obrigatorio => 'Required';
+
+  @override
+  String get imovelCriado => 'Property created!';
+
+  @override
+  String get imovelAtualizado => 'Property updated!';
+
+  @override
+  String get terrenoCriado => 'Land created!';
+
+  @override
+  String get terrenoAtualizado => 'Land updated!';
+
+  @override
+  String get garagem => 'garage';
+
+  @override
+  String get wc => 'WC';
+
+  @override
+  String get fichaTecnica => 'Technical Sheet';
+
+  @override
+  String get caracteristicaSolo => 'Land Features';
+
+  @override
+  String get areaTerreno => 'Area (m²)';
+
+  @override
+  String get preco => 'Price (AOA)';
+
+  @override
+  String get telefoneContato => 'Contact phone';
+
+  @override
+  String get whatsappContato => 'Contact WhatsApp';
+
+  @override
+  String get nifLabel => 'NIF';
+
+  @override
+  String get licencaLabel => 'License';
+
+  @override
+  String get piso => 'Floor';
+
+  @override
+  String get quartosLabel => 'Bedrooms';
+
+  @override
+  String get casasDeBanhoLabel => 'Bathrooms';
+
+  @override
+  String get areasComuns => 'Common Areas';
+
+  @override
+  String get estacionamento => 'Parking';
+
+  @override
+  String get conservacao => 'Condition';
+
+  @override
+  String get novo => 'New';
+
+  @override
+  String get usado => 'Used';
+
+  @override
+  String get emConstrucao => 'Under construction';
+
+  @override
+  String get precoM2 => 'Price (AOA/m²)';
+
+  @override
+  String get longitude => 'Longitude';
+
+  @override
+  String get latitude => 'Latitude';
+
+  @override
+  String get painelAdmin => 'Admin Panel';
+
+  @override
+  String get visaoGeral => 'Overview';
+
+  @override
+  String get totalImoveis => 'Total Properties';
+
+  @override
+  String get totalTerrenos => 'Total Land';
+
+  @override
+  String get totalUtilizadores => 'Total Users';
+
+  @override
+  String get acoesRapidas => 'Quick Actions';
+
+  @override
+  String get gerirImoveis => 'Manage Properties';
+
+  @override
+  String get gerirTerrenos => 'Manage Land';
+
+  @override
+  String get gerirUtilizadores => 'Manage Users';
+
+  @override
+  String get gerir => 'Manage\nProperties';
+
+  @override
+  String get verParceiros => 'See\nPartners';
+
+  @override
+  String get verUtilizadores => 'See\nUsers';
+
+  @override
+  String get cadastroImovel => 'Register\nProperty';
+
+  @override
+  String get cadastroTerreno => 'Register\nLand';
+
+  @override
+  String get totalMensagens => 'Unread Messages';
+
+  @override
+  String get semImoveis => 'No properties';
+
+  @override
+  String get semTerrenos => 'No land';
+
+  @override
+  String get erroRemoverUtilizador => 'Error removing user';
+
+  @override
+  String get utilizadorRemovido => 'User removed';
+
+  @override
+  String get removerUtilizador => 'Remove user';
+
+  @override
+  String temCertezaRemover(Object name) {
+    return 'Are you sure you want to remove $name? This action cannot be undone.';
+  }
+
+  @override
+  String get acaoIrreversivel => 'Irreversible action';
+
+  @override
+  String get alterarFuncao => 'Change role';
+
+  @override
+  String alterarFuncaoDe(Object name, Object role) {
+    return 'Change the role of $name to \"$role\"?';
+  }
+
+  @override
+  String funcaoAlterada(Object role) {
+    return 'Role changed to $role';
+  }
+
+  @override
+  String get erroAlterarFuncao => 'Error changing role';
+
+  @override
+  String get funcao => 'Role';
+
+  @override
+  String get nenhumUtilizador => 'No registered users.';
+
+  @override
+  String nenhumUtilizadorBusca(Object q) {
+    return 'No users found for \"$q\"';
+  }
+
+  @override
+  String get pesquisarUtilizadores => 'Search users...';
+
+  @override
+  String get imoveis => 'Properties';
+
+  @override
+  String imoveisCount(Object count) {
+    return 'Properties ($count)';
+  }
+
+  @override
+  String terrenosCount(Object count) {
+    return 'Land ($count)';
+  }
+
+  @override
+  String get cadastrePrimeiroImovel =>
+      'Register the first property using the button below.';
+
+  @override
+  String get cadastrePrimeiroTerreno =>
+      'Register the first land using the button below.';
+
+  @override
+  String get carregandoImoveis => 'Loading properties...';
+
+  @override
+  String get carregandoTerrenos => 'Loading land...';
+
+  @override
+  String get carregandoImovel => 'Loading property...';
+
+  @override
+  String get carregandoTerreno => 'Loading land...';
+
+  @override
+  String get carregandoFavoritos => 'Loading favorites...';
+
+  @override
+  String get acessoRestritoAdmin => 'Access restricted to administrators';
+
+  @override
+  String get acessoRestritoAgentes =>
+      'Access restricted to agents and administrators';
+
+  @override
+  String get sessaoExpirada => 'Session expired. Sign in again.';
+
+  @override
+  String get campoObrigatorio => 'Required field';
+
+  @override
+  String get emailObrigatorio => 'Email required';
+
+  @override
+  String get emailInvalidoMsg => 'Invalid email';
+
+  @override
+  String get telefoneObrigatorio => 'Phone required';
+
+  @override
+  String get telefoneInvalido => 'Invalid phone';
+
+  @override
+  String minimoCaracteres(Object n) {
+    return 'Minimum of $n characters';
+  }
+
+  @override
+  String maximoCaracteres(Object n) {
+    return 'Maximum of $n characters';
+  }
+
+  @override
+  String get numeroInvalido => 'Invalid number';
+
+  @override
+  String get formatoInvalido => 'Invalid format';
+
+  @override
+  String get fechar => 'Close';
+
+  @override
+  String get sim => 'Yes';
+
+  @override
+  String get guardar => 'Save';
+
+  @override
+  String get salvar => 'Save';
+
+  @override
+  String get todos => 'All';
+
+  @override
+  String get todosText => 'All properties loaded';
+
+  @override
+  String get verOfertas => 'View Offers';
+
+  @override
+  String get partilhar => 'Share';
+
+  @override
+  String get copiar => 'Copy';
+
+  @override
+  String get copiado => 'Copied!';
+
+  @override
+  String get altText => 'Property image';
+
+  @override
+  String get email => 'Email';
+
+  @override
+  String get telefoneLabel => 'Phone';
+
+  @override
+  String get whatsappLabel => 'WhatsApp';
+
+  @override
+  String get morada => 'Address';
+
+  @override
+  String get horario => 'Schedule';
+
+  @override
+  String get permissaoNegada => 'Permission denied';
+
+  @override
+  String get carregando => 'Loading...';
+
+  @override
+  String get perMes => '/month';
+
+  @override
+  String contarImoveis(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'properties',
+      one: 'property',
+    );
+    return '$count $_temp0';
+  }
+
+  @override
+  String get bemVindoAdmin => 'Welcome, Admin';
+
+  @override
+  String get gestaoCompleta => 'Complete management of your real estate agency';
+
+  @override
+  String get gerirTerrenosCard => 'Manage\nLands';
+
+  @override
+  String get editar => 'Edit';
+
+  @override
+  String get utilizadores => 'Users';
+
+  @override
+  String contarUtilizadores(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count users',
+      one: '$count user',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get confirmar => 'Confirm';
+
+  @override
+  String get adicionar => 'Add';
+
+  @override
+  String get bairro => 'Neighborhood';
+
+  @override
+  String get churrasqueira => 'Barbecue';
+
+  @override
+  String get cidade => 'City';
+
+  @override
+  String get closet => 'Closet';
+
+  @override
+  String get consultor => 'Consultant';
+
+  @override
+  String get despensa => 'Pantry';
+
+  @override
+  String get elevador => 'Elevator';
+
+  @override
+  String get erro => 'Error';
+
+  @override
+  String erroEnviarImagem(Object erro) {
+    return 'Error uploading image: $erro';
+  }
+
+  @override
+  String get fotos => 'Photos';
+
+  @override
+  String get garagemLabel => 'Garage';
+
+  @override
+  String get guardando => 'Saving...';
+
+  @override
+  String get jardim => 'Garden';
+
+  @override
+  String get lareira => 'Fireplace';
+
+  @override
+  String get ligar => 'Call';
+
+  @override
+  String get lojas => 'Stores';
+
+  @override
+  String mensagemInteresseImovel(Object title) {
+    return 'Hello! I\'m interested in the property \"$title\".';
+  }
+
+  @override
+  String get piscina => 'Pool';
+
+  @override
+  String get tipo => 'Type';
+
+  @override
+  String get varanda => 'Balcony';
+
+  @override
+  String mensagemInteresseTerreno(Object title) {
+    return 'Hello! I\'m interested in the land \"$title\".';
+  }
+
+  @override
+  String get urbanos => 'Urban';
+
+  @override
+  String get agricolas => 'Agricultural';
+
+  @override
+  String get industriais => 'Industrial';
+
+  @override
+  String get comerciais => 'Commercial';
+
+  @override
+  String get lotes => 'Plots';
+
+  @override
+  String get semHistorico => 'No history';
+
+  @override
+  String get pendente => 'Pending';
+
+  @override
+  String get confirmada => 'Confirmed';
+
+  @override
+  String get cancelada => 'Cancelled';
+
+  @override
+  String get data => 'Date';
+
+  @override
+  String get exPrefiroManha => 'E.g.: I prefer in the morning...';
+
+  @override
+  String get cercado => 'Fenced';
+
+  @override
+  String get eletricidade => 'Electricity';
+
+  @override
+  String get flat => 'Flat';
+
+  @override
+  String get agora => 'Now';
+
+  @override
+  String erroEnviarAvatar(Object erro) {
+    return 'Error uploading avatar: $erro';
+  }
+
+  @override
+  String get imobiliaria => 'Real estate agency';
+
+  @override
+  String get construtora => 'Construction company';
+
+  @override
+  String get corretor => 'Broker';
+
+  @override
+  String get outro => 'Other';
+
+  @override
+  String get parceiro => 'Partner';
+
+  @override
+  String get contactos => 'Contacts';
+}

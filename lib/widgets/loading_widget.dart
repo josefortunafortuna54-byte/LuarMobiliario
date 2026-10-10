@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/constants/app_colors.dart';
+import '../core/theme/app_palette.dart';
 
 class LoadingWidget extends StatelessWidget {
   const LoadingWidget({
@@ -16,26 +17,27 @@ class LoadingWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     final content = Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(
           width: size,
           height: size,
-          child: const CircularProgressIndicator(
+          child: CircularProgressIndicator(
             strokeWidth: 3,
-            valueColor: AlwaysStoppedAnimation<Color>(AppColors.gold),
-            backgroundColor: AppColors.gray200,
+            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.gold),
+            backgroundColor: palette.borderStrong,
           ),
         ),
         if (message != null) ...[
           const SizedBox(height: 16),
           Text(
             message!,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
-              color: AppColors.gray500,
+              color: palette.textSecondary,
             ),
           ),
         ],
@@ -44,7 +46,7 @@ class LoadingWidget extends StatelessWidget {
 
     if (isFullScreen) {
       return Scaffold(
-        backgroundColor: AppColors.white,
+        backgroundColor: palette.background,
         body: Center(child: content),
       );
     }
@@ -130,7 +132,7 @@ class PropertyCardShimmer extends StatelessWidget {
       return Container(
         height: 140,
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: context.palette.surface,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -181,7 +183,7 @@ class PropertyCardShimmer extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: context.palette.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(

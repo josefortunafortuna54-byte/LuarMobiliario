@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../core/constants/app_colors.dart';
 import '../core/constants/app_text_styles.dart';
+import '../l10n/app_localizations.dart';
 
 class CategoryCard extends StatelessWidget {
   const CategoryCard({
@@ -58,7 +59,7 @@ class CategoryCard extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              '$count ${count == 1 ? 'imóvel' : 'imóveis'}',
+              AppLocalizations.of(context).contarImoveis(count),
               style: AppTextStyles.bodyTiny.copyWith(color: AppColors.gray400),
               textAlign: TextAlign.center,
             ),

@@ -33,12 +33,14 @@ flutter build appbundle --release
 
 O AAB será gerado em: `build/app/outputs/bundle/release/app-release.aab`
 
+> O workflow `Build & Release` (GitHub Actions) gera automaticamente um AAB assinado em cada push para `main`, disponível como artefacto `luar-mobiliario-aab-<run>`.
+
 ### Publicação na Google Play
 
 1. Aceda à [Google Play Console](https://play.google.com/console)
 2. Crie uma nova aplicação ou selecione a existente
 3. Faça upload do ficheiro `.aab`
-4. Preencha as informações商店:
+4. Preencha as informações da loja:
    - Título: "Luar Company Imobiliária"
    - Descrição curta e detalhada
    - Capturas de ecrã

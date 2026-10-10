@@ -27,10 +27,6 @@ class AuthRepository {
     );
   }
 
-  Future<bool> ensureAuthUserExists(String email, String name) {
-    return _authService.ensureAuthUserExists(email, name);
-  }
-
   Future<void> signOut() => _authService.signOut();
 
   Future<void> resetPassword(String email) => _authService.resetPassword(email);

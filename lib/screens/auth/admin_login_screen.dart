@@ -23,106 +23,85 @@ class AdminLoginScreen extends StatefulWidget {
 }
 
 class _AdminLoginScreenState extends State<AdminLoginScreen> {
-  final _emailFormKey = GlobalKey<FormState>();
-  final _otpFormKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
-  final _otpController = TextEditingController();
+  final _passController = TextEditingController();
   bool _isLoading = false;
-  bool _otpSent = false;
   String? _error;
-  String? _maskedEmail;
 
   @override
   void dispose() {
     _emailController.dispose();
-    _otpController.dispose();
+    _passController.dispose();
     super.dispose();
   }
 
-  String _maskEmail(String email) {
-    final parts = email.split('@');
-    if (parts.length != 2) return email;
-    final name = parts[0];
-    final domain = parts[1];
-    if (name.length <= 2) return '***@$domain';
-    return '${name.substring(0, 2)}${'*' * (name.length - 2)}@$domain';
-  }
-
-  Future<void> _sendOtp() async {
-    if (!_emailFormKey.currentState!.validate()) return;
+  Future<void> _login() async {
+    if (!_formKey.currentState!.validate()) return;
+    FocusScope.of(context).unfocus();
 
     setState(() {
       _isLoading = true;
       _error = null;
     });
 
-    try {
-      final client = SupabaseService.client;
-      final email = _emailController.text.trim();
+    final l10n = AppLocalizations.of(context);
+    final client = SupabaseService.client;
+    final email = _emailController.text.trim();
+    final passcode = _passController.text.trim();
 
-      final response = await client
+    try {
+      final authService = AuthService();
+      final response = await authService.signInWithEmail(
+        email: email,
+        password: passcode,
+      );
+
+      final user = response.user;
+      if (user == null) {
+        if (!mounted) return;
+        setState(() {
+          _isLoading = false;
+          _error = l10n.passeIncorreta;
+        });
+        return;
+      }
+
+      final profile = await client
           .from(AppConstants.usersTable)
-          .select('role, name')
-          .eq('email', email)
+          .select('role')
+          .eq('id', user.id)
           .maybeSingle();
 
       if (!mounted) return;
 
-      if (response == null) {
-        setState(() {
-          _isLoading = false;
-          _error = AppLocalizations.of(context).emailNaoEncontrado;
-        });
-        return;
-      }
-
-      final role = response['role'] as String? ?? 'client';
+      final role = profile?['role'] as String? ?? 'client';
       if (role != 'admin' && role != 'agent') {
+        await client.auth.signOut();
+        if (!mounted) return;
         setState(() {
           _isLoading = false;
-          _error = AppLocalizations.of(context).semPermissoesAdmin;
+          _error = l10n.semPermissoesAdmin;
         });
         return;
       }
 
-      final name = response['name'] as String? ?? 'Admin';
-
-      final authService = AuthService();
-      final authUserReady = await authService.ensureAuthUserExists(email, name);
+      final auth = context.read<AuthProvider>();
+      await auth.init();
 
       if (!mounted) return;
-
-      if (!authUserReady) {
-        setState(() {
-          _isLoading = false;
-          _error = AppLocalizations.of(context).prepararAcessoErro;
-        });
-        return;
-      }
-
-      await client.auth.signInWithOtp(email: email);
-
-      if (!mounted) return;
-
-      setState(() {
-        _isLoading = false;
-        _otpSent = true;
-        _maskedEmail = _maskEmail(email);
-      });
+      Navigator.of(context).pushReplacementNamed(AppRoutes.adminDashboard);
     } on AuthException catch (e) {
       if (!mounted) return;
 
       String errorMsg;
       final msg = e.message.toLowerCase();
-      if (msg.contains('email') &&
-          (msg.contains('smtp') ||
-              msg.contains('mail') ||
-              msg.contains('send'))) {
-        errorMsg = AppLocalizations.of(context).erroEnvioEmail;
-      } else if (msg.contains('rate limit')) {
-        errorMsg = AppLocalizations.of(context).muitasTentativas;
+      if (msg.contains('not confirmed')) {
+        errorMsg = l10n.prepararAcessoErro;
+      } else if (msg.contains('rate limit') || msg.contains('too many')) {
+        errorMsg = l10n.muitasTentativas;
       } else {
-        errorMsg = e.message;
+        errorMsg = l10n.passeIncorreta;
       }
 
       setState(() {
@@ -133,65 +112,9 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
       if (!mounted) return;
       setState(() {
         _isLoading = false;
-        _error = AppLocalizations.of(context).erroEnvioCodigo;
+        _error = l10n.erroEntrar;
       });
     }
-  }
-
-  Future<void> _verifyOtp() async {
-    if (!_otpFormKey.currentState!.validate()) return;
-
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-
-    try {
-      final client = SupabaseService.client;
-      final email = _emailController.text.trim();
-      final otp = _otpController.text.trim();
-
-      final response = await client.auth.verifyOTP(
-        email: email,
-        token: otp,
-        type: OtpType.email,
-      );
-
-      if (!mounted) return;
-
-      if (response.session != null) {
-        final auth = context.read<AuthProvider>();
-        await auth.init();
-        if (mounted) {
-          Navigator.of(context).pushReplacementNamed(AppRoutes.adminDashboard);
-        }
-      } else {
-        setState(() {
-          _isLoading = false;
-          _error = AppLocalizations.of(context).codigoInvalido;
-        });
-      }
-    } on AuthException catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _isLoading = false;
-        _error = e.message;
-      });
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _isLoading = false;
-        _error = AppLocalizations.of(context).erroVerificarCodigo;
-      });
-    }
-  }
-
-  void _goBackToEmail() {
-    setState(() {
-      _otpSent = false;
-      _otpController.clear();
-      _error = null;
-    });
   }
 
   String? _validateEmail(String? value) {
@@ -203,10 +126,10 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
     return null;
   }
 
-  String? _validateOtp(String? value) {
+  String? _validatePass(String? value) {
     final l10n = AppLocalizations.of(context);
-    if (value == null || value.isEmpty) return l10n.insiraCodigo;
-    if (value.length < 6) return l10n.codigo6Digitos;
+    if (value == null || value.isEmpty) return l10n.insiraPasse;
+    if (value.trim().length != 6) return l10n.passe6Digitos;
     return null;
   }
 
@@ -240,7 +163,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   ],
                   _buildHeader(),
                   const SizedBox(height: 32),
-                  if (_otpSent) _buildOtpSection() else _buildEmailSection(),
+                  _buildCredentialsSection(),
                   const SizedBox(height: 16),
                   _buildBackButton(),
                   if (_error != null) ...[
@@ -303,9 +226,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
         ),
         const SizedBox(height: 8),
         Text(
-          _otpSent
-              ? l10n.codigoEnviado(_maskedEmail ?? '')
-              : l10n.insiraEmailCodigo,
+          l10n.insiraEmailPasse,
           style: AppTextStyles.bodyMedium.copyWith(
             color: palette.textSecondary,
           ),
@@ -314,105 +235,48 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
     );
   }
 
-  Widget _buildEmailSection() {
+  Widget _buildCredentialsSection() {
     final l10n = AppLocalizations.of(context);
     return Column(
       children: [
         Form(
-          key: _emailFormKey,
-          child: CustomInput(
-            label: l10n.emailAdmin,
-            hint: l10n.emailHint,
-            prefixIcon: Icons.email_outlined,
-            keyboardType: TextInputType.emailAddress,
-            textInputAction: TextInputAction.done,
-            controller: _emailController,
-            validator: _validateEmail,
-            enabled: !_isLoading,
-            onFieldSubmitted: (_) => _sendOtp(),
-          ),
-        ),
-        const SizedBox(height: 24),
-        CustomButton(
-          text: l10n.enviarCodigo,
-          isFullWidth: true,
-          size: CustomButtonSize.large,
-          isLoading: _isLoading,
-          icon: Icons.send_rounded,
-          onPressed: _sendOtp,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildOtpSection() {
-    final l10n = AppLocalizations.of(context);
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppColors.success.withValues(alpha: 0.08),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.success.withValues(alpha: 0.2)),
-          ),
-          child: Row(
+          key: _formKey,
+          child: Column(
             children: [
-              const Icon(
-                Icons.mark_email_read_outlined,
-                size: 22,
-                color: AppColors.success,
+              CustomInput(
+                label: l10n.emailAdmin,
+                hint: l10n.emailHint,
+                prefixIcon: Icons.email_outlined,
+                keyboardType: TextInputType.emailAddress,
+                textInputAction: TextInputAction.next,
+                controller: _emailController,
+                validator: _validateEmail,
+                enabled: !_isLoading,
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  l10n.verifiqueCaixa,
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.success,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+              const SizedBox(height: 16),
+              CustomInput(
+                label: l10n.passeAcesso,
+                hint: l10n.passeHint,
+                prefixIcon: Icons.lock_outline_rounded,
+                keyboardType: TextInputType.number,
+                textInputAction: TextInputAction.done,
+                obscureText: true,
+                controller: _passController,
+                validator: _validatePass,
+                enabled: !_isLoading,
+                onFieldSubmitted: (_) => _login(),
               ),
             ],
           ),
         ),
-        const SizedBox(height: 20),
-        Form(
-          key: _otpFormKey,
-          child: CustomInput(
-            label: l10n.codigoVerificacao,
-            hint: l10n.codigoHint,
-            prefixIcon: Icons.pin_outlined,
-            keyboardType: TextInputType.number,
-            textInputAction: TextInputAction.done,
-            controller: _otpController,
-            validator: _validateOtp,
-            enabled: !_isLoading,
-            onFieldSubmitted: (_) => _verifyOtp(),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Align(
-          alignment: Alignment.centerRight,
-          child: TextButton(
-            onPressed: _isLoading ? null : _sendOtp,
-            child: Text(
-              l10n.reenviarCodigo,
-              style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.gold,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
         CustomButton(
-          text: l10n.verificarEntrar,
+          text: l10n.entrar,
           isFullWidth: true,
           size: CustomButtonSize.large,
           isLoading: _isLoading,
-          icon: Icons.verified_rounded,
-          onPressed: _verifyOtp,
+          icon: Icons.login_rounded,
+          onPressed: _login,
         ),
       ],
     );
@@ -422,14 +286,10 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
     return TextButton.icon(
-      onPressed: _isLoading
-          ? null
-          : _otpSent
-          ? _goBackToEmail
-          : () => Navigator.of(context).pop(),
+      onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
       icon: const Icon(Icons.arrow_back_rounded, size: 18),
       label: Text(
-        _otpSent ? l10n.usarOutroEmail : l10n.voltar,
+        l10n.voltar,
         style: AppTextStyles.bodyMedium.copyWith(color: palette.textSecondary),
       ),
     );

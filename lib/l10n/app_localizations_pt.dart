@@ -1404,4 +1404,29 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get contactos => 'Contactos';
+
+  @override
+  String get insiraEmailPasse => 'Insira o email e a sua passe de acesso';
+
+  @override
+  String get passeAcesso => 'Passe de acesso';
+
+  @override
+  String get passeHint => '6 dígitos';
+
+  @override
+  String get insiraPasse => 'Insira a sua passe de acesso';
+
+  @override
+  String get passe6Digitos => 'A passe deve ter 6 dígitos';
+
+  @override
+  String get passeIncorreta => 'Email ou passe de acesso incorretos';
+
+  @override
+  String get entrar => 'Entrar';
+
+  @override
+  String get erroEntrar =>
+      'Erro ao entrar. Verifique a ligação e tente novamente.';
 }

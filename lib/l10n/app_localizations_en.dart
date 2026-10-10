@@ -1397,4 +1397,29 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get contactos => 'Contacts';
+
+  @override
+  String get insiraEmailPasse => 'Enter your email and access passcode';
+
+  @override
+  String get passeAcesso => 'Access passcode';
+
+  @override
+  String get passeHint => '6 digits';
+
+  @override
+  String get insiraPasse => 'Enter your access passcode';
+
+  @override
+  String get passe6Digitos => 'Passcode must be 6 digits';
+
+  @override
+  String get passeIncorreta => 'Invalid email or access passcode';
+
+  @override
+  String get entrar => 'Sign in';
+
+  @override
+  String get erroEntrar =>
+      'Sign-in error. Check your connection and try again.';
 }

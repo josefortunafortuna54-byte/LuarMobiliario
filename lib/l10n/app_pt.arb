@@ -432,5 +432,13 @@
   "corretor": "Corretor",
   "outro": "Outro",
   "parceiro": "Parceiro",
-  "contactos": "Contactos"
+  "contactos": "Contactos",
+  "insiraEmailPasse": "Insira o email e a sua passe de acesso",
+  "passeAcesso": "Passe de acesso",
+  "passeHint": "6 dígitos",
+  "insiraPasse": "Insira a sua passe de acesso",
+  "passe6Digitos": "A passe deve ter 6 dígitos",
+  "passeIncorreta": "Email ou passe de acesso incorretos",
+  "entrar": "Entrar",
+  "erroEntrar": "Erro ao entrar. Verifique a ligação e tente novamente."
 }

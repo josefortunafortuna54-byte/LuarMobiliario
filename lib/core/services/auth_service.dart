@@ -64,34 +64,6 @@ class AuthService {
     }
   }
 
-  /// Garante que o email existe em auth.users (Supabase Auth).
-  /// Se não existir, cria o utilizador em auth com senha temporária.
-  /// Retorna true se o utilizador já existia ou foi criado com sucesso.
-  Future<bool> ensureAuthUserExists(String email, String name) async {
-    try {
-      // Tenta criar o utilizador em auth.users
-      // Se já existir, o Supabase retorna erro "User already registered" — o que é bom
-      final tempPassword = 'AdminTemp${DateTime.now().millisecondsSinceEpoch}!';
-      await _auth.signUp(
-        email: email,
-        password: tempPassword,
-        data: {'name': name},
-      );
-      return true;
-    } on AuthException catch (e) {
-      // Se o utilizador já existe em auth.users, está tudo bem
-      final msg = e.message.toLowerCase();
-      if (msg.contains('already') ||
-          msg.contains('already registered') ||
-          msg.contains('already been registered') ||
-          msg.contains('duplicate')) {
-        return true;
-      }
-      // Para outros erros, relança para o chamador tratar
-      rethrow;
-    }
-  }
-
   Future<void> signOut() async {
     try {
       await _auth.signOut();

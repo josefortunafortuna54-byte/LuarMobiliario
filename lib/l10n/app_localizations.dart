@@ -2695,6 +2695,54 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Contactos'**
   String get contactos;
+
+  /// No description provided for @insiraEmailPasse.
+  ///
+  /// In pt, this message translates to:
+  /// **'Insira o email e a sua passe de acesso'**
+  String get insiraEmailPasse;
+
+  /// No description provided for @passeAcesso.
+  ///
+  /// In pt, this message translates to:
+  /// **'Passe de acesso'**
+  String get passeAcesso;
+
+  /// No description provided for @passeHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'6 dígitos'**
+  String get passeHint;
+
+  /// No description provided for @insiraPasse.
+  ///
+  /// In pt, this message translates to:
+  /// **'Insira a sua passe de acesso'**
+  String get insiraPasse;
+
+  /// No description provided for @passe6Digitos.
+  ///
+  /// In pt, this message translates to:
+  /// **'A passe deve ter 6 dígitos'**
+  String get passe6Digitos;
+
+  /// No description provided for @passeIncorreta.
+  ///
+  /// In pt, this message translates to:
+  /// **'Email ou passe de acesso incorretos'**
+  String get passeIncorreta;
+
+  /// No description provided for @entrar.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entrar'**
+  String get entrar;
+
+  /// No description provided for @erroEntrar.
+  ///
+  /// In pt, this message translates to:
+  /// **'Erro ao entrar. Verifique a ligação e tente novamente.'**
+  String get erroEntrar;
 }
 
 class _AppLocalizationsDelegate

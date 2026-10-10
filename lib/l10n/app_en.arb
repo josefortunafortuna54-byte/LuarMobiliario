@@ -432,5 +432,13 @@
   "corretor": "Broker",
   "outro": "Other",
   "parceiro": "Partner",
-  "contactos": "Contacts"
+  "contactos": "Contacts",
+  "insiraEmailPasse": "Enter your email and access passcode",
+  "passeAcesso": "Access passcode",
+  "passeHint": "6 digits",
+  "insiraPasse": "Enter your access passcode",
+  "passe6Digitos": "Passcode must be 6 digits",
+  "passeIncorreta": "Invalid email or access passcode",
+  "entrar": "Sign in",
+  "erroEntrar": "Sign-in error. Check your connection and try again."
 }

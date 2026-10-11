@@ -260,7 +260,7 @@ void main() {
 
     test('has 22 keys', () {
       final json = createSubject().toJson();
-      expect(json.length, 22);
+      expect(json.length, 23);
     });
   });
 

@@ -38,6 +38,7 @@ class PropertyModel {
   final double latitude;
   final double longitude;
   final List<String> images;
+  final List<String> videos;
   final List<String> features;
   final String? agentId;
   final String agentName;
@@ -65,6 +66,7 @@ class PropertyModel {
     required this.latitude,
     required this.longitude,
     required this.images,
+    this.videos = const [],
     required this.features,
     this.agentId,
     required this.agentName,
@@ -97,6 +99,11 @@ class PropertyModel {
       longitude: (json['longitude'] as num?)?.toDouble() ?? 0.0,
       images:
           (json['images'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          [],
+      videos:
+          (json['videos'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
           [],
@@ -138,6 +145,7 @@ class PropertyModel {
       'latitude': latitude,
       'longitude': longitude,
       'images': images,
+      'videos': videos,
       'features': features,
       'agent_id': agentId,
       'agent_name': agentName,
@@ -167,6 +175,7 @@ class PropertyModel {
     double? latitude,
     double? longitude,
     List<String>? images,
+    List<String>? videos,
     List<String>? features,
     String? agentId,
     String? agentName,
@@ -194,6 +203,7 @@ class PropertyModel {
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
       images: images ?? this.images,
+      videos: videos ?? this.videos,
       features: features ?? this.features,
       agentId: agentId ?? this.agentId,
       agentName: agentName ?? this.agentName,

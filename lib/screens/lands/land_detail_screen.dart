@@ -14,6 +14,7 @@ import '../../core/theme/app_palette.dart';
 import '../../core/utils/routes.dart';
 import '../../l10n/app_localizations.dart';
 import '../../screens/bookings/booking_bottom_sheet.dart';
+import '../../screens/videos/video_viewer_screen.dart';
 import '../../widgets/loading_widget.dart';
 import '../../widgets/avatar_widget.dart';
 import '../../widgets/feature_chip.dart';
@@ -129,6 +130,7 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
                 _buildImageCarousel(land.images),
                 _buildTitlePriceSection(land, isRent, location),
                 _buildFeaturesSection(land),
+                _buildVideoSection(land.videos),
                 _buildDescriptionSection(land),
                 _buildLocationSection(land, location),
                 _buildAgentSection(land),
@@ -294,6 +296,88 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
             ),
           ),
       ],
+    );
+  }
+
+  Widget _buildVideoSection(List<String> videos) {
+    if (videos.isEmpty) return const SizedBox.shrink();
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 20, 0, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.videocam_outlined, size: 20, color: AppColors.gold),
+              const SizedBox(width: 8),
+              Text(
+                l10n.videos,
+                style: AppTextStyles.h6.copyWith(color: palette.textTitle),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 120,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: videos.length,
+              itemBuilder: (_, index) {
+                return GestureDetector(
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => VideoViewerScreen(
+                        videos: videos,
+                        initialIndex: index,
+                      ),
+                    ),
+                  ),
+                  child: Container(
+                    width: 180,
+                    margin: const EdgeInsets.only(right: 12),
+                    decoration: BoxDecoration(
+                      color: AppColors.navy,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Stack(
+                      children: [
+                        Center(
+                          child: Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.15),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.play_arrow_rounded,
+                              color: Colors.white,
+                              size: 32,
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          left: 10,
+                          bottom: 8,
+                          child: Text(
+                            '${l10n.videos} ${index + 1}',
+                            style: AppTextStyles.bodyTiny.copyWith(
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -703,6 +787,7 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
                     builder: (_) => BookingBottomSheet(
                       propertyId: land.id,
                       propertyTitle: land.title,
+                      isLand: true,
                     ),
                   );
                 },

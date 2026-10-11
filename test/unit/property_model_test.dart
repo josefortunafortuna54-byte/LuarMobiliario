@@ -303,9 +303,9 @@ void main() {
       expect(json.containsKey('updated_at'), isTrue);
     });
 
-    test('has 25 keys', () {
+    test('has 26 keys', () {
       final json = createSubject().toJson();
-      expect(json.length, 25);
+      expect(json.length, 26);
     });
   });
 

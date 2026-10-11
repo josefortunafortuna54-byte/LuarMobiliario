@@ -11,11 +11,11 @@ abstract final class AppConstants {
 
   // ── Contact ────────────────────────────────────────────────────────
 
-  static const String whatsappNumber = '244923456789';
+  static const String whatsappNumber = '244942203497';
   static const String whatsappMessage =
       'Olá! Vim pelo app e gostaria de mais informações.';
   static const String supportEmail = 'geral@luarcompany.ao';
-  static const String supportPhone = '+244 923 456 789';
+  static const String supportPhone = '+244 942 203 497';
 
   // ── Social Media ───────────────────────────────────────────────────
 
@@ -27,6 +27,7 @@ abstract final class AppConstants {
   // ── Storage Buckets (Supabase) ─────────────────────────────────────
 
   static const String propertyImagesBucket = 'property-images';
+  static const String propertyVideosBucket = 'property-videos';
   static const String avatarBucket = 'avatars';
   static const String documentBucket = 'documents';
   static const String productsBucket = 'products';
@@ -45,6 +46,13 @@ abstract final class AppConstants {
 
   static const int defaultPageSize = 20;
   static const int maxImageUploads = 10;
+  static const int maxVideoUploads = 5;
+
+  /// Tamanho máximo por imagem (10 MB, igual ao limite do bucket).
+  static const int maxImageSizeBytes = 10 * 1024 * 1024;
+
+  /// Tamanho máximo por vídeo (50 MB, igual ao limite do bucket).
+  static const int maxVideoSizeBytes = 50 * 1024 * 1024;
 
   // ── Animation Durations ────────────────────────────────────────────
 

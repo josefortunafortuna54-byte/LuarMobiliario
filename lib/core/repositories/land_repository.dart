@@ -11,7 +11,8 @@ class LandRepository {
     return response.map((e) {
       final json = Map<String, dynamic>.from(e as Map);
       final images = _extractImageUrls(json.remove('land_images'));
-      return LandModel.fromJson(json).copyWith(images: images);
+      final videos = _extractVideoUrls(json.remove('land_videos'));
+      return LandModel.fromJson(json).copyWith(images: images, videos: videos);
     }).toList();
   }
 
@@ -20,6 +21,17 @@ class LandRepository {
     try {
       return (imagesData as List)
           .map((img) => (img as Map<String, dynamic>)['image_url'] as String)
+          .toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  List<String> _extractVideoUrls(dynamic videosData) {
+    if (videosData == null) return [];
+    try {
+      return (videosData as List)
+          .map((video) => (video as Map<String, dynamic>)['video_url'] as String)
           .toList();
     } catch (_) {
       return [];
@@ -78,7 +90,7 @@ class LandRepository {
     final response = await _applyFilters(
       _client
           .from('lands')
-          .select('*, land_images(image_url)')
+          .select('*, land_images(image_url), land_videos(video_url)')
           .eq('is_available', true),
       filters,
     )
@@ -109,13 +121,15 @@ class LandRepository {
 
     final json = Map<String, dynamic>.from(response as Map);
     final images = _extractImageUrls(json.remove('land_images'));
-    return LandModel.fromJson(json).copyWith(images: images);
+    final videos = _extractVideoUrls(json.remove('land_videos'));
+    return LandModel.fromJson(json).copyWith(images: images, videos: videos);
   }
 
   Future<LandModel> create(LandModel land) async {
     final data = land.toJson();
     data.remove('id');
     final imageUrls = List<String>.from(data.remove('images') ?? []);
+    final videoUrls = List<String>.from(data.remove('videos') ?? []);
     data['created_at'] = DateTime.now().toIso8601String();
     data['updated_at'] = DateTime.now().toIso8601String();
 
@@ -130,12 +144,20 @@ class LandRepository {
       await _client.from('land_images').insert(imageRecords);
     }
 
-    return newLand.copyWith(images: imageUrls);
+    if (videoUrls.isNotEmpty) {
+      final videoRecords = videoUrls
+          .map((url) => {'land_id': newLand.id, 'video_url': url})
+          .toList();
+      await _client.from('land_videos').insert(videoRecords);
+    }
+
+    return newLand.copyWith(images: imageUrls, videos: videoUrls);
   }
 
   Future<void> update(LandModel land) async {
     final data = land.toJson();
     final imageUrls = List<String>.from(data.remove('images') ?? []);
+    final videoUrls = List<String>.from(data.remove('videos') ?? []);
     data['updated_at'] = DateTime.now().toIso8601String();
 
     await _client.from('lands').update(data).eq('id', land.id);
@@ -147,10 +169,19 @@ class LandRepository {
           .toList();
       await _client.from('land_images').insert(imageRecords);
     }
+
+    await _client.from('land_videos').delete().eq('land_id', land.id);
+    if (videoUrls.isNotEmpty) {
+      final videoRecords = videoUrls
+          .map((url) => {'land_id': land.id, 'video_url': url})
+          .toList();
+      await _client.from('land_videos').insert(videoRecords);
+    }
   }
 
   Future<void> delete(String id) async {
     await _client.from('land_images').delete().eq('land_id', id);
+    await _client.from('land_videos').delete().eq('land_id', id);
 
     await _client.from('lands').update({'is_available': false}).eq('id', id);
   }

@@ -14,6 +14,7 @@ import '../../widgets/custom_button.dart';
 import '../../widgets/custom_input.dart';
 import '../../widgets/loading_widget.dart';
 import '../../widgets/xfile_thumbnail.dart';
+import '../videos/video_viewer_screen.dart';
 
 class PropertyFormScreen extends StatefulWidget {
   const PropertyFormScreen({super.key});
@@ -27,6 +28,8 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
   final _imagePicker = ImagePicker();
   final List<XFile> _selectedImages = [];
   List<String> _existingImages = [];
+  final List<XFile> _selectedVideos = [];
+  List<String> _existingVideos = [];
   List<String> _selectedFeatures = [];
   bool _isSubmitting = false;
 
@@ -81,6 +84,7 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
           _selectedType = prop.type.name;
           _selectedTransaction = prop.transactionType.name;
           _existingImages = List.from(prop.images);
+          _existingVideos = List.from(prop.videos);
           _selectedFeatures = List.from(prop.features);
         });
       }
@@ -110,12 +114,52 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
     }
   }
 
+  Future<void> _pickVideo() async {
+    final l10n = AppLocalizations.of(context);
+    if (_existingVideos.length + _selectedVideos.length >=
+        AppConstants.maxVideoUploads) {
+      _showError(l10n.limiteVideos(AppConstants.maxVideoUploads));
+      return;
+    }
+    try {
+      final video = await _imagePicker.pickVideo(source: ImageSource.gallery);
+      if (video == null) return;
+
+      final size = await video.length();
+      if (size > AppConstants.maxVideoSizeBytes) {
+        final maxMb = AppConstants.maxVideoSizeBytes ~/ (1024 * 1024);
+        _showError(l10n.videoMuitoGrande(maxMb));
+        return;
+      }
+
+      if (!mounted) return;
+      setState(() => _selectedVideos.add(video));
+    } catch (_) {
+      _showError(l10n.erroSelecionarVideo);
+    }
+  }
+
+  void _showError(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: AppColors.error),
+    );
+  }
+
   void _removeNewImage(int index) {
     setState(() => _selectedImages.removeAt(index));
   }
 
   void _removeExistingImage(int index) {
     setState(() => _existingImages.removeAt(index));
+  }
+
+  void _removeNewVideo(int index) {
+    setState(() => _selectedVideos.removeAt(index));
+  }
+
+  void _removeExistingVideo(int index) {
+    setState(() => _existingVideos.removeAt(index));
   }
 
   Future<void> _handleSubmit() async {
@@ -144,17 +188,36 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
             bytes: bytes,
             fileName: file.name,
             bucket: AppConstants.propertyImagesBucket,
+            maxBytes: AppConstants.maxImageSizeBytes,
           );
           allImages.add(url);
+        } on StorageUploadException catch (e) {
+          _showError(e.message);
+          return;
         } catch (e) {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(l10n.erroEnviarImagem(e)),
-                backgroundColor: AppColors.error,
-              ),
-            );
-          }
+          _showError(l10n.erroEnviarImagem('$e'));
+          return;
+        }
+      }
+
+      List<String> allVideos = List.from(_existingVideos);
+
+      for (final file in _selectedVideos) {
+        try {
+          final bytes = await file.readAsBytes();
+          final url = await StorageService().uploadVideo(
+            bytes: bytes,
+            fileName: file.name,
+            bucket: AppConstants.propertyVideosBucket,
+            maxBytes: AppConstants.maxVideoSizeBytes,
+          );
+          allVideos.add(url);
+        } on StorageUploadException catch (e) {
+          _showError(e.message);
+          return;
+        } catch (e) {
+          _showError(l10n.erroEnviarVideo('$e'));
+          return;
         }
       }
 
@@ -179,6 +242,7 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
         latitude: _existingProperty?.latitude ?? -8.8390,
         longitude: _existingProperty?.longitude ?? 13.2891,
         images: allImages,
+        videos: allVideos,
         features: _selectedFeatures,
         agentId: user?.id,
         agentName: user?.name ?? '',
@@ -247,6 +311,8 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildImageSection(),
+                    const SizedBox(height: 24),
+                    _buildVideoSection(),
                     const SizedBox(height: 24),
                     Text(l10n.informacoesBasicas, style: AppTextStyles.h6),
                     const SizedBox(height: 16),
@@ -496,6 +562,129 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
           child: imageUrl != null
               ? Image.network(imageUrl, fit: BoxFit.cover)
               : XFileThumbnail(file: file!),
+        ),
+        Positioned(
+          top: 4,
+          right: 12,
+          child: GestureDetector(
+            onTap: onRemove,
+            child: Container(
+              width: 24,
+              height: 24,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.error,
+              ),
+              child: const Icon(Icons.close, size: 14, color: AppColors.white),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildVideoSection() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
+    final hasVideos = _existingVideos.isNotEmpty || _selectedVideos.isNotEmpty;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(l10n.videos, style: AppTextStyles.h6),
+            TextButton.icon(
+              onPressed: _pickVideo,
+              icon: const Icon(Icons.video_library_outlined, size: 20),
+              label: Text(l10n.adicionarVideo),
+            ),
+          ],
+        ),
+        if (!hasVideos)
+          Container(
+            width: double.infinity,
+            height: 100,
+            decoration: BoxDecoration(
+              color: palette.background,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: palette.borderStrong),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.videocam_outlined,
+                  size: 32,
+                  color: palette.textMuted,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  l10n.nenhumVideoSelecionado,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: palette.textMuted,
+                  ),
+                ),
+              ],
+            ),
+          )
+        else
+          SizedBox(
+            height: 100,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: [
+                ..._existingVideos.asMap().entries.map(
+                  (entry) => _buildVideoThumbnail(
+                    onRemove: () => _removeExistingVideo(entry.key),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => VideoViewerScreen(
+                          videos: _existingVideos,
+                          initialIndex: entry.key,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                ..._selectedVideos.asMap().entries.map(
+                  (entry) => _buildVideoThumbnail(
+                    onRemove: () => _removeNewVideo(entry.key),
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildVideoThumbnail({
+    required VoidCallback onRemove,
+    VoidCallback? onTap,
+  }) {
+    return Stack(
+      children: [
+        GestureDetector(
+          onTap: onTap,
+          child: Container(
+            width: 100,
+            height: 100,
+            margin: const EdgeInsets.only(right: 8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: AppColors.navy,
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Center(
+              child: Icon(
+                Icons.play_circle_fill_rounded,
+                size: 36,
+                color: Colors.white.withValues(alpha: 0.9),
+              ),
+            ),
+          ),
         ),
         Positioned(
           top: 4,

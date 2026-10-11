@@ -176,6 +176,8 @@ scoop install supabase
 
 ### Aplicar Migrations
 
+> Guia passo-a-passo (CLI e SQL Editor), migrações pendentes e verificação: [`docs/MIGRATIONS.md`](MIGRATIONS.md).
+
 ```bash
 # Login no Supabase
 supabase login

@@ -165,6 +165,7 @@ FCM_PROJECT_ID=
 
 ## Checklist Pré-Deploy
 
+- [ ] **Migrações do Supabase aplicadas** (ver [`docs/MIGRATIONS.md`](MIGRATIONS.md); atualmente pendentes: 015 e 016)
 - [ ] Variáveis de ambiente configuradas para o ambiente alvo
 - [ ] `flutter analyze` sem erros
 - [ ] `flutter test` todos os testes a passar

@@ -49,6 +49,9 @@ class _BookingsScreenState extends State<BookingsScreen>
     return id;
   }
 
+  String _bookingTargetId(BookingModel booking) =>
+      booking.isLand ? (booking.landId ?? '') : booking.propertyId;
+
   Future<void> _onRefresh() async {
     await _loadBookings();
   }
@@ -65,7 +68,7 @@ class _BookingsScreenState extends State<BookingsScreen>
           l10n.desejaCancelarAgendamento(
             booking.propertyTitle.isNotEmpty
                 ? booking.propertyTitle
-                : _shortPropertyId(l10n, booking.propertyId),
+                : _shortPropertyId(l10n, _bookingTargetId(booking)),
           ),
           style: AppTextStyles.bodyMedium,
         ),
@@ -308,7 +311,7 @@ class _BookingsScreenState extends State<BookingsScreen>
                         booking.propertyTitle.isNotEmpty
                             ? booking.propertyTitle
                             : l10n.imovelCurto(
-                                _shortPropertyId(l10n, booking.propertyId),
+                                _shortPropertyId(l10n, _bookingTargetId(booking)),
                               ),
                         style: AppTextStyles.bodyMediumBold,
                         maxLines: 1,

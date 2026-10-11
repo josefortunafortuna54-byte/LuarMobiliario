@@ -260,4 +260,60 @@ void main() {
       expect(original.status, BookingStatus.pending);
     });
   });
+
+  group('land bookings', () {
+    BookingModel landBooking() => BookingModel(
+      id: 'b9',
+      propertyId: '',
+      landId: 'l1',
+      userName: 'Rui',
+      userPhone: '+244933333333',
+      date: fixedDate,
+      time: '11:00',
+      status: BookingStatus.pending,
+      notes: '',
+      createdAt: fixedCreatedAt,
+    );
+
+    test('isLand is true when landId present', () {
+      expect(landBooking().isLand, isTrue);
+    });
+
+    test('isLand is false for property bookings', () {
+      expect(createSubject().isLand, isFalse);
+    });
+
+    test('toJson omits property_id and includes land_id', () {
+      final json = landBooking().toJson();
+      expect(json.containsKey('property_id'), isFalse);
+      expect(json['land_id'], 'l1');
+    });
+
+    test('fromJson resolves title from lands relation', () {
+      final b = BookingModel.fromJson({
+        'id': 'b9',
+        'land_id': 'l1',
+        'lands': {'title': 'Terreno Talatona'},
+      });
+      expect(b.landId, 'l1');
+      expect(b.propertyId, '');
+      expect(b.isLand, isTrue);
+      expect(b.propertyTitle, 'Terreno Talatona');
+    });
+
+    test('fromJson resolves title from properties relation', () {
+      final b = BookingModel.fromJson({
+        'property_id': 'p1',
+        'properties': {'title': 'Casa Miramar'},
+      });
+      expect(b.propertyTitle, 'Casa Miramar');
+      expect(b.isLand, isFalse);
+    });
+
+    test('round trip preserves land_id', () {
+      final restored = BookingModel.fromJson(landBooking().toJson());
+      expect(restored.landId, 'l1');
+      expect(restored.propertyId, '');
+    });
+  });
 }

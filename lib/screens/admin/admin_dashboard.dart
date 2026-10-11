@@ -108,13 +108,16 @@ class _AdminDashboardState extends State<AdminDashboard> {
             children: [
               Text(l10n.visaoGeral, style: AppTextStyles.h6),
               const SizedBox(height: 16),
-              GridView.count(
-                crossAxisCount: 2,
+              GridView(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                childAspectRatio: 1.5,
+                gridDelegate:
+                    const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 12,
+                      crossAxisSpacing: 12,
+                      mainAxisExtent: 88,
+                    ),
                 children: [
                   _buildStatCard(
                     icon: Icons.apartment_rounded,
@@ -157,7 +160,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }) {
     final palette = context.palette;
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: palette.surface,
         borderRadius: BorderRadius.circular(16),
@@ -169,29 +172,40 @@ class _AdminDashboardState extends State<AdminDashboard> {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Row(
         children: [
           Container(
-            width: 36,
-            height: 36,
+            width: 44,
+            height: 44,
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, size: 20, color: color),
+            child: Icon(icon, size: 22, color: color),
           ),
-          const SizedBox(height: 10),
-          Text(value, style: AppTextStyles.h4.copyWith(color: color)),
-          const SizedBox(height: 2),
-          Text(
-            title,
-            style: AppTextStyles.bodyTiny.copyWith(
-              color: palette.textSecondary,
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  value,
+                  style: AppTextStyles.h4.copyWith(color: color),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  title,
+                  style: AppTextStyles.bodyTiny.copyWith(
+                    color: palette.textSecondary,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -200,6 +214,44 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   Widget _buildQuickActions(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final actions = <({IconData icon, String title, String route})>[
+      (
+        icon: Icons.add_home_work_outlined,
+        title: l10n.cadastroImovel,
+        route: AppRoutes.propertyForm,
+      ),
+      (
+        icon: Icons.add_location_alt_outlined,
+        title: l10n.cadastroTerreno,
+        route: AppRoutes.landForm,
+      ),
+      (
+        icon: Icons.calendar_month_outlined,
+        title: l10n.agendamentos,
+        route: AppRoutes.adminBookings,
+      ),
+      (
+        icon: Icons.people_alt_outlined,
+        title: l10n.verUtilizadores,
+        route: AppRoutes.adminUsers,
+      ),
+      (
+        icon: Icons.apartment_rounded,
+        title: l10n.gerir,
+        route: AppRoutes.adminProperties,
+      ),
+      (
+        icon: Icons.landscape_rounded,
+        title: l10n.gerirTerrenosCard,
+        route: AppRoutes.adminLands,
+      ),
+      (
+        icon: Icons.handshake_outlined,
+        title: l10n.verParceiros,
+        route: AppRoutes.partners,
+      ),
+    ];
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
@@ -207,68 +259,24 @@ class _AdminDashboardState extends State<AdminDashboard> {
         children: [
           Text(l10n.acoesRapidas, style: AppTextStyles.h6),
           const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _buildActionCard(
-                  icon: Icons.add_home_work_outlined,
-                  title: l10n.cadastroImovel,
-                  onTap: () =>
-                      Navigator.pushNamed(context, AppRoutes.propertyForm),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildActionCard(
-                  icon: Icons.add_location_alt_outlined,
-                  title: l10n.cadastroTerreno,
-                  onTap: () => Navigator.pushNamed(context, AppRoutes.landForm),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _buildActionCard(
-                  icon: Icons.people_alt_outlined,
-                  title: l10n.verUtilizadores,
-                  onTap: () =>
-                      Navigator.pushNamed(context, AppRoutes.adminUsers),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildActionCard(
-                  icon: Icons.apartment_rounded,
-                  title: l10n.gerir,
-                  onTap: () =>
-                      Navigator.pushNamed(context, AppRoutes.adminProperties),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildActionCard(
-                  icon: Icons.landscape_rounded,
-                  title: l10n.gerirTerrenosCard,
-                  onTap: () =>
-                      Navigator.pushNamed(context, AppRoutes.adminLands),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _buildActionCard(
-                  icon: Icons.handshake_outlined,
-                  title: l10n.verParceiros,
-                  onTap: () => Navigator.pushNamed(context, AppRoutes.partners),
-                ),
-              ),
-            ],
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+              mainAxisExtent: 128,
+            ),
+            itemCount: actions.length,
+            itemBuilder: (_, index) {
+              final action = actions[index];
+              return _buildActionCard(
+                icon: action.icon,
+                title: action.title,
+                onTap: () => Navigator.pushNamed(context, action.route),
+              );
+            },
           ),
         ],
       ),
@@ -283,7 +291,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
         decoration: BoxDecoration(
           color: AppColors.navy,
           borderRadius: BorderRadius.circular(16),
@@ -296,6 +304,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
           ],
         ),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
               width: 44,
@@ -307,12 +316,16 @@ class _AdminDashboardState extends State<AdminDashboard> {
               child: Icon(icon, size: 22, color: AppColors.gold),
             ),
             const SizedBox(height: 10),
-            Text(
-              title,
-              style: AppTextStyles.bodySmallBold.copyWith(
-                color: AppColors.white,
+            Flexible(
+              child: Text(
+                title,
+                style: AppTextStyles.bodySmallBold.copyWith(
+                  color: AppColors.white,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
-              textAlign: TextAlign.center,
             ),
           ],
         ),

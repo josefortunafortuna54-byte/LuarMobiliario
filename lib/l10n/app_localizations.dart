@@ -716,6 +716,12 @@ abstract class AppLocalizations {
   /// **'Condomínio'**
   String get condominio;
 
+  /// No description provided for @condominios.
+  ///
+  /// In pt, this message translates to:
+  /// **'Condomínios'**
+  String get condominios;
+
   /// No description provided for @armazem.
   ///
   /// In pt, this message translates to:
@@ -1238,6 +1244,18 @@ abstract class AppLocalizations {
   /// **'Erro ao criar agendamento. Tente novamente.'**
   String get erroCriarAgendamento;
 
+  /// No description provided for @agendamentoAtualizado.
+  ///
+  /// In pt, this message translates to:
+  /// **'Agendamento atualizado com sucesso!'**
+  String get agendamentoAtualizado;
+
+  /// No description provided for @erroAtualizarDados.
+  ///
+  /// In pt, this message translates to:
+  /// **'Erro ao atualizar. Tente novamente.'**
+  String get erroAtualizarDados;
+
   /// No description provided for @agendadoPor.
   ///
   /// In pt, this message translates to:
@@ -1303,6 +1321,18 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Insira o seu nome'**
   String get insiraNome;
+
+  /// No description provided for @concluir.
+  ///
+  /// In pt, this message translates to:
+  /// **'Concluir'**
+  String get concluir;
+
+  /// No description provided for @falarWhatsapp.
+  ///
+  /// In pt, this message translates to:
+  /// **'Falar no WhatsApp'**
+  String get falarWhatsapp;
 
   /// No description provided for @concluirRegisto.
   ///
@@ -2743,6 +2773,54 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Erro ao entrar. Verifique a ligação e tente novamente.'**
   String get erroEntrar;
+
+  /// No description provided for @videos.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vídeos'**
+  String get videos;
+
+  /// No description provided for @adicionarVideo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar vídeo'**
+  String get adicionarVideo;
+
+  /// No description provided for @nenhumVideoSelecionado.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nenhum vídeo selecionado'**
+  String get nenhumVideoSelecionado;
+
+  /// No description provided for @erroEnviarVideo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Erro ao enviar vídeo: {erro}'**
+  String erroEnviarVideo(Object erro);
+
+  /// No description provided for @erroCarregarVideo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar o vídeo'**
+  String get erroCarregarVideo;
+
+  /// No description provided for @limiteVideos.
+  ///
+  /// In pt, this message translates to:
+  /// **'Limite de {max} vídeos atingido'**
+  String limiteVideos(Object max);
+
+  /// No description provided for @videoMuitoGrande.
+  ///
+  /// In pt, this message translates to:
+  /// **'O vídeo é demasiado grande (máx. {max} MB).'**
+  String videoMuitoGrande(Object max);
+
+  /// No description provided for @erroSelecionarVideo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível selecionar o vídeo. Tente novamente.'**
+  String get erroSelecionarVideo;
 }
 
 class _AppLocalizationsDelegate

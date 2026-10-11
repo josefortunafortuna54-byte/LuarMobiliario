@@ -11,7 +11,12 @@ String _statusToString(BookingStatus status) => status.name;
 
 class BookingModel {
   final String id;
+
+  /// Imóvel marcado (vazio quando a marcação é de um terreno).
   final String propertyId;
+
+  /// Terreno marcado (nulo quando a marcação é de um imóvel).
+  final String? landId;
   final String? userId;
   final String userName;
   final String userPhone;
@@ -32,19 +37,28 @@ class BookingModel {
     required this.status,
     required this.notes,
     required this.createdAt,
+    this.landId,
     this.userId,
     this.propertyTitle = '',
   });
 
+  /// Verdadeiro quando a marcação é de um terreno.
+  bool get isLand => (landId ?? '').isNotEmpty;
+
   factory BookingModel.fromJson(Map<String, dynamic> json) {
     String resolvedTitle = '';
-    if (json['properties'] != null && json['properties'] is Map) {
-      resolvedTitle = (json['properties'] as Map)['title'] as String? ?? '';
+    final properties = json['properties'];
+    final lands = json['lands'];
+    if (properties is Map) {
+      resolvedTitle = properties['title'] as String? ?? '';
+    } else if (lands is Map) {
+      resolvedTitle = lands['title'] as String? ?? '';
     }
 
     return BookingModel(
       id: json['id'] as String? ?? '',
       propertyId: json['property_id'] as String? ?? '',
+      landId: json['land_id'] as String?,
       userId: json['user_id'] as String?,
       userName: json['user_name'] as String? ?? '',
       userPhone: json['user_phone'] as String? ?? '',
@@ -64,7 +78,8 @@ class BookingModel {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'property_id': propertyId,
+      if (propertyId.isNotEmpty) 'property_id': propertyId,
+      if (landId != null && landId!.isNotEmpty) 'land_id': landId,
       if (userId != null) 'user_id': userId,
       'user_name': userName,
       'user_phone': userPhone,
@@ -79,6 +94,7 @@ class BookingModel {
   BookingModel copyWith({
     String? id,
     String? propertyId,
+    String? landId,
     String? userId,
     String? userName,
     String? userPhone,
@@ -92,6 +108,7 @@ class BookingModel {
     return BookingModel(
       id: id ?? this.id,
       propertyId: propertyId ?? this.propertyId,
+      landId: landId ?? this.landId,
       userId: userId ?? this.userId,
       userName: userName ?? this.userName,
       userPhone: userPhone ?? this.userPhone,

@@ -8,18 +8,21 @@ import '../../core/providers/auth_provider.dart';
 import '../../core/providers/booking_provider.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/utils/validators.dart';
+import '../../core/utils/whatsapp_util.dart';
 import '../../l10n/app_localizations.dart';
 
-enum _BookingStep { schedule, register }
+enum _BookingStep { schedule, success }
 
 class BookingBottomSheet extends StatefulWidget {
   final String propertyId;
   final String propertyTitle;
+  final bool isLand;
 
   const BookingBottomSheet({
     super.key,
     required this.propertyId,
     required this.propertyTitle,
+    this.isLand = false,
   });
 
   @override
@@ -28,15 +31,25 @@ class BookingBottomSheet extends StatefulWidget {
 
 class _BookingBottomSheetState extends State<BookingBottomSheet> {
   final _formKey = GlobalKey<FormState>();
-  final _registerFormKey = GlobalKey<FormState>();
   DateTime _selectedDate = DateTime.now().add(const Duration(days: 1));
   TimeOfDay _selectedTime = const TimeOfDay(hour: 10, minute: 0);
   final _notesController = TextEditingController();
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
   _BookingStep _step = _BookingStep.schedule;
-  String? _bookingId;
   bool _isSubmitting = false;
+
+  bool get _isGuest => context.read<AuthProvider>().user == null;
+
+  @override
+  void initState() {
+    super.initState();
+    final user = context.read<AuthProvider>().user;
+    if (user != null) {
+      _nameController.text = user.name;
+      _phoneController.text = user.phone;
+    }
+  }
 
   @override
   void dispose() {
@@ -99,9 +112,10 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
 
     final auth = context.read<AuthProvider>();
     final guest = auth.user == null;
-    final userId = auth.user?.id;
-    final userName = guest ? '' : (auth.user?.name ?? '');
-    final userPhone = guest ? '' : (auth.user?.phone ?? '');
+    final name = guest ? _nameController.text.trim() : (auth.user?.name ?? '');
+    final phone = guest
+        ? _phoneController.text.trim()
+        : (auth.user?.phone ?? '');
 
     setState(() => _isSubmitting = true);
 
@@ -110,10 +124,11 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
 
     final booking = BookingModel(
       id: '',
-      propertyId: widget.propertyId,
-      userId: guest ? null : userId,
-      userName: userName,
-      userPhone: userPhone,
+      propertyId: widget.isLand ? '' : widget.propertyId,
+      landId: widget.isLand ? widget.propertyId : null,
+      userId: guest ? null : auth.user?.id,
+      userName: name,
+      userPhone: phone,
       date: _selectedDate,
       time: timeStr,
       status: BookingStatus.pending,
@@ -121,9 +136,8 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
       createdAt: DateTime.now(),
     );
 
-    final created = await context.read<BookingProvider>().createBooking(
-      booking,
-    );
+    final provider = context.read<BookingProvider>();
+    final created = await provider.createBooking(booking);
 
     if (!mounted) return;
 
@@ -139,54 +153,37 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
     }
 
     if (guest) {
-      setState(() {
-        _bookingId = created.id;
-        _step = _BookingStep.register;
-        _isSubmitting = false;
-      });
-      return;
+      await provider.registerGuestClient(
+        name: name,
+        phone: phone,
+        bookingId: created.id,
+      );
     }
-
-    Navigator.pop(context);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(l10n.agendamentoSolicitado),
-        backgroundColor: AppColors.success,
-      ),
-    );
-  }
-
-  Future<void> _submitRegistration() async {
-    final l10n = AppLocalizations.of(context);
-    if (!_registerFormKey.currentState!.validate()) return;
-
-    setState(() => _isSubmitting = true);
-
-    final success = await context.read<BookingProvider>().registerGuestClient(
-      name: _nameController.text.trim(),
-      phone: _phoneController.text.trim(),
-      bookingId: _bookingId ?? '',
-    );
 
     if (!mounted) return;
+    setState(() {
+      _isSubmitting = false;
+      _step = _BookingStep.success;
+    });
+  }
 
-    if (success) {
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.agendamentoRegistado),
-          backgroundColor: AppColors.success,
-        ),
-      );
-    } else {
-      setState(() => _isSubmitting = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.erroRegistarDados),
-          backgroundColor: AppColors.error,
-        ),
-      );
-    }
+  String get _whatsappMessage {
+    final dateStr =
+        '${_selectedDate.day.toString().padLeft(2, '0')}/${_selectedDate.month.toString().padLeft(2, '0')}/${_selectedDate.year}';
+    final timeStr =
+        '${_selectedTime.hour.toString().padLeft(2, '0')}:${_selectedTime.minute.toString().padLeft(2, '0')}';
+    final name = _nameController.text.trim().isNotEmpty
+        ? _nameController.text.trim()
+        : (context.read<AuthProvider>().user?.name ?? '');
+    return 'Olá! Agendei uma visita pelo app.\n'
+        '${widget.isLand ? 'Terreno' : 'Imóvel'}: ${widget.propertyTitle}\n'
+        'Data: $dateStr\n'
+        'Hora: $timeStr\n'
+        'Nome: $name';
+  }
+
+  Future<void> _openWhatsApp() async {
+    await WhatsAppUtil.open(message: _whatsappMessage);
   }
 
   @override
@@ -200,7 +197,7 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
       child: SingleChildScrollView(
         child: _step == _BookingStep.schedule
             ? _buildScheduleStep()
-            : _buildRegisterStep(),
+            : _buildSuccessStep(),
       ),
     );
   }
@@ -208,6 +205,7 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
   Widget _buildScheduleStep() {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
+    final guest = _isGuest;
     final dateStr =
         '${_selectedDate.day.toString().padLeft(2, '0')}/${_selectedDate.month.toString().padLeft(2, '0')}/${_selectedDate.year}';
     final timeStr =
@@ -232,6 +230,43 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 24),
+          if (guest) ...[
+            _buildFieldLabel(l10n.nomeCompleto),
+            const SizedBox(height: 8),
+            TextFormField(
+              controller: _nameController,
+              enabled: !_isSubmitting,
+              textInputAction: TextInputAction.next,
+              textCapitalization: TextCapitalization.words,
+              style: AppTextStyles.bodyMedium,
+              decoration: _inputDecoration(
+                hint: l10n.oSeuNome,
+                icon: Icons.person_outline,
+              ),
+              validator: (value) => Validators.minLength(
+                value,
+                3,
+                customMessage: l10n.insiraNome,
+                l10n: l10n,
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildFieldLabel(l10n.telefone),
+            const SizedBox(height: 8),
+            TextFormField(
+              controller: _phoneController,
+              enabled: !_isSubmitting,
+              textInputAction: TextInputAction.next,
+              keyboardType: TextInputType.phone,
+              style: AppTextStyles.bodyMedium,
+              decoration: _inputDecoration(
+                hint: '(9XX) XXX XXX',
+                icon: Icons.phone_outlined,
+              ),
+              validator: (value) => Validators.phone(value, l10n: l10n),
+            ),
+            const SizedBox(height: 16),
+          ],
           _buildFieldLabel(l10n.data),
           const SizedBox(height: 8),
           GestureDetector(
@@ -289,26 +324,9 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
             maxLines: 3,
             enabled: !_isSubmitting,
             style: AppTextStyles.bodyMedium,
-            decoration: InputDecoration(
-              hintText: l10n.exPrefiroManha,
-              hintStyle: AppTextStyles.bodyMedium.copyWith(
-                color: palette.textMuted,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: palette.borderStrong),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: palette.borderStrong),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: AppColors.gold, width: 1.5),
-              ),
-              filled: true,
-              fillColor: palette.background,
-              contentPadding: const EdgeInsets.all(14),
+            decoration: _inputDecoration(
+              hint: l10n.exPrefiroManha,
+              multiline: true,
             ),
           ),
           const SizedBox(height: 24),
@@ -348,160 +366,111 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
     );
   }
 
-  Widget _buildRegisterStep() {
+  Widget _buildSuccessStep() {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
-    return Form(
-      key: _registerFormKey,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _buildDragHandle(),
-          const SizedBox(height: 20),
-          Container(
-            padding: const EdgeInsets.all(14),
+    final dateStr =
+        '${_selectedDate.day.toString().padLeft(2, '0')}/${_selectedDate.month.toString().padLeft(2, '0')}/${_selectedDate.year}';
+    final timeStr =
+        '${_selectedTime.hour.toString().padLeft(2, '0')}:${_selectedTime.minute.toString().padLeft(2, '0')}';
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildDragHandle(),
+        const SizedBox(height: 24),
+        Center(
+          child: Container(
+            width: 88,
+            height: 88,
             decoration: BoxDecoration(
-              color: AppColors.success.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: AppColors.success.withValues(alpha: 0.2),
-              ),
+              shape: BoxShape.circle,
+              color: AppColors.success.withValues(alpha: 0.1),
             ),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.check_circle_outline,
-                  size: 22,
-                  color: AppColors.success,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    l10n.agendamentoSolicitado,
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.success,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
+            child: const Icon(
+              Icons.check_circle_outline,
+              size: 48,
+              color: AppColors.success,
             ),
           ),
-          const SizedBox(height: 20),
-          Text(l10n.completeRegisto, style: AppTextStyles.h6),
-          const SizedBox(height: 4),
-          Text(
-            l10n.indiqueNomeTelefone,
-            style: AppTextStyles.bodySmall.copyWith(
-              color: palette.textSecondary,
+        ),
+        const SizedBox(height: 20),
+        Text(
+          l10n.agendamentoSolicitado,
+          style: AppTextStyles.h5,
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          '${widget.propertyTitle}\n$dateStr · $timeStr',
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: palette.textSecondary,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 28),
+        SizedBox(
+          height: 52,
+          child: ElevatedButton.icon(
+            onPressed: _openWhatsApp,
+            icon: const Icon(Icons.chat_bubble_outline, size: 20),
+            label: Text(
+              l10n.falarWhatsapp,
+              style: AppTextStyles.buttonLarge.copyWith(
+                color: AppColors.white,
+              ),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.whatsapp,
+              foregroundColor: AppColors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 4,
+              shadowColor: AppColors.whatsapp.withValues(alpha: 0.4),
             ),
           ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _nameController,
-            enabled: !_isSubmitting,
-            textInputAction: TextInputAction.next,
-            style: AppTextStyles.bodyMedium,
-            decoration: InputDecoration(
-              labelText: l10n.nomeCompleto,
-              hintText: l10n.oSeuNome,
-              prefixIcon: const Icon(
-                Icons.person_outline,
-                size: 20,
-                color: AppColors.gold,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: palette.borderStrong),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: palette.borderStrong),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: AppColors.gold, width: 1.5),
-              ),
-              filled: true,
-              fillColor: palette.background,
-              contentPadding: const EdgeInsets.all(14),
-            ),
-            validator: (value) => Validators.minLength(
-              value,
-              3,
-              customMessage: l10n.insiraNome,
-              l10n: l10n,
+        ),
+        const SizedBox(height: 12),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(
+            l10n.concluir,
+            style: AppTextStyles.buttonMedium.copyWith(
+              color: palette.textBody,
             ),
           ),
-          const SizedBox(height: 12),
-          TextFormField(
-            controller: _phoneController,
-            enabled: !_isSubmitting,
-            textInputAction: TextInputAction.done,
-            keyboardType: TextInputType.phone,
-            style: AppTextStyles.bodyMedium,
-            decoration: InputDecoration(
-              labelText: l10n.telefone,
-              hintText: '(00) 00000-0000',
-              prefixIcon: const Icon(
-                Icons.phone_outlined,
-                size: 20,
-                color: AppColors.gold,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: palette.borderStrong),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: palette.borderStrong),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: AppColors.gold, width: 1.5),
-              ),
-              filled: true,
-              fillColor: palette.background,
-              contentPadding: const EdgeInsets.all(14),
-            ),
-            validator: (value) => Validators.phone(value, l10n: l10n),
-            onFieldSubmitted: (_) => _submitRegistration(),
-          ),
-          const SizedBox(height: 24),
-          SizedBox(
-            width: double.infinity,
-            height: 52,
-            child: ElevatedButton(
-              onPressed: _isSubmitting ? null : _submitRegistration,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.gold,
-                foregroundColor: AppColors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 4,
-                shadowColor: AppColors.gold.withValues(alpha: 0.4),
-              ),
-              child: _isSubmitting
-                  ? const SizedBox(
-                      width: 22,
-                      height: 22,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.5,
-                        color: AppColors.white,
-                      ),
-                    )
-                  : Text(
-                      l10n.concluirRegisto,
-                      style: AppTextStyles.buttonLarge.copyWith(
-                        color: AppColors.white,
-                      ),
-                    ),
-            ),
-          ),
-        ],
+        ),
+      ],
+    );
+  }
+
+  InputDecoration _inputDecoration({
+    required String hint,
+    IconData? icon,
+    bool multiline = false,
+  }) {
+    final palette = context.palette;
+    final border = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: palette.borderStrong),
+    );
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: AppTextStyles.bodyMedium.copyWith(color: palette.textMuted),
+      prefixIcon: icon != null
+          ? Icon(icon, size: 20, color: AppColors.gold)
+          : null,
+      border: border,
+      enabledBorder: border,
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.gold, width: 1.5),
       ),
+      filled: true,
+      fillColor: palette.background,
+      contentPadding: const EdgeInsets.all(14),
     );
   }
 

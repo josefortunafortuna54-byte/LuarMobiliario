@@ -332,6 +332,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get condominio => 'Condominium';
 
   @override
+  String get condominios => 'Condominiums';
+
+  @override
   String get armazem => 'Warehouse';
 
   @override
@@ -614,6 +617,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get erroCriarAgendamento => 'Error creating the booking. Try again.';
 
   @override
+  String get agendamentoAtualizado => 'Booking updated successfully!';
+
+  @override
+  String get erroAtualizarDados => 'Error updating. Try again.';
+
+  @override
   String agendadoPor(Object name) {
     return 'Booked by: $name';
   }
@@ -651,6 +660,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get insiraNome => 'Enter your name';
+
+  @override
+  String get concluir => 'Done';
+
+  @override
+  String get falarWhatsapp => 'Chat on WhatsApp';
 
   @override
   String get concluirRegisto => 'Complete Registration';
@@ -1422,4 +1437,35 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get erroEntrar =>
       'Sign-in error. Check your connection and try again.';
+
+  @override
+  String get videos => 'Videos';
+
+  @override
+  String get adicionarVideo => 'Add video';
+
+  @override
+  String get nenhumVideoSelecionado => 'No video selected';
+
+  @override
+  String erroEnviarVideo(Object erro) {
+    return 'Error uploading video: $erro';
+  }
+
+  @override
+  String get erroCarregarVideo => 'Could not load the video';
+
+  @override
+  String limiteVideos(Object max) {
+    return 'Limit of $max videos reached';
+  }
+
+  @override
+  String videoMuitoGrande(Object max) {
+    return 'The video is too large (max $max MB).';
+  }
+
+  @override
+  String get erroSelecionarVideo =>
+      'Could not select the video. Please try again.';
 }

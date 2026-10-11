@@ -7,10 +7,12 @@ class BookingProvider extends ChangeNotifier {
   final BookingRepository _repository = BookingRepository();
 
   List<BookingModel> _bookings = [];
+  List<BookingModel> _allBookings = [];
   bool _isLoading = false;
   String? _error;
 
   List<BookingModel> get bookings => _bookings;
+  List<BookingModel> get allBookings => _allBookings;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
@@ -47,6 +49,46 @@ class BookingProvider extends ChangeNotifier {
     } finally {
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  Future<void> loadAllBookings() async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      _allBookings = await _repository.fetchAll();
+    } catch (e) {
+      _error = e.toString();
+      _allBookings = [];
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> updateBookingStatus(
+    String bookingId,
+    BookingStatus status,
+  ) async {
+    try {
+      await _repository.updateStatus(bookingId, status);
+
+      final allIndex = _allBookings.indexWhere((b) => b.id == bookingId);
+      if (allIndex != -1) {
+        _allBookings[allIndex] = _allBookings[allIndex].copyWith(status: status);
+      }
+      final index = _bookings.indexWhere((b) => b.id == bookingId);
+      if (index != -1) {
+        _bookings[index] = _bookings[index].copyWith(status: status);
+      }
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      return false;
     }
   }
 
@@ -123,6 +165,7 @@ class BookingProvider extends ChangeNotifier {
 
   void clearBookings() {
     _bookings = [];
+    _allBookings = [];
     notifyListeners();
   }
 

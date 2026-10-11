@@ -7,16 +7,37 @@ import '../services/supabase_service.dart';
 class BookingRepository {
   final SupabaseClient _client = SupabaseService.client;
 
+  static const String _selectWithTarget =
+      '*, properties(title), lands(title)';
+
   Future<List<BookingModel>> fetchByUser(String userId) async {
     final response = await _client
         .from('bookings')
-        .select('*, properties(title)')
+        .select(_selectWithTarget)
         .eq('user_id', userId)
         .order('created_at', ascending: false);
 
     return (response as List<dynamic>)
         .map((json) => BookingModel.fromJson(json as Map<String, dynamic>))
         .toList();
+  }
+
+  Future<List<BookingModel>> fetchAll() async {
+    final response = await _client
+        .from('bookings')
+        .select(_selectWithTarget)
+        .order('created_at', ascending: false);
+
+    return (response as List<dynamic>)
+        .map((json) => BookingModel.fromJson(json as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<void> updateStatus(String bookingId, BookingStatus status) async {
+    await _client
+        .from('bookings')
+        .update({'status': status.name})
+        .eq('id', bookingId);
   }
 
   Future<BookingModel> create(BookingModel booking) async {

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
+import '../../core/constants/app_categories.dart';
 import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_constants.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/models/land_model.dart';
 import '../../core/models/property_model.dart';
@@ -13,6 +12,7 @@ import '../../core/providers/property_provider.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/utils/responsive.dart';
 import '../../core/utils/routes.dart';
+import '../../core/utils/whatsapp_util.dart';
 import '../../l10n/app_localizations.dart';
 import '../../widgets/land_card.dart';
 import '../../widgets/property_card.dart';
@@ -47,12 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _openWhatsApp() async {
-    final url = Uri.parse(
-      'https://wa.me/${AppConstants.whatsappNumber}?text=${Uri.encodeComponent(AppConstants.whatsappMessage)}',
-    );
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
-    }
+    await WhatsAppUtil.open();
   }
 
   @override
@@ -201,36 +196,22 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildCategoriesSection(double padding, bool isDesktop) {
     final l10n = AppLocalizations.of(context);
     final categories = [
-      _CategoryData(
-        icon: Icons.home_outlined,
-        title: l10n.casas,
-        count: 0,
-        filterType: 'house',
+      ...propertyCategories.map(
+        (c) => _CategoryData(
+          icon: c.icon,
+          title: propertyCategoryLabel(c.key, l10n),
+          count: 0,
+          filterType: c.key,
+        ),
       ),
-      _CategoryData(
-        icon: Icons.apartment_rounded,
-        title: l10n.apartamentos,
-        count: 0,
-        filterType: 'apartment',
-      ),
-      _CategoryData(
-        icon: Icons.landscape_rounded,
-        title: l10n.terrenos,
-        count: 0,
-        isLand: true,
-      ),
-      _CategoryData(
-        icon: Icons.agriculture_rounded,
-        title: l10n.fazendas,
-        count: 0,
-        filterType: 'farm',
-        isLand: true,
-      ),
-      _CategoryData(
-        icon: Icons.warehouse_outlined,
-        title: l10n.armazens,
-        count: 0,
-        filterType: 'warehouse',
+      ...landCategories.map(
+        (c) => _CategoryData(
+          icon: c.icon,
+          title: landCategoryLabel(c.key, l10n),
+          count: 0,
+          filterType: c.key,
+          isLand: true,
+        ),
       ),
     ];
 
@@ -246,7 +227,9 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Text(l10n.categorias, style: AppTextStyles.h5),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(AppRoutes.properties);
+                  },
                   child: Text(
                     l10n.verTodas,
                     style: AppTextStyles.bodySmall.copyWith(

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/constants/app_categories.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/constants/app_text_styles.dart';
@@ -689,16 +690,12 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
   }
 
   Widget _buildPropertyTypeChips() {
-    final types = ['house', 'apartment', 'office', 'warehouse', 'shop'];
+    final types = propertyCategories.map((c) => c.key).toList();
     final l10n = AppLocalizations.of(context);
     final palette = context.palette;
-    final labels = [
-      l10n.casa,
-      l10n.apartamento,
-      l10n.escritorio,
-      l10n.armazem,
-      l10n.loja,
-    ];
+    final labels = propertyCategories
+        .map((c) => propertyCategoryLabel(c.key, l10n))
+        .toList();
 
     return Wrap(
       spacing: 8,

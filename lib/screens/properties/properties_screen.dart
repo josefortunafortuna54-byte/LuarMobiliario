@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/constants/app_categories.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/models/property_model.dart';
@@ -23,24 +24,11 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
   int _selectedFilterIndex = 0;
   String _sortOption = 'recent';
   bool _showSortOptions = false;
+  bool _routeArgumentApplied = false;
 
-  static const List<String> _filterKeys = [
-    '',
-    'house',
-    'apartment',
-    'office',
-    'warehouse',
-    'shop',
-  ];
+  List<String> get _filterKeys => propertyFilterKeys;
 
-  List<String> _filterLabels(AppLocalizations l10n) => [
-    l10n.todos,
-    l10n.casas,
-    l10n.apartamentos,
-    l10n.escritorios,
-    l10n.armazens,
-    l10n.lojas,
-  ];
+  List<String> _filterLabels(AppLocalizations l10n) => propertyFilterLabels(l10n);
 
   String _sortLabel(String key, AppLocalizations l10n) => switch (key) {
     'priceAsc' => l10n.menorPreco,
@@ -52,14 +40,21 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
   @override
   void initState() {
     super.initState();
-    _applyRouteArgument();
-    _loadProperties();
     _scrollController.addListener(_onScroll);
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_routeArgumentApplied) return;
+    _routeArgumentApplied = true;
+    _applyRouteArgument();
+    _loadProperties();
+  }
+
   void _applyRouteArgument() {
-    final filterType = ModalRoute.of(context)?.settings.arguments as String?;
-    if (filterType != null) {
+    final filterType = ModalRoute.of(context)?.settings.arguments;
+    if (filterType is String) {
       final index = _filterKeys.indexOf(filterType);
       if (index != -1) {
         _selectedFilterIndex = index;

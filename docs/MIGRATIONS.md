@@ -10,15 +10,17 @@ As migrações vivem em `luar_company/supabase/migrations/` e são aplicadas **p
 
 ## Estado
 
-Todas as migrações (`001`–`016`) estão aplicadas no projeto de produção (`vgwaxjxkknogmwnmuiux`). As últimas aplicadas foram:
+Todas as migrações (`001`–`017`) estão aplicadas no projeto de produção (`vgwaxjxkknogmwnmuiux`). As últimas aplicadas foram:
 
 | Migration | Ficheiro | O que faz | Estado |
 |---|---|---|---|
 | 015 | `015_fix_bookings_target_and_rls.sql` | Adiciona `bookings.land_id` (agendar terrenos), torna `property_id` opcional com `CHECK` de alvo único, e corrige as policies de `SELECT`/`UPDATE` para agentes/admins gerirem marcações | Aplicada |
 | 016 | `016_add_property_land_videos.sql` | Cria `property_videos` / `land_videos`, o bucket `property-videos` (50 MB) e as respetivas policies RLS | Aplicada |
+| 017 | `017_fix_storage_delete_policies_owner_cast.sql` | Recria as policies de DELETE de `property-images`/`avatars` com `owner_id::text` (o `owner_id` do storage é TEXT e as policies da 007 comparavam com uuid) | Aplicada |
 
 > Sem a 015: agendar visita a um **terreno** falha e o admin não confirma/cancela marcações.
 > Sem a 016: **publicação de vídeos falha** (tabelas e bucket inexistentes).
+> Sem a 017: apagar **imagens de imóvel** ou **avatares** pode falhar (`operator does not exist: text = uuid`).
 
 ### Dependências
 

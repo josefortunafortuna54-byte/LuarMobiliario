@@ -131,5 +131,5 @@ CREATE POLICY "Property videos: delete own" ON storage.objects
   FOR DELETE TO authenticated
   USING (
     bucket_id = 'property-videos'
-    AND owner_id = auth.uid()::text
+    AND owner_id::text = auth.uid()::text
   );

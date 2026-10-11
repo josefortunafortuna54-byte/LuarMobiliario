@@ -4,14 +4,18 @@ Como aplicar as migrações SQL ao projeto Supabase de produção.
 
 As migrações vivem em `luar_company/supabase/migrations/` e são aplicadas **por ordem** (`001` → `016`). São idempotentes na sua maioria (`IF NOT EXISTS`, `DROP POLICY IF EXISTS`), pelo que reaplicar é seguro.
 
+> O projeto já está ligado (`supabase link`) ao ref `vgwaxjxkknogmwnmuiux`; o pipe `.env`/CLI usa a ligação guardada.
+
 ---
 
-## Pendentes (aplicar antes de publicar)
+## Estado
 
-| Migration | Ficheiro | O que faz |
-|---|---|---|
-| 015 | `015_fix_bookings_target_and_rls.sql` | Adiciona `bookings.land_id` (agendar terrenos), torna `property_id` opcional com `CHECK` de alvo único, e corrige as policies de `SELECT`/`UPDATE` para agentes/admins gerirem marcações |
-| 016 | `016_add_property_land_videos.sql` | Cria `property_videos` / `land_videos`, o bucket `property-videos` (50 MB) e as respetivas policies RLS |
+Todas as migrações (`001`–`016`) estão aplicadas no projeto de produção (`vgwaxjxkknogmwnmuiux`). As últimas aplicadas foram:
+
+| Migration | Ficheiro | O que faz | Estado |
+|---|---|---|---|
+| 015 | `015_fix_bookings_target_and_rls.sql` | Adiciona `bookings.land_id` (agendar terrenos), torna `property_id` opcional com `CHECK` de alvo único, e corrige as policies de `SELECT`/`UPDATE` para agentes/admins gerirem marcações | Aplicada |
+| 016 | `016_add_property_land_videos.sql` | Cria `property_videos` / `land_videos`, o bucket `property-videos` (50 MB) e as respetivas policies RLS | Aplicada |
 
 > Sem a 015: agendar visita a um **terreno** falha e o admin não confirma/cancela marcações.
 > Sem a 016: **publicação de vídeos falha** (tabelas e bucket inexistentes).
@@ -20,9 +24,10 @@ As migrações vivem em `luar_company/supabase/migrations/` e são aplicadas **p
 
 As migrações 015/016 assumem o schema já aplicado (001–014), em particular:
 
-- extensão `uuid-ossp` (`uuid_generate_v4()`) — migration 001
 - função `public.get_user_role()` — migrations 002/006
 - tabelas `properties` e `lands` — migrations 001/003
+
+> **Nota sobre UUIDs:** a extensão `uuid-ossp` vive no schema `extensions` e `uuid_generate_v4()` não resolve durante as migrações. Use `gen_random_uuid()` (nativo do PostgreSQL, sempre resolvível), como nas migrations 014 e 016.
 
 ---
 

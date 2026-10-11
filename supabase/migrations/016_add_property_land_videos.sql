@@ -6,14 +6,14 @@
 -- ════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS property_videos (
-  id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   property_id UUID NOT NULL REFERENCES properties(id) ON DELETE CASCADE,
   video_url   TEXT NOT NULL,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE IF NOT EXISTS land_videos (
-  id        UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id        UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   land_id   UUID NOT NULL REFERENCES lands(id) ON DELETE CASCADE,
   video_url TEXT NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -131,5 +131,5 @@ CREATE POLICY "Property videos: delete own" ON storage.objects
   FOR DELETE TO authenticated
   USING (
     bucket_id = 'property-videos'
-    AND owner_id = auth.uid()
+    AND owner_id = auth.uid()::text
   );

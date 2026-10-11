@@ -290,7 +290,7 @@ AdminDashboard → "Utilizadores"
 PropertyDetailScreen / LandDetailScreen
   → Tocar ícone WhatsApp
     → url_launcher: abre WhatsApp com:
-      → Número: +244 923 456 789
+      → Número: +244 942 203 497
       → Mensagem pré-definida: "Olá! Vim pelo app e gostaria de mais informações."
     → Se WhatsApp não instalado → erro silencioso
 ```

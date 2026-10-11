@@ -221,7 +221,7 @@ A navegação principal é feita via barra de navegação inferior fixa:
 - Via pacote `intl`
 
 ### Números de Telefone
-- Formato: `+244 923 456 789`
+- Formato: `+244 942 203 497`
 - Regex: `^(\+244\s?)?9[1-9]\d{7}$`
 
 ---

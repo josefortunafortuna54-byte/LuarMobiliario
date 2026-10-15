@@ -83,3 +83,18 @@ String landCategoryLabel(String key, AppLocalizations l10n) => switch (key) {
   'farm' => l10n.fazendas,
   _ => l10n.todos,
 };
+
+/// Finalidade (design de referência) e os tipos de imóvel que abrangem.
+///
+/// Só se aplica a imóveis: os terrenos têm classificação própria e não são
+/// filtrados por finalidade.
+const List<String> residentialPropertyTypes = ['house', 'apartment', 'condo'];
+const List<String> commercialPropertyTypes = ['office', 'warehouse', 'shop'];
+
+/// Converte uma finalidade (`residential`/`commercial`) na lista de tipos de
+/// imóvel correspondente, ou `null` quando não há finalidade definida.
+List<String>? purposePropertyTypes(String? purpose) => switch (purpose) {
+  'residential' => residentialPropertyTypes,
+  'commercial' => commercialPropertyTypes,
+  _ => null,
+};

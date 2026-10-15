@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/providers/auth_provider.dart';
+import '../../core/services/notification_service.dart';
 import '../../core/utils/routes.dart';
 import '../../l10n/app_localizations.dart';
 
@@ -71,6 +72,9 @@ class _SplashScreenState extends State<SplashScreen>
 
     if (!mounted) return;
     Navigator.of(context).pushReplacementNamed(AppRoutes.home);
+
+    // Notificação de arranque frio: navegar só agora, com o Navigator pronto.
+    NotificationService().consumePendingNavigation();
   }
 
   @override

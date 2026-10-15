@@ -1,7 +1,7 @@
 # Supabase config.toml — Luar Company Imobiliária
 # Usado pelo `supabase start` (local) e `supabase db push` (projeto ligado).
-# NOTA: `verify_jwt = false` nas funções é irrelevante porque a entrega FCM
-# depende da chave de servidor secreta; o RPC continua a validar permissões.
+# A função send-notification exige JWT válido (verify_jwt = true) e valida
+# adicionalmente o papel do chamador (agente/admin ou o próprio utilizador).
 
 project_id = "luar-company-mobiliario"
 
@@ -50,4 +50,4 @@ enabled = false
 
 [functions.send-notification]
 enabled = true
-verify_jwt = false
+verify_jwt = true

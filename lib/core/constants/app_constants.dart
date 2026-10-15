@@ -38,6 +38,8 @@ abstract final class AppConstants {
   static const String propertiesTable = 'properties';
   static const String landsTable = 'lands';
   static const String partnersTable = 'partners';
+  static const String partnersPublicView = 'partners_public';
+  static const String reportsTable = 'reports';
 
   // ── Firebase (via .env) ───────────────────────────────────────────
   // Valores carregados de EnvConfig - nao hardcode aqui
@@ -45,6 +47,11 @@ abstract final class AppConstants {
   // ── Pagination ─────────────────────────────────────────────────────
 
   static const int defaultPageSize = 20;
+
+  /// Limite de itens mantidos no feed Discover (evita crescimento sem fim
+  /// em sessões longas; a paginação pára ao atingir este valor).
+  static const int discoverMaxItems = 60;
+
   static const int maxImageUploads = 10;
   static const int maxVideoUploads = 5;
 
@@ -119,4 +126,5 @@ abstract final class AppConstants {
   static const String keyUserId = 'user_id';
   static const String keyThemeMode = 'theme_mode';
   static const String keyLocale = 'locale';
+  static const String keyAutoplayVideos = 'autoplay_videos';
 }

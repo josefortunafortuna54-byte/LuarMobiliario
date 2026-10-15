@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../core/constants/app_colors.dart';
 import '../core/constants/app_text_styles.dart';
 import '../core/providers/locale_provider.dart';
+import '../core/providers/playback_provider.dart';
 import '../core/providers/theme_provider.dart';
 import '../core/theme/app_palette.dart';
 import '../l10n/app_localizations.dart';
@@ -11,6 +12,7 @@ import '../l10n/app_localizations.dart';
 Future<void> showSettingsSheet(BuildContext context) async {
   final themeProvider = context.read<ThemeProvider>();
   final localeProvider = context.read<LocaleProvider>();
+  final playbackProvider = context.read<PlaybackProvider>();
   final l10n = AppLocalizations.of(context);
 
   await showModalBottomSheet<void>(
@@ -71,6 +73,29 @@ Future<void> showSettingsSheet(BuildContext context) async {
                 palette: palette,
                 onTap: () {
                   localeProvider.setLocale(const Locale('en'));
+                  Navigator.pop(ctx);
+                },
+              ),
+              const SizedBox(height: 8),
+              _SectionHeader(label: l10n.videos, palette: palette),
+              SwitchListTile(
+                title: Text(
+                  l10n.reproducaoAutomatica,
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: palette.textBody,
+                  ),
+                ),
+                subtitle: Text(
+                  l10n.reproducaoAutomaticaDesc,
+                  style: AppTextStyles.bodyTiny.copyWith(
+                    color: palette.textSecondary,
+                  ),
+                ),
+                value: playbackProvider.autoplay,
+                activeThumbColor: AppColors.gold,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                onChanged: (value) {
+                  playbackProvider.setAutoplay(value);
                   Navigator.pop(ctx);
                 },
               ),

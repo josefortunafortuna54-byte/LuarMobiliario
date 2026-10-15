@@ -59,4 +59,41 @@ void main() {
       );
     });
   });
+
+  group('purposePropertyTypes (finalidade)', () {
+    test('residential devolve apenas tipos residenciais', () {
+      expect(
+        purposePropertyTypes('residential'),
+        ['house', 'apartment', 'condo'],
+      );
+    });
+
+    test('commercial devolve apenas tipos comerciais', () {
+      expect(
+        purposePropertyTypes('commercial'),
+        ['office', 'warehouse', 'shop'],
+      );
+    });
+
+    test('sem finalidade devolve null', () {
+      expect(purposePropertyTypes(null), isNull);
+      expect(purposePropertyTypes(''), isNull);
+      expect(purposePropertyTypes('unknown'), isNull);
+    });
+
+    test('residential e commercial são disjuntos', () {
+      final res = purposePropertyTypes('residential')!;
+      final com = purposePropertyTypes('commercial')!;
+      expect(res.where(com.contains), isEmpty);
+    });
+
+    test('todas as finalidades existem em propertyCategories', () {
+      final categoryKeys = propertyCategories.map((c) => c.key).toSet();
+      final all = [
+        ...?purposePropertyTypes('residential'),
+        ...?purposePropertyTypes('commercial'),
+      ];
+      expect(all.every(categoryKeys.contains), isTrue);
+    });
+  });
 }

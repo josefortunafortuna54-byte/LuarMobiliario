@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../core/constants/app_colors.dart';
@@ -5,6 +6,7 @@ import '../core/constants/app_text_styles.dart';
 import '../core/theme/app_palette.dart';
 import '../core/utils/formatters.dart';
 import '../l10n/app_localizations.dart';
+import 'verified_badge.dart';
 
 class LandCard extends StatelessWidget {
   const LandCard({
@@ -18,6 +20,7 @@ class LandCard extends StatelessWidget {
     this.features = const [],
     this.onTap,
     this.onDetailsTap,
+    this.agentVerified = false,
   });
 
   final String imageUrl;
@@ -29,6 +32,7 @@ class LandCard extends StatelessWidget {
   final List<String> features;
   final VoidCallback? onTap;
   final VoidCallback? onDetailsTap;
+  final bool agentVerified;
 
   @override
   Widget build(BuildContext context) {
@@ -68,10 +72,11 @@ class LandCard extends StatelessWidget {
         SizedBox(
           height: 220,
           width: double.infinity,
-          child: Image.network(
-            imageUrl,
+          child: CachedNetworkImage(
+            imageUrl: imageUrl,
             fit: BoxFit.cover,
-            errorBuilder: (_, _, _) => Container(
+            memCacheWidth: 800,
+            errorWidget: (_, _, _) => Container(
               color: palette.surfaceAlt,
               child: Icon(
                 Icons.landscape_rounded,
@@ -170,6 +175,10 @@ class LandCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
+              if (agentVerified) ...[
+                const SizedBox(width: 6),
+                const VerifiedBadge(compact: true),
+              ],
             ],
           ),
           if (features.isNotEmpty) ...[

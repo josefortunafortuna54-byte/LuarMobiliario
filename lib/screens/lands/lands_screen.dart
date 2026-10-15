@@ -484,6 +484,7 @@ class _LandsScreenState extends State<LandsScreen> {
                   price: land.price,
                   badgeLabel: _landTypeLabel(l10n, land.type),
                   features: land.features,
+                  agentVerified: land.agentVerified,
                   onTap: () => Navigator.pushNamed(
                     context,
                     AppRoutes.landDetail,

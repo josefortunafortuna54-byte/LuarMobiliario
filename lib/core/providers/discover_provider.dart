@@ -49,7 +49,8 @@ class DiscoverProvider extends ChangeNotifier {
         ..clear()
         ..addAll(result);
       _page = 1;
-      _hasMore = result.length >= AppConstants.defaultPageSize;
+      _hasMore = result.length >= AppConstants.defaultPageSize &&
+          _items.length < AppConstants.discoverMaxItems;
     } catch (e) {
       _error = e.toString();
     } finally {
@@ -73,7 +74,8 @@ class DiscoverProvider extends ChangeNotifier {
       );
       _items.addAll(result);
       _page++;
-      _hasMore = result.length >= AppConstants.defaultPageSize;
+      _hasMore = result.length >= AppConstants.defaultPageSize &&
+          _items.length < AppConstants.discoverMaxItems;
     } catch (e) {
       _error = e.toString();
     } finally {

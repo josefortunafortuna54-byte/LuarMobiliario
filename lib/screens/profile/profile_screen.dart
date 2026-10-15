@@ -4,17 +4,30 @@ import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/constants/app_text_styles.dart';
+import '../../core/models/user_model.dart';
 import '../../core/providers/auth_provider.dart';
-import '../../core/providers/locale_provider.dart';
-import '../../core/providers/theme_provider.dart';
+import '../../core/providers/favorite_provider.dart';
+import '../../core/repositories/land_repository.dart';
+import '../../core/repositories/message_repository.dart';
+import '../../core/repositories/property_repository.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/utils/responsive.dart';
 import '../../core/utils/routes.dart';
 import '../../l10n/app_localizations.dart';
 import '../../widgets/avatar_widget.dart';
+import '../../widgets/custom_button.dart';
+import '../../widgets/settings_sheet.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
+
+  String _roleLabel(AppLocalizations l10n, UserRole role) {
+    return switch (role) {
+      UserRole.admin => l10n.administrador,
+      UserRole.agent => l10n.agenteImobiliario,
+      UserRole.client => l10n.cliente,
+    };
+  }
 
   void _showSignOutDialog(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -86,12 +99,19 @@ class ProfileScreen extends StatelessWidget {
               ),
               child: SingleChildScrollView(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _buildProfileHeader(context, user, isDesktop),
-                    const SizedBox(height: 8),
-                    _buildSettingsSection(context, padding: padding),
+                    _buildProfileHeader(context, user, l10n, isDesktop),
                     const SizedBox(height: 16),
-                    _buildMenuSection(context, padding: padding),
+                    _ProfileStats(userId: user.id),
+                    const SizedBox(height: 16),
+                    _buildActions(context, padding: padding),
+                    const SizedBox(height: 16),
+                    _buildMenuSection(
+                      context,
+                      role: user.role,
+                      padding: padding,
+                    ),
                     const SizedBox(height: 32),
                     _buildVersionInfo(context),
                     const SizedBox(height: 32),
@@ -108,10 +128,12 @@ class ProfileScreen extends StatelessWidget {
   Widget _buildProfileHeader(
     BuildContext context,
     dynamic user,
+    AppLocalizations l10n,
     bool isDesktop,
   ) {
-    final palette = context.palette;
-    final l10n = AppLocalizations.of(context);
+    final role = user?.role as UserRole? ?? UserRole.client;
+    final verified = user?.verified as bool? ?? false;
+
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(vertical: isDesktop ? 48 : 40),
@@ -132,31 +154,91 @@ class ProfileScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(user?.name ?? l10n.utilizador, style: AppTextStyles.h4White),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           Text(
-            user?.email ?? '',
-            style: AppTextStyles.bodySmall.copyWith(color: palette.textMuted),
+            _roleLabel(l10n, role),
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.white.withValues(alpha: 0.85),
+            ),
           ),
-          if (user?.phone != null && user!.phone.isNotEmpty) ...[
-            const SizedBox(height: 4),
-            Text(
-              user.phone,
-              style: AppTextStyles.bodySmall.copyWith(color: palette.textMuted),
+          if (verified) ...[
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+              decoration: BoxDecoration(
+                color: AppColors.gold.withValues(alpha: 0.18),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: AppColors.gold.withValues(alpha: 0.45),
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.verified_user_rounded,
+                    size: 16,
+                    color: AppColors.gold,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    l10n.verificado,
+                    style: AppTextStyles.labelMedium.copyWith(
+                      color: AppColors.gold,
+                      letterSpacing: 0.4,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.gold.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppColors.gold.withValues(alpha: 0.3)),
+          if (user?.email != null && user!.email.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            Text(
+              user.email,
+              style: AppTextStyles.bodySmall.copyWith(
+                color: AppColors.white.withValues(alpha: 0.7),
+              ),
             ),
-            child: Text(
-              (user?.role?.name ?? 'client').toUpperCase(),
-              style: AppTextStyles.labelMedium.copyWith(
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActions(BuildContext context, {double padding = 16}) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: padding),
+      child: Row(
+        children: [
+          Expanded(
+            child: CustomButton(
+              text: l10n.editarPerfil,
+              variant: CustomButtonVariant.outline,
+              icon: Icons.edit_outlined,
+              onPressed: () =>
+                  Navigator.of(context).pushNamed(AppRoutes.editProfile),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Container(
+            height: 48,
+            width: 48,
+            decoration: BoxDecoration(
+              color: palette.surface,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: palette.border),
+            ),
+            child: IconButton(
+              tooltip: l10n.definicoes,
+              onPressed: () => showSettingsSheet(context),
+              icon: const Icon(
+                Icons.settings_outlined,
                 color: AppColors.gold,
-                letterSpacing: 1.2,
+                size: 22,
               ),
             ),
           ),
@@ -165,24 +247,27 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuSection(BuildContext context, {double padding = 16}) {
+  Widget _buildMenuSection(
+    BuildContext context, {
+    required UserRole role,
+    double padding = 16,
+  }) {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
+    final canManageListings =
+        role == UserRole.agent || role == UserRole.admin;
+
     final menuItems = [
-      _MenuItem(
-        icon: Icons.edit_outlined,
-        title: l10n.editarPerfil,
-        route: AppRoutes.editProfile,
-      ),
+      if (canManageListings)
+        _MenuItem(
+          icon: Icons.home_work_outlined,
+          title: l10n.meusAnuncios,
+          route: AppRoutes.myListings,
+        ),
       _MenuItem(
         icon: Icons.favorite_border_rounded,
         title: l10n.favoritos,
         route: AppRoutes.favorites,
-      ),
-      _MenuItem(
-        icon: Icons.calendar_today_outlined,
-        title: l10n.agendamentos,
-        route: AppRoutes.bookings,
       ),
       _MenuItem(
         icon: Icons.chat_bubble_outline_rounded,
@@ -190,9 +275,14 @@ class ProfileScreen extends StatelessWidget {
         route: AppRoutes.messages,
       ),
       _MenuItem(
-        icon: Icons.handshake_outlined,
-        title: l10n.parceiros,
-        route: AppRoutes.partners,
+        icon: Icons.calendar_today_outlined,
+        title: l10n.agendamentos,
+        route: AppRoutes.bookings,
+      ),
+      _MenuItem(
+        icon: Icons.settings_outlined,
+        title: l10n.definicoes,
+        onTap: (ctx) => showSettingsSheet(ctx),
       ),
       _MenuItem(
         icon: Icons.logout_rounded,
@@ -229,6 +319,8 @@ class ProfileScreen extends StatelessWidget {
                   onTap: () {
                     if (item.isDestructive) {
                       _showSignOutDialog(context);
+                    } else if (item.onTap != null) {
+                      item.onTap!(context);
                     } else if (item.route != null) {
                       Navigator.of(context).pushNamed(item.route!);
                     }
@@ -293,235 +385,6 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSettingsSection(BuildContext context, {double padding = 16}) {
-    final palette = context.palette;
-    final l10n = AppLocalizations.of(context);
-    final themeProvider = context.watch<ThemeProvider>();
-    final localeProvider = context.watch<LocaleProvider>();
-
-    final themeLabel = switch (themeProvider.preference) {
-      ThemePreference.system => l10n.temaSistema,
-      ThemePreference.light => l10n.temaClaro,
-      ThemePreference.dark => l10n.temaEscuro,
-    };
-    final languageLabel = localeProvider.locale.languageCode == 'en'
-        ? l10n.ingles
-        : l10n.portugues;
-
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: padding),
-      decoration: BoxDecoration(
-        color: palette.surface,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.navy.withValues(alpha: 0.06),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-        border: Border.all(color: palette.border),
-      ),
-      child: Column(
-        children: [
-          _buildSettingRow(
-            context,
-            icon: Icons.dark_mode_outlined,
-            title: l10n.aparencia,
-            value: themeLabel,
-            onTap: () => _showThemeSheet(context),
-          ),
-          Divider(height: 1, indent: 74, color: palette.border),
-          _buildSettingRow(
-            context,
-            icon: Icons.language_outlined,
-            title: l10n.idioma,
-            value: languageLabel,
-            onTap: () => _showLanguageSheet(context),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSettingRow(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required String value,
-    required VoidCallback onTap,
-  }) {
-    final palette = context.palette;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        highlightColor: AppColors.gold.withValues(alpha: 0.05),
-        splashColor: AppColors.gold.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          child: Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppColors.gold.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(icon, size: 20, color: AppColors.gold),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Text(
-                  title,
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: palette.textBody,
-                  ),
-                ),
-              ),
-              Text(
-                value,
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: palette.textSecondary,
-                ),
-              ),
-              const SizedBox(width: 6),
-              Icon(
-                Icons.chevron_right_rounded,
-                size: 22,
-                color: palette.textMuted,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _showThemeSheet(BuildContext context) async {
-    final provider = context.read<ThemeProvider>();
-    final l10n = AppLocalizations.of(context);
-    await showModalBottomSheet<void>(
-      context: context,
-      builder: (ctx) {
-        final palette = ctx.palette;
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
-                child: Row(
-                  children: [
-                    Text(l10n.aparencia, style: AppTextStyles.h6),
-                  ],
-                ),
-              ),
-              _buildChoiceTile(
-                context: ctx,
-                palette: palette,
-                label: l10n.temaSistema,
-                selected: provider.preference == ThemePreference.system,
-                onTap: () {
-                  provider.setPreference(ThemePreference.system);
-                  Navigator.pop(ctx);
-                },
-              ),
-              _buildChoiceTile(
-                context: ctx,
-                palette: palette,
-                label: l10n.temaClaro,
-                selected: provider.preference == ThemePreference.light,
-                onTap: () {
-                  provider.setPreference(ThemePreference.light);
-                  Navigator.pop(ctx);
-                },
-              ),
-              _buildChoiceTile(
-                context: ctx,
-                palette: palette,
-                label: l10n.temaEscuro,
-                selected: provider.preference == ThemePreference.dark,
-                onTap: () {
-                  provider.setPreference(ThemePreference.dark);
-                  Navigator.pop(ctx);
-                },
-              ),
-              const SizedBox(height: 8),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Future<void> _showLanguageSheet(BuildContext context) async {
-    final provider = context.read<LocaleProvider>();
-    final l10n = AppLocalizations.of(context);
-    await showModalBottomSheet<void>(
-      context: context,
-      builder: (ctx) {
-        final palette = ctx.palette;
-        final code = provider.locale.languageCode;
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
-                child: Row(
-                  children: [Text(l10n.idioma, style: AppTextStyles.h6)],
-                ),
-              ),
-              _buildChoiceTile(
-                context: ctx,
-                palette: palette,
-                label: l10n.portugues,
-                selected: code == 'pt',
-                onTap: () {
-                  provider.setLocale(const Locale('pt'));
-                  Navigator.pop(ctx);
-                },
-              ),
-              _buildChoiceTile(
-                context: ctx,
-                palette: palette,
-                label: l10n.ingles,
-                selected: code == 'en',
-                onTap: () {
-                  provider.setLocale(const Locale('en'));
-                  Navigator.pop(ctx);
-                },
-              ),
-              const SizedBox(height: 8),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildChoiceTile({
-    required BuildContext context,
-    required AppPalette palette,
-    required String label,
-    required bool selected,
-    required VoidCallback onTap,
-  }) {
-    return ListTile(
-      title: Text(
-        label,
-        style: AppTextStyles.bodyMedium.copyWith(color: palette.textBody),
-      ),
-      trailing: selected
-          ? const Icon(Icons.check_rounded, color: AppColors.gold)
-          : null,
-      onTap: onTap,
-    );
-  }
-
   Widget _buildVersionInfo(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Text(
@@ -577,16 +440,149 @@ class ProfileScreen extends StatelessWidget {
   }
 }
 
+/// Estatísticas do perfil — apenas com dados reais da base de dados:
+/// anúncios publicados, favoritos guardados e conversas de mensagens.
+class _ProfileStats extends StatefulWidget {
+  const _ProfileStats({required this.userId});
+
+  final String userId;
+
+  @override
+  State<_ProfileStats> createState() => _ProfileStatsState();
+}
+
+class _ProfileStatsState extends State<_ProfileStats> {
+  int? _listings;
+  int? _messages;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<FavoriteProvider>().loadFavorites(widget.userId);
+    });
+  }
+
+  Future<void> _load() async {
+    int listings = 0;
+    int messages = 0;
+
+    try {
+      final properties = await PropertyRepository().countByAgent(widget.userId);
+      final lands = await LandRepository().countByAgent(widget.userId);
+      listings = properties + lands;
+    } catch (_) {
+      listings = 0;
+    }
+
+    try {
+      final conversations = await MessageRepository()
+          .fetchConversations(widget.userId);
+      messages = conversations.length;
+    } catch (_) {
+      messages = 0;
+    }
+
+    if (!mounted) return;
+    setState(() {
+      _listings = listings;
+      _messages = messages;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
+    final favorites = context.watch<FavoriteProvider>().favorites.length;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 8),
+        decoration: BoxDecoration(
+          color: palette.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: palette.border),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.navy.withValues(alpha: 0.06),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: _StatItem(
+                value: _listings,
+                label: l10n.anuncios,
+              ),
+            ),
+            Container(width: 1, height: 44, color: palette.border),
+            Expanded(
+              child: _StatItem(
+                value: favorites,
+                label: l10n.favoritos,
+              ),
+            ),
+            Container(width: 1, height: 44, color: palette.border),
+            Expanded(
+              child: _StatItem(
+                value: _messages,
+                label: l10n.mensagens,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StatItem extends StatelessWidget {
+  const _StatItem({required this.value, required this.label});
+
+  final int? value;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          value == null ? '—' : '$value',
+          style: AppTextStyles.h5.copyWith(color: palette.textBody),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: AppTextStyles.bodySmall.copyWith(color: palette.textSecondary),
+        ),
+      ],
+    );
+  }
+}
+
 class _MenuItem {
   final IconData icon;
   final String title;
   final String? route;
   final bool isDestructive;
+  final void Function(BuildContext)? onTap;
 
   const _MenuItem({
     required this.icon,
     required this.title,
     this.route,
     this.isDestructive = false,
+    this.onTap,
   });
 }

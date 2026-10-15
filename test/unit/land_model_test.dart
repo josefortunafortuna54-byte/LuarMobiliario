@@ -258,9 +258,9 @@ void main() {
       expect(json.containsKey('images'), isTrue);
     });
 
-    test('has 22 keys', () {
+    test('has 24 keys', () {
       final json = createSubject().toJson();
-      expect(json.length, 23);
+      expect(json.length, 24);
     });
   });
 

@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import '../../screens/splash/splash_screen.dart';
 import '../../screens/welcome/welcome_screen.dart';
 import '../../screens/auth/admin_login_screen.dart';
-import '../../screens/home/home_screen.dart';
+import '../../screens/home/main_shell.dart';
 import '../../screens/discover/discover_screen.dart';
+import '../../screens/comparison/comparison_screen.dart';
+import '../../screens/search/filters_screen.dart';
 import '../../screens/search/search_screen.dart';
 import '../../screens/properties/properties_screen.dart';
 import '../../screens/properties/property_detail_screen.dart';
@@ -12,6 +14,7 @@ import '../../screens/lands/lands_screen.dart';
 import '../../screens/lands/land_detail_screen.dart';
 import '../../screens/favorites/favorites_screen.dart';
 import '../../screens/messages/messages_screen.dart';
+import '../../screens/profile/my_listings_screen.dart';
 import '../../screens/profile/profile_screen.dart';
 import '../../screens/bookings/bookings_screen.dart';
 import '../../screens/admin/admin_dashboard.dart';
@@ -19,6 +22,7 @@ import '../../screens/admin/admin_properties.dart';
 import '../../screens/admin/admin_users.dart';
 import '../../screens/admin/admin_lands.dart';
 import '../../screens/admin/admin_bookings.dart';
+import '../../screens/admin/admin_reports.dart';
 import '../../screens/messages/chat_screen.dart';
 import '../../screens/properties/property_form_screen.dart';
 import '../../screens/lands/land_form_screen.dart';
@@ -32,7 +36,9 @@ abstract final class AppRoutes {
   static const String adminLogin = '/admin-login';
   static const String home = '/home';
   static const String discover = '/discover';
+  static const String comparison = '/comparison';
   static const String search = '/search';
+  static const String filters = '/filters';
   static const String properties = '/properties';
   static const String propertyDetail = '/properties/:id';
   static const String lands = '/lands';
@@ -46,12 +52,73 @@ abstract final class AppRoutes {
   static const String adminLands = '/admin/lands';
   static const String adminUsers = '/admin/users';
   static const String adminBookings = '/admin/bookings';
+  static const String adminReports = '/admin/reports';
   static const String chat = '/chat';
   static const String propertyForm = '/property-form';
   static const String landForm = '/land-form';
   static const String editProfile = '/edit-profile';
+  static const String myListings = '/my-listings';
   static const String partners = '/partners';
   static const String partnerForm = '/partner-form';
+
+  /// Rotas estáticas que uma notificação pode abrir (allowlist fechada).
+  /// Exclui splash/welcome/adminLogin: reencaminhar o utilizador para o
+  /// arranque ou para o login de admin a partir de um payload não confiável
+  /// não faz sentido.
+  static const Set<String> _notificationRoutes = {
+    home,
+    discover,
+    comparison,
+    search,
+    properties,
+    lands,
+    favorites,
+    messages,
+    profile,
+    bookings,
+    adminDashboard,
+    adminProperties,
+    adminLands,
+    adminUsers,
+    adminBookings,
+    adminReports,
+    chat,
+    propertyForm,
+    landForm,
+    editProfile,
+    partners,
+    partnerForm,
+  };
+
+  /// Valida um payload de rota vindo de uma notificação (FCM ou notificação
+  /// local) contra as rotas conhecidas da app.
+  ///
+  /// Devolve o nome da rota e os arguments a passar (o id, no caso das rotas
+  /// de detalhe), ou `null` se o payload não for seguro/conhecido.
+  static ({String name, Object? arguments})? parse(String? route) {
+    if (route == null || route.isEmpty) return null;
+
+    final path = Uri.tryParse(route)?.path ?? '';
+    if (path.isEmpty || !path.startsWith('/')) return null;
+
+    if (_notificationRoutes.contains(path)) {
+      return (name: path, arguments: null);
+    }
+
+    final segments = path.split('/').where((s) => s.isNotEmpty).toList();
+    if (segments.length == 2) {
+      final id = segments[1];
+      if (id.isEmpty || id.contains('/') || id.contains(':')) return null;
+      if (segments[0] == 'properties') {
+        return (name: propertyDetail, arguments: id);
+      }
+      if (segments[0] == 'lands') {
+        return (name: landDetail, arguments: id);
+      }
+    }
+
+    return null;
+  }
 }
 
 Route<dynamic> onGenerateRoute(RouteSettings settings) {
@@ -61,7 +128,7 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     return _buildRoute(
       const PropertyDetailScreen(),
       settings,
-      arguments: settings.arguments,
+      arguments: settings.arguments ?? _idFromPath(name, 'properties'),
     );
   }
 
@@ -69,7 +136,7 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     return _buildRoute(
       const LandDetailScreen(),
       settings,
-      arguments: settings.arguments,
+      arguments: settings.arguments ?? _idFromPath(name, 'lands'),
     );
   }
 
@@ -84,13 +151,19 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
       return _buildRoute(const AdminLoginScreen(), settings);
 
     case AppRoutes.home:
-      return _buildRoute(const HomeScreen(), settings);
+      return _buildRoute(const MainShell(), settings);
 
     case AppRoutes.discover:
       return _buildRoute(const DiscoverScreen(), settings);
 
+    case AppRoutes.comparison:
+      return _buildRoute(const ComparisonScreen(), settings);
+
     case AppRoutes.search:
       return _buildRoute(const SearchScreen(), settings);
+
+    case AppRoutes.filters:
+      return _buildRoute(const FiltersScreen(), settings);
 
     case AppRoutes.properties:
       return _buildRoute(const PropertiesScreen(), settings);
@@ -125,6 +198,9 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     case AppRoutes.adminBookings:
       return _buildRoute(const AdminBookingsScreen(), settings);
 
+    case AppRoutes.adminReports:
+      return _buildRoute(const AdminReportsScreen(), settings);
+
     case AppRoutes.chat:
       return _buildRoute(const ChatScreen(), settings, arguments: settings.arguments);
 
@@ -137,6 +213,9 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     case AppRoutes.editProfile:
       return _buildRoute(const EditProfileScreen(), settings);
 
+    case AppRoutes.myListings:
+      return _buildRoute(const MyListingsScreen(), settings);
+
     case AppRoutes.partners:
       return _buildRoute(const PartnersScreen(), settings);
 
@@ -146,6 +225,15 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     default:
       return _buildRoute(const WelcomeScreen(), settings);
   }
+}
+
+/// Extrai o id do segmento final de um caminho `/properties/<id>` ou
+/// `/lands/<id>`. Devolve `null` se o caminho não tiver um id válido.
+String? _idFromPath(String path, String prefix) {
+  final segments = path.split('/').where((s) => s.isNotEmpty).toList();
+  if (segments.length != 2 || segments[0] != prefix) return null;
+  final id = segments[1];
+  return id.isEmpty || id.contains(':') ? null : id;
 }
 
 PageRouteBuilder _buildRoute(

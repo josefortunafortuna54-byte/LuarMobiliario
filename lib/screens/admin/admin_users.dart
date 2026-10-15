@@ -376,12 +376,14 @@ class _UserDetailSheet extends StatefulWidget {
 
 class _UserDetailSheetState extends State<_UserDetailSheet> {
   late UserRole _selectedRole;
+  late bool _isVerified;
   bool _isUpdating = false;
 
   @override
   void initState() {
     super.initState();
     _selectedRole = widget.user.role;
+    _isVerified = widget.user.verified;
   }
 
   String _formatDate(DateTime date) {
@@ -465,6 +467,10 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
 
             if (!isCurrentUser) ...[
               _buildRoleSection(),
+              if (widget.user.role == UserRole.agent) ...[
+                const SizedBox(height: 16),
+                _buildVerificationSection(),
+              ],
               const SizedBox(height: 16),
               _buildDeleteSection(),
             ],
@@ -569,6 +575,123 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
               ),
             ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildVerificationSection() {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
+    final color = _isVerified ? AppColors.info : palette.textMuted;
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: _isVerified
+            ? AppColors.info.withValues(alpha: 0.04)
+            : palette.background,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: _isVerified
+              ? AppColors.info.withValues(alpha: 0.25)
+              : palette.borderStrong,
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            _isVerified
+                ? Icons.verified_user_rounded
+                : Icons.help_outline_rounded,
+            size: 20,
+            color: color,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _isVerified
+                      ? l10n.anuncianteVerificado
+                      : l10n.verificarAnunciante,
+                  style: AppTextStyles.bodyMediumBold,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  widget.user.email,
+                  style: AppTextStyles.bodyTiny.copyWith(
+                    color: palette.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          TextButton(
+            onPressed: _isUpdating ? null : () => _toggleVerification(),
+            style: TextButton.styleFrom(
+              foregroundColor: _isVerified ? AppColors.error : AppColors.info,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              _isVerified ? l10n.retirarVerificacao : l10n.verificarAnunciante,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _toggleVerification() async {
+    final l10n = AppLocalizations.of(context);
+    final actorId = context.read<AuthProvider>().user?.id;
+    if (actorId == null) return;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(
+          _isVerified ? l10n.retirarVerificacao : l10n.verificarAnunciante,
+        ),
+        content: Text(l10n.temCertezaRemover(widget.user.name)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.cancelar),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.navy),
+            child: Text(l10n.confirmar),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    setState(() => _isUpdating = true);
+    final admin = context.read<AdminProvider>();
+    final newVerified = !_isVerified;
+    final success = await admin.setUserVerified(
+      userId: widget.user.id,
+      verified: newVerified,
+      actorId: actorId,
+    );
+
+    if (!mounted) return;
+    setState(() {
+      _isUpdating = false;
+      if (success) _isVerified = newVerified;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(success ? l10n.verificacaoAlterada : l10n.erroVerificacao),
+        backgroundColor: success ? AppColors.success : AppColors.error,
       ),
     );
   }

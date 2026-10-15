@@ -9,7 +9,7 @@ class PartnerRepository {
 
   Future<List<PartnerModel>> fetchAll() async {
     final response = await _client
-        .from(AppConstants.partnersTable)
+        .from(AppConstants.partnersPublicView)
         .select()
         .order('company_name', ascending: true);
 

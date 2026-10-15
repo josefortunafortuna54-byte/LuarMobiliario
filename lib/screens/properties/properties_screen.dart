@@ -471,6 +471,7 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
                   bedrooms: property.bedrooms,
                   bathrooms: property.bathrooms,
                   area: property.area,
+                  agentVerified: property.agentVerified,
                   onTap: () => Navigator.pushNamed(
                     context,
                     AppRoutes.propertyDetail,

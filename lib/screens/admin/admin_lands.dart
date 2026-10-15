@@ -75,7 +75,7 @@ class _AdminLandsScreenState extends State<AdminLandsScreen> {
       if (i > 0 && (parts[0].length - i) % 3 == 0) buffer.write('.');
       buffer.write(parts[0][i]);
     }
-    return 'AOA ${buffer.toString()}';
+    return '${buffer.toString()} Kz';
   }
 
   Future<void> _deleteLand(LandModel land) async {

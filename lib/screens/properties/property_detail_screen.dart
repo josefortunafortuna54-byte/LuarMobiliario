@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -7,10 +8,14 @@ import '../../core/constants/app_colors.dart';
 
 import '../../core/constants/app_text_styles.dart';
 import '../../core/models/property_model.dart';
+import '../../core/models/report_model.dart';
 import '../../core/providers/property_provider.dart';
 import '../../core/providers/favorite_provider.dart';
 import '../../core/providers/auth_provider.dart';
+import '../../core/providers/comparison_provider.dart';
 import '../../core/theme/app_palette.dart';
+import '../../core/utils/deep_links.dart';
+import '../../core/utils/formatters.dart';
 import '../../core/utils/routes.dart';
 import '../../l10n/app_localizations.dart';
 import '../../screens/bookings/booking_bottom_sheet.dart';
@@ -18,6 +23,8 @@ import '../../screens/videos/video_viewer_screen.dart';
 import '../../widgets/loading_widget.dart';
 import '../../widgets/avatar_widget.dart';
 import '../../widgets/feature_chip.dart';
+import '../../widgets/report_dialog.dart';
+import '../../widgets/verified_badge.dart';
 
 class PropertyDetailScreen extends StatefulWidget {
   const PropertyDetailScreen({super.key});
@@ -176,9 +183,9 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
             SharePlus.instance.share(
               ShareParams(
                 text:
-                    '${property.title} - AOA ${property.price.toStringAsFixed(0)}\n'
+                    '${property.title} - ${formatPrice(property.price)}\n'
                     '${l10n.localizacao}: $location\n'
-                    '${l10n.verEmLuar}',
+                    '${DeepLinks.property(property.id)}',
               ),
             );
           },
@@ -199,6 +206,15 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                 : Icons.favorite_border_rounded,
             color: _isFavorite ? AppColors.gold : AppColors.white,
           ),
+        ),
+        IconButton(
+          onPressed: () => showReportDialog(
+            context,
+            targetType: ReportTarget.property,
+            targetId: property.id,
+          ),
+          icon: const Icon(Icons.flag_outlined, color: AppColors.white),
+          tooltip: l10n.reportar,
         ),
         const SizedBox(width: 4),
       ],
@@ -223,10 +239,11 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                     return Stack(
                       fit: StackFit.expand,
                       children: [
-                        Image.network(
-                          images[index],
+                        CachedNetworkImage(
+                          imageUrl: images[index],
                           fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) => Container(
+                          memCacheWidth: 1080,
+                          errorWidget: (_, _, _) => Container(
                             color: palette.surfaceAlt,
                             child: Icon(
                               Icons.apartment_rounded,
@@ -432,7 +449,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'AOA ${property.price.toStringAsFixed(0)}',
+            formatPrice(property.price),
             style: AppTextStyles.priceLarge,
           ),
           if (isRent)
@@ -690,6 +707,10 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                           color: palette.textTitle,
                         ),
                       ),
+                      if (property.agentVerified) ...[
+                        const SizedBox(height: 4),
+                        const VerifiedBadge(),
+                      ],
                       const SizedBox(height: 4),
                       Text(
                         property.agentPhone,
@@ -757,6 +778,9 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
   Widget _buildBottomActions(PropertyModel property) {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
+    final comparison = context.watch<ComparisonProvider>();
+    final isCompared = comparison.isSelected(property.id);
+
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 28),
       decoration: BoxDecoration(
@@ -801,6 +825,8 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                 ),
               ),
             ),
+            const SizedBox(height: 10),
+            _buildCompareButton(property, isCompared, comparison, l10n),
             const SizedBox(height: 10),
             Row(
               children: [
@@ -874,6 +900,81 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCompareButton(
+    PropertyModel property,
+    bool isCompared,
+    ComparisonProvider comparison,
+    AppLocalizations l10n,
+  ) {
+    return SizedBox(
+      width: double.infinity,
+      height: 44,
+      child: OutlinedButton.icon(
+        onPressed: () {
+          if (!isCompared && comparison.isFull) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(l10n.limiteComparacao),
+                backgroundColor: AppColors.navy,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            );
+            return;
+          }
+
+          comparison.toggle(property);
+
+          if (!isCompared && comparison.canCompare) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  l10n.imovelAdicionadoComparacao(comparison.count),
+                ),
+                backgroundColor: AppColors.gold,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                action: SnackBarAction(
+                  label: l10n.comparar,
+                  textColor: AppColors.white,
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(AppRoutes.comparison);
+                  },
+                ),
+              ),
+            );
+          }
+        },
+        icon: Icon(
+          isCompared
+              ? Icons.check_circle_rounded
+              : Icons.compare_arrows_rounded,
+          size: 18,
+        ),
+        label: Text(
+          isCompared ? l10n.comparando : l10n.adicionarComparacao,
+          style: AppTextStyles.buttonMedium.copyWith(
+            color: isCompared ? AppColors.gold : AppColors.navy,
+          ),
+        ),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: isCompared ? AppColors.gold : AppColors.navy,
+          side: BorderSide(
+            color: isCompared ? AppColors.gold : AppColors.navy,
+            width: 1.5,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
         ),
       ),
     );

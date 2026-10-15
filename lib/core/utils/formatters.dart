@@ -1,17 +1,5 @@
-String formatPrice(double value) {
-  final text = value.toStringAsFixed(0);
-  final buffer = StringBuffer();
-  var count = 0;
-
-  for (var i = text.length - 1; i >= 0; i--) {
-    if (count > 0 && count % 3 == 0) buffer.write('.');
-    buffer.write(text[i]);
-    count++;
-  }
-
-  final formatted = buffer.toString().split('').reversed.join();
-  return 'AOA $formatted';
-}
+/// Preço no formato do design de referência: `85.000.000 Kz`.
+String formatPrice(double value) => formatPriceCurrency(value);
 
 String formatDate(DateTime date) {
   final day = date.day.toString().padLeft(2, '0');
@@ -67,5 +55,5 @@ String formatPriceRaw(double value) {
 }
 
 String formatPriceCurrency(double value) {
-  return 'AOA ${formatPriceRaw(value)}';
+  return '${formatPriceRaw(value)} Kz';
 }

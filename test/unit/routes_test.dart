@@ -57,4 +57,63 @@ void main() {
       expect(AppRoutes.adminUsers.contains(':id'), isFalse);
     });
   });
+
+  group('AppRoutes.parse', () {
+    test('accepts known static routes', () {
+      expect(AppRoutes.parse('/favorites')?.name, AppRoutes.favorites);
+      expect(AppRoutes.parse('/bookings')?.name, AppRoutes.bookings);
+      expect(AppRoutes.parse('/messages')?.name, AppRoutes.messages);
+      expect(AppRoutes.parse('/profile')?.name, AppRoutes.profile);
+      expect(AppRoutes.parse('/admin/users')?.name, AppRoutes.adminUsers);
+      expect(AppRoutes.parse('/favorites')?.arguments, isNull);
+    });
+
+    test('accepts property detail and extracts the id', () {
+      final parsed = AppRoutes.parse('/properties/abc-123');
+      expect(parsed?.name, AppRoutes.propertyDetail);
+      expect(parsed?.arguments, 'abc-123');
+    });
+
+    test('accepts land detail and extracts the id', () {
+      final parsed = AppRoutes.parse('/lands/xyz-789');
+      expect(parsed?.name, AppRoutes.landDetail);
+      expect(parsed?.arguments, 'xyz-789');
+    });
+
+    test('strips query string when parsing', () {
+      final parsed = AppRoutes.parse('/properties/abc-123?utm=push');
+      expect(parsed?.name, AppRoutes.propertyDetail);
+      expect(parsed?.arguments, 'abc-123');
+    });
+
+    test('rejects null and empty', () {
+      expect(AppRoutes.parse(null), isNull);
+      expect(AppRoutes.parse(''), isNull);
+    });
+
+    test('rejects unknown routes', () {
+      expect(AppRoutes.parse('/evil'), isNull);
+      expect(AppRoutes.parse('/settings'), isNull);
+      expect(AppRoutes.parse('/admin'), isNull);
+      expect(AppRoutes.parse('/properties/extra/segment'), isNull);
+    });
+
+    test('rejects splash, welcome and admin login', () {
+      expect(AppRoutes.parse(AppRoutes.splash), isNull);
+      expect(AppRoutes.parse(AppRoutes.welcome), isNull);
+      expect(AppRoutes.parse(AppRoutes.adminLogin), isNull);
+    });
+
+    test('rejects path traversal and malformed ids', () {
+      expect(AppRoutes.parse('/properties/../admin'), isNull);
+      expect(AppRoutes.parse('/properties/a/b'), isNull);
+      expect(AppRoutes.parse('/properties/:id'), isNull);
+      expect(AppRoutes.parse('/lands/:id'), isNull);
+    });
+
+    test('rejects routes without a leading slash', () {
+      expect(AppRoutes.parse('properties/abc'), isNull);
+      expect(AppRoutes.parse('favorites'), isNull);
+    });
+  });
 }

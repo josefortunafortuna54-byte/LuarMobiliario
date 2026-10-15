@@ -55,6 +55,9 @@ class PropertyRepository {
           case 'transactionType':
             query = query.eq('transaction_type', entry.value);
             break;
+          case 'province':
+            query = query.ilike('province', '%${entry.value}%');
+            break;
           case 'city':
             query = query.ilike('city', '%${entry.value}%');
             break;
@@ -115,7 +118,7 @@ class PropertyRepository {
   Future<List<PropertyModel>> fetchFeatured({int limit = 10}) async {
     final response = await _client
         .from('properties')
-        .select('*, property_images(image_url)')
+        .select('*, property_images(image_url), property_videos(video_url)')
         .eq('is_featured', true)
         .eq('is_available', true)
         .order('created_at', ascending: false)
@@ -127,7 +130,7 @@ class PropertyRepository {
   Future<PropertyModel> fetchById(String id) async {
     final response = await _client
         .from('properties')
-        .select('*, property_images(image_url)')
+        .select('*, property_images(image_url), property_videos(video_url)')
         .eq('id', id)
         .single();
 
@@ -225,7 +228,9 @@ class PropertyRepository {
   Future<List<PropertyModel>> searchAdvanced({
     String? query,
     String? type,
+    List<String>? types,
     String? transactionType,
+    String? province,
     String? city,
     String? municipality,
     String? neighborhood,
@@ -236,20 +241,28 @@ class PropertyRepository {
     int? bedrooms,
     int? bathrooms,
     int? garage,
+    int page = 0,
+    int pageSize = AppConstants.defaultPageSize,
+    String orderBy = 'created_at',
+    bool ascending = false,
   }) async {
     var queryBuilder = _client
         .from('properties')
-        .select()
+        .select('*, property_images(image_url), property_videos(video_url)')
         .eq('is_available', true);
 
     if (query != null && query.isNotEmpty) {
       queryBuilder = queryBuilder.or(
-        'title.ilike.%$query%,description.ilike.%$query%,address.ilike.%$query%,city.ilike.%$query%,municipality.ilike.%$query%,neighborhood.ilike.%$query%',
+        'title.ilike.%$query%,description.ilike.%$query%,address.ilike.%$query%,province.ilike.%$query%,city.ilike.%$query%,municipality.ilike.%$query%,neighborhood.ilike.%$query%',
       );
     }
 
     if (transactionType != null) {
       queryBuilder = queryBuilder.eq('transaction_type', transactionType);
+    }
+
+    if (province != null) {
+      queryBuilder = queryBuilder.ilike('province', '%$province%');
     }
 
     if (city != null) {
@@ -296,24 +309,55 @@ class PropertyRepository {
       queryBuilder = queryBuilder.eq('type', type);
     }
 
-    final response = await queryBuilder
-        .order('created_at', ascending: false)
-        .limit(AppConstants.defaultPageSize);
+    if (types != null && types.isNotEmpty) {
+      queryBuilder = queryBuilder.inFilter('type', types);
+    }
 
-    return (response as List)
-        .map((json) => PropertyModel.fromJson(json as Map<String, dynamic>))
-        .toList();
+    final from = page * pageSize;
+    final to = from + pageSize - 1;
+
+    final response = await queryBuilder
+        .order(orderBy, ascending: ascending)
+        .range(from, to);
+
+    return _mapResponse(response as List);
+  }
+
+  /// Anúncios do agente (inclui os indisponíveis, para gestão própria).
+  Future<List<PropertyModel>> fetchByAgent(String agentId) async {
+    final response = await _client
+        .from('properties')
+        .select('*, property_images(image_url), property_videos(video_url)')
+        .eq('agent_id', agentId)
+        .order('created_at', ascending: false);
+
+    return _mapResponse(response as List);
+  }
+
+  /// Número de anúncios do agente (estatística do perfil).
+  Future<int> countByAgent(String agentId) async {
+    final response = await _client
+        .from('properties')
+        .select('id')
+        .eq('agent_id', agentId);
+    return (response as List).length;
+  }
+
+  /// Ativa ou desativa a publicação de um anúncio do próprio agente.
+  Future<void> setAvailable(String id, bool available) async {
+    await _client
+        .from('properties')
+        .update({'is_available': available})
+        .eq('id', id);
   }
 
   Future<List<PropertyModel>> fetchByIds(List<String> ids) async {
     if (ids.isEmpty) return [];
     final response = await _client
         .from('properties')
-        .select()
+        .select('*, property_images(image_url), property_videos(video_url)')
         .inFilter('id', ids);
 
-    return (response as List)
-        .map((json) => PropertyModel.fromJson(json as Map<String, dynamic>))
-        .toList();
+    return _mapResponse(response as List);
   }
 }

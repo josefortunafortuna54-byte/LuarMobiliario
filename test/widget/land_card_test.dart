@@ -147,7 +147,7 @@ void main() {
       await tester.pumpWidget(wrapInApp(createCard(price: 25000000)));
       await tester.pumpAndSettle();
 
-      expect(find.text('AOA 25.000.000'), findsOneWidget);
+      expect(find.text('25.000.000 Kz'), findsOneWidget);
     });
 
     testWidgets('renders area with m² suffix', (tester) async {

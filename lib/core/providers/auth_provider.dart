@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/user_model.dart';
 import '../repositories/auth_repository.dart';
+import '../services/notification_service.dart';
 
 class AuthProvider extends ChangeNotifier {
   final AuthRepository _authRepository = AuthRepository();
@@ -16,6 +17,11 @@ class AuthProvider extends ChangeNotifier {
   String? get error => _error;
   bool get isAuthenticated => _user != null;
 
+  /// Regista o token FCM do dispositivo para entregas push (não bloqueante).
+  void _registerFcmToken(String userId) {
+    NotificationService().saveTokenToDatabase(userId);
+  }
+
   Future<void> init() async {
     _isLoading = true;
     _error = null;
@@ -24,6 +30,7 @@ class AuthProvider extends ChangeNotifier {
     try {
       final user = await _authRepository.getCurrentUser();
       _user = user;
+      if (user != null) _registerFcmToken(user.id);
     } catch (e) {
       _user = null;
       _error = e.toString();
@@ -42,6 +49,7 @@ class AuthProvider extends ChangeNotifier {
       await _authRepository.signInWithEmail(email: email, password: password);
       final user = await _authRepository.getCurrentUser();
       _user = user;
+      if (user != null) _registerFcmToken(user.id);
       _isLoading = false;
       notifyListeners();
       return true;
@@ -72,6 +80,7 @@ class AuthProvider extends ChangeNotifier {
       );
       final user = await _authRepository.getCurrentUser();
       _user = user;
+      if (user != null) _registerFcmToken(user.id);
       _isLoading = false;
       notifyListeners();
       return true;
@@ -94,6 +103,9 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
+      // Antes do signOut: a remoção em device_tokens depende de RLS
+      // (auth.uid()), que deixa de ser válido depois de terminar a sessão.
+      await NotificationService().deleteToken();
       await _authRepository.signOut();
       _user = null;
     } catch (e) {

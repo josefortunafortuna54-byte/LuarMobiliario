@@ -170,9 +170,9 @@ void main() {
       expect(restored.updatedAt, original.updatedAt);
     });
 
-    test('toJson produces 8 keys', () {
+    test('toJson produces 9 keys', () {
       final json = createSubject().toJson();
-      expect(json.length, 8);
+      expect(json.length, 9);
     });
   });
 

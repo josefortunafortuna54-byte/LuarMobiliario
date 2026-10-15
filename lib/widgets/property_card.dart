@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:luar_company/l10n/app_localizations.dart';
 
@@ -5,6 +6,7 @@ import '../core/constants/app_colors.dart';
 import '../core/constants/app_text_styles.dart';
 import '../core/theme/app_palette.dart';
 import '../core/utils/formatters.dart';
+import 'verified_badge.dart';
 
 enum PropertyListingType { venda, arrendamento }
 
@@ -24,6 +26,9 @@ class PropertyCard extends StatelessWidget {
     this.area,
     this.onTap,
     this.onDetailsTap,
+    this.onCompareTap,
+    this.isCompared = false,
+    this.agentVerified = false,
   });
 
   final String imageUrl;
@@ -37,6 +42,9 @@ class PropertyCard extends StatelessWidget {
   final double? area;
   final VoidCallback? onTap;
   final VoidCallback? onDetailsTap;
+  final VoidCallback? onCompareTap;
+  final bool isCompared;
+  final bool agentVerified;
 
   String _badgeLabel(AppLocalizations l10n) =>
       listingType == PropertyListingType.venda ? l10n.venda : l10n.arrendamento;
@@ -123,10 +131,11 @@ class PropertyCard extends StatelessWidget {
         SizedBox(
           height: height,
           width: width,
-          child: Image.network(
-            imageUrl,
+          child: CachedNetworkImage(
+            imageUrl: imageUrl,
             fit: BoxFit.cover,
-            errorBuilder: (_, _, _) => Container(
+            memCacheWidth: 800,
+            errorWidget: (_, _, _) => Container(
               color: context.palette.surfaceAlt,
               child: Icon(
                 Icons.apartment_rounded,
@@ -202,6 +211,10 @@ class PropertyCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
+              if (agentVerified) ...[
+                const SizedBox(width: 6),
+                const VerifiedBadge(compact: true),
+              ],
             ],
           ),
           const SizedBox(height: 12),
@@ -215,6 +228,49 @@ class PropertyCard extends StatelessWidget {
                   style: AppTextStyles.priceMedium,
                 ),
               ),
+              if (onCompareTap != null) ...[
+                GestureDetector(
+                  onTap: onCompareTap,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isCompared
+                          ? AppColors.gold.withValues(alpha: 0.15)
+                          : palette.border,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: isCompared
+                            ? AppColors.gold
+                            : palette.borderStrong,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          isCompared
+                              ? Icons.check_circle_rounded
+                              : Icons.add_circle_outline_rounded,
+                          size: 16,
+                          color: isCompared ? AppColors.gold : palette.textMuted,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          isCompared ? l10n.comparando : l10n.comparar,
+                          style: AppTextStyles.buttonSmall.copyWith(
+                            fontSize: 11,
+                            color: isCompared ? AppColors.gold : palette.textBody,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+              ],
               GestureDetector(
                 onTap: onDetailsTap,
                 child: Container(
@@ -275,6 +331,10 @@ class PropertyCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
+              if (agentVerified) ...[
+                const SizedBox(width: 4),
+                const VerifiedBadge(compact: true),
+              ],
             ],
           ),
           const SizedBox(height: 8),
@@ -288,6 +348,33 @@ class PropertyCard extends StatelessWidget {
                   style: AppTextStyles.priceSmall,
                 ),
               ),
+              if (onCompareTap != null) ...[
+                GestureDetector(
+                  onTap: onCompareTap,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: isCompared
+                          ? AppColors.gold.withValues(alpha: 0.15)
+                          : palette.border,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                        color: isCompared
+                            ? AppColors.gold
+                            : palette.borderStrong,
+                      ),
+                    ),
+                    child: Icon(
+                      isCompared
+                          ? Icons.check_circle_rounded
+                          : Icons.add_circle_outline_rounded,
+                      size: 14,
+                      color: isCompared ? AppColors.gold : palette.textMuted,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 6),
+              ],
               GestureDetector(
                 onTap: onDetailsTap,
                 child: Container(

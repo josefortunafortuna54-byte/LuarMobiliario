@@ -139,6 +139,16 @@ class WelcomeScreen extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           const SizedBox(height: 8),
+          // Headline do design de referência (sem alterar a cor do app).
+          Text(
+            l10n.welcomeHeadline,
+            style: AppTextStyles.h3White.copyWith(
+              fontSize: Responsive.fontSize(context, 22),
+              fontWeight: FontWeight.w700,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
           Text(
             l10n.welcomeDesc,
             style: AppTextStyles.bodyMedium.copyWith(
@@ -156,9 +166,128 @@ class WelcomeScreen extends StatelessWidget {
             },
           ),
           const SizedBox(height: 32),
+          _buildWhyChooseSection(context, isDesktop),
+          const SizedBox(height: 24),
           Text(
             l10n.versao(AppConstants.appVersion),
             style: AppTextStyles.bodyTiny.copyWith(color: palette.textMuted),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Secção "Por que escolher o Luar Mobiliário?" — lista de features com
+  /// ícone dourado, replicando o layout do material de referência.
+  Widget _buildWhyChooseSection(BuildContext context, bool isDesktop) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
+    final features = <({IconData icon, String title, String desc})>[
+      (
+        icon: Icons.play_circle_outline_rounded,
+        title: l10n.featVideosTitle,
+        desc: l10n.featVideosDesc,
+      ),
+      (
+        icon: Icons.swipe_vertical_rounded,
+        title: l10n.featVerticalTitle,
+        desc: l10n.featVerticalDesc,
+      ),
+      (
+        icon: Icons.search_rounded,
+        title: l10n.featSearchTitle,
+        desc: l10n.featSearchDesc,
+      ),
+      (
+        icon: Icons.map_outlined,
+        title: l10n.featMapTitle,
+        desc: l10n.featMapDesc,
+      ),
+      (
+        icon: Icons.phone_outlined,
+        title: l10n.featContactTitle,
+        desc: l10n.featContactDesc,
+      ),
+      (
+        icon: Icons.favorite_outline_rounded,
+        title: l10n.featFavoritesTitle,
+        desc: l10n.featFavoritesDesc,
+      ),
+      (
+        icon: Icons.notifications_none_rounded,
+        title: l10n.featNotificationsTitle,
+        desc: l10n.featNotificationsDesc,
+      ),
+    ];
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          l10n.whyChooseTitle,
+          style: AppTextStyles.h6.copyWith(
+            color: palette.textTitle,
+            fontWeight: FontWeight.w700,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 20),
+        ...features.map(
+          (f) => _FeatureItem(icon: f.icon, title: f.title, desc: f.desc),
+        ),
+      ],
+    );
+  }
+}
+
+/// Linha de feature com ícone em círculo dourado (design de referência),
+/// reutilizando as cores atuais do app (navy + gold).
+class _FeatureItem extends StatelessWidget {
+  const _FeatureItem({required this.icon, required this.title, required this.desc});
+
+  final IconData icon;
+  final String title;
+  final String desc;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: AppColors.gold, width: 1.5),
+              color: AppColors.gold.withValues(alpha: 0.12),
+            ),
+            child: Icon(icon, size: 22, color: AppColors.gold),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: palette.textTitle,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  desc,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: palette.textMuted,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

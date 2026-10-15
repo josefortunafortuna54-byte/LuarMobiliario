@@ -302,7 +302,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get endereco => 'Endereço';
 
   @override
-  String get precoAOA => 'Preço (AOA)';
+  String get precoAOA => 'Preço (Kz)';
 
   @override
   String get tipoTransacao => 'Tipo de Transação';
@@ -499,16 +499,22 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String maxPreco(Object v) {
-    return 'Max: AOA $v';
+    return 'Máx: Kz $v';
   }
 
   @override
   String minPreco(Object v) {
-    return 'Min: AOA $v';
+    return 'Mín: Kz $v';
   }
 
   @override
   String get selecioneCidade => 'Selecione a cidade';
+
+  @override
+  String get provincia => 'Província';
+
+  @override
+  String get selecioneProvincia => 'Selecione a província';
 
   @override
   String get cidadeLuandaNorte => 'Luanda Norte';
@@ -958,7 +964,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get areaTerreno => 'Área (m²)';
 
   @override
-  String get preco => 'Preço (AOA)';
+  String get preco => 'Preço (Kz)';
 
   @override
   String get telefoneContato => 'Telefone de contato';
@@ -1000,7 +1006,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get emConstrucao => 'Em construção';
 
   @override
-  String get precoM2 => 'Preço (AOA/m²)';
+  String get precoM2 => 'Preço (Kz/m²)';
 
   @override
   String get longitude => 'Longitude';
@@ -1494,4 +1500,263 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get contactar => 'Contactar';
+
+  @override
+  String get welcomeHeadline => 'Mais que imóveis. É o seu próximo capítulo.';
+
+  @override
+  String get whyChooseTitle => 'Por que escolher o Luar Mobiliário?';
+
+  @override
+  String get featVideosTitle => 'Vídeos em alta definição';
+
+  @override
+  String get featVideosDesc => 'Veja os imóveis como se estivesse lá.';
+
+  @override
+  String get featVerticalTitle => 'Navegação vertical';
+
+  @override
+  String get featVerticalDesc =>
+      'Deslize para cima e descubra o próximo imóvel.';
+
+  @override
+  String get featSearchTitle => 'Busca inteligente';
+
+  @override
+  String get featSearchDesc => 'Encontre exatamente o que procura.';
+
+  @override
+  String get featMapTitle => 'Mapa interativo';
+
+  @override
+  String get featMapDesc => 'Veja a localização e arredores.';
+
+  @override
+  String get featContactTitle => 'Contacto direto';
+
+  @override
+  String get featContactDesc =>
+      'Fale com o anunciante via WhatsApp ou telefone.';
+
+  @override
+  String get featFavoritesTitle => 'Favoritos e histórico';
+
+  @override
+  String get featFavoritesDesc => 'Guarde os imóveis que mais gosta.';
+
+  @override
+  String get featNotificationsTitle => 'Notificações em tempo real';
+
+  @override
+  String get featNotificationsDesc => 'Não perca novas oportunidades.';
+
+  @override
+  String get comparar => 'Comparar';
+
+  @override
+  String get comparando => 'Comparando';
+
+  @override
+  String get adicionarComparacao => 'Adicionar à comparação';
+
+  @override
+  String get limiteComparacao => 'Máximo de 3 imóveis na comparação.';
+
+  @override
+  String imovelAdicionadoComparacao(Object count) {
+    return 'Imóvel adicionado à comparação ($count/3)';
+  }
+
+  @override
+  String get comparacaoVaziaTitulo => 'Sem imóveis para comparar';
+
+  @override
+  String get comparacaoVaziaSubtitulo =>
+      'Adicione imóveis à comparação para os ver lado a lado.';
+
+  @override
+  String get destaques => 'Destaques';
+
+  @override
+  String get maisBarato => 'Mais barato';
+
+  @override
+  String get melhorValor => 'Melhor valor';
+
+  @override
+  String get imagens => 'Imagens';
+
+  @override
+  String get acoes => 'Ações';
+
+  @override
+  String get limparComparacao => 'Limpar comparação';
+
+  @override
+  String get limparComparacaoConfirmacao =>
+      'Remover todos os imóveis da comparação?';
+
+  @override
+  String get precoPorM2 => 'Preço por m²';
+
+  @override
+  String get verImovel => 'Ver imóvel';
+
+  @override
+  String get filtros => 'Filtros';
+
+  @override
+  String get finalidade => 'Finalidade';
+
+  @override
+  String get residencial => 'Residencial';
+
+  @override
+  String get minimo => 'Mínimo';
+
+  @override
+  String get maximo => 'Máximo';
+
+  @override
+  String get meusAnuncios => 'Os meus anúncios';
+
+  @override
+  String get definicoes => 'Definições';
+
+  @override
+  String get verificado => 'Verificado';
+
+  @override
+  String get anuncios => 'Anúncios';
+
+  @override
+  String get novoAnuncio => 'Novo anúncio';
+
+  @override
+  String get semAnuncios => 'Ainda não tem anúncios';
+
+  @override
+  String get semAnunciosSubtitulo =>
+      'Publique um imóvel para começar a receber contactos.';
+
+  @override
+  String get anuncioAtivo => 'Ativo';
+
+  @override
+  String get anuncioInativo => 'Inativo';
+
+  @override
+  String get ativar => 'Ativar';
+
+  @override
+  String get desativar => 'Desativar';
+
+  @override
+  String get arrendar => 'Arrendar';
+
+  @override
+  String get reportar => 'Reportar';
+
+  @override
+  String get reportarAnuncio => 'Reportar anúncio';
+
+  @override
+  String get motivo => 'Motivo';
+
+  @override
+  String get detalhesOpcionais => 'Detalhes (opcional)';
+
+  @override
+  String get enviarDenuncia => 'Enviar denúncia';
+
+  @override
+  String get denunciaEnviada => 'Denúncia enviada. Obrigado pela ajuda.';
+
+  @override
+  String get erroEnviarDenuncia => 'Erro ao enviar denúncia';
+
+  @override
+  String get selecionarMotivo => 'Selecione um motivo';
+
+  @override
+  String get motivoSpam => 'Spam';
+
+  @override
+  String get motivoInformacaoFalsa => 'Informação falsa';
+
+  @override
+  String get motivoConteudoInapropriado => 'Conteúdo impróprio';
+
+  @override
+  String get motivoBurla => 'Burla / fraude';
+
+  @override
+  String get motivoOutro => 'Outro';
+
+  @override
+  String get denuncias => 'Denúncias';
+
+  @override
+  String get semDenuncias => 'Sem denúncias';
+
+  @override
+  String get todasAsOpcoes => 'Todas';
+
+  @override
+  String get emAnalise => 'Em análise';
+
+  @override
+  String get resolvida => 'Resolvida';
+
+  @override
+  String get dispensada => 'Dispensada';
+
+  @override
+  String get denunciadoPor => 'Denunciado por';
+
+  @override
+  String get ocultarAnuncio => 'Ocultar anúncio';
+
+  @override
+  String get anuncioOcultado => 'Anúncio ocultado';
+
+  @override
+  String get verificarAnunciante => 'Verificar anunciante';
+
+  @override
+  String get retirarVerificacao => 'Retirar verificação';
+
+  @override
+  String get anuncianteVerificado => 'Anunciante verificado';
+
+  @override
+  String get verificacaoAlterada => 'Verificação alterada';
+
+  @override
+  String get erroVerificacao => 'Erro ao alterar verificação';
+
+  @override
+  String get marcarResolvida => 'Marcar resolvida';
+
+  @override
+  String get dispensar => 'Dispensar';
+
+  @override
+  String get erroAcaoModeracao => 'Erro ao executar ação de moderação';
+
+  @override
+  String get acaoConcluida => 'Ação concluída';
+
+  @override
+  String get reportarRequerLogin => 'Inicie sessão para reportar anúncios';
+
+  @override
+  String get semLigacao => 'Sem ligação à internet';
+
+  @override
+  String get reproducaoAutomatica => 'Reprodução automática';
+
+  @override
+  String get reproducaoAutomaticaDesc => 'Reproduzir vídeos do feed sem toque';
 }

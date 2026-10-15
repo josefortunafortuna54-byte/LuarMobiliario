@@ -214,6 +214,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
                 bedrooms: property.bedrooms,
                 bathrooms: property.bathrooms,
                 area: property.area,
+                agentVerified: property.agentVerified,
                 onTap: () {
                   Navigator.of(
                     context,
@@ -274,6 +275,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
                 price: land.price,
                 badgeLabel: land.type.name.toUpperCase(),
                 features: land.features,
+                agentVerified: land.agentVerified,
                 onTap: () {
                   Navigator.of(
                     context,

@@ -12,7 +12,7 @@ void main() {
         testApp(home: Scaffold(body: PriceTag(price: 1500000))),
       );
 
-      expect(find.text('AOA 1.500.000'), findsOneWidget);
+      expect(find.text('1.500.000 Kz'), findsOneWidget);
       expect(find.text('/mês'), findsNothing);
     });
 
@@ -23,7 +23,7 @@ void main() {
         ),
       );
 
-      expect(find.text('AOA 250.000'), findsOneWidget);
+      expect(find.text('250.000 Kz'), findsOneWidget);
       expect(find.text('/mês'), findsOneWidget);
     });
 
@@ -34,7 +34,7 @@ void main() {
         ),
       );
 
-      expect(find.text('AOA 5.000'), findsNothing);
+      expect(find.text('5.000 Kz'), findsNothing);
       expect(find.text('5.000'), findsOneWidget);
     });
 
@@ -45,7 +45,7 @@ void main() {
         ),
       );
 
-      expect(find.text('AOA 123.456.789'), findsOneWidget);
+      expect(find.text('123.456.789 Kz'), findsOneWidget);
     });
 
     testWidgets('handles zero price', (tester) async {
@@ -53,7 +53,7 @@ void main() {
         testApp(home: Scaffold(body: PriceTag(price: 0))),
       );
 
-      expect(find.text('AOA 0'), findsOneWidget);
+      expect(find.text('0 Kz'), findsOneWidget);
     });
 
     testWidgets('applies different fontSize per size variant', (tester) async {
@@ -63,7 +63,7 @@ void main() {
         ),
       );
 
-      final text = tester.widget<Text>(find.text('AOA 100'));
+      final text = tester.widget<Text>(find.text('100 Kz'));
       expect(text.style?.fontSize, isNotNull);
     });
   });

@@ -299,7 +299,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get endereco => 'Address';
 
   @override
-  String get precoAOA => 'Price (AOA)';
+  String get precoAOA => 'Price (Kz)';
 
   @override
   String get tipoTransacao => 'Transaction Type';
@@ -496,16 +496,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String maxPreco(Object v) {
-    return 'Max: AOA $v';
+    return 'Max: Kz $v';
   }
 
   @override
   String minPreco(Object v) {
-    return 'Min: AOA $v';
+    return 'Min: Kz $v';
   }
 
   @override
   String get selecioneCidade => 'Select the city';
+
+  @override
+  String get provincia => 'Province';
+
+  @override
+  String get selecioneProvincia => 'Select the province';
 
   @override
   String get cidadeLuandaNorte => 'Luanda Norte';
@@ -951,7 +957,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get areaTerreno => 'Area (m²)';
 
   @override
-  String get preco => 'Price (AOA)';
+  String get preco => 'Price (Kz)';
 
   @override
   String get telefoneContato => 'Contact phone';
@@ -993,7 +999,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get emConstrucao => 'Under construction';
 
   @override
-  String get precoM2 => 'Price (AOA/m²)';
+  String get precoM2 => 'Price (Kz/m²)';
 
   @override
   String get longitude => 'Longitude';
@@ -1487,4 +1493,262 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get contactar => 'Contact';
+
+  @override
+  String get welcomeHeadline =>
+      'More than properties. It\'s your next chapter.';
+
+  @override
+  String get whyChooseTitle => 'Why choose Luar Mobiliário?';
+
+  @override
+  String get featVideosTitle => 'High-definition videos';
+
+  @override
+  String get featVideosDesc => 'See the properties as if you were there.';
+
+  @override
+  String get featVerticalTitle => 'Vertical navigation';
+
+  @override
+  String get featVerticalDesc => 'Swipe up and discover the next property.';
+
+  @override
+  String get featSearchTitle => 'Smart search';
+
+  @override
+  String get featSearchDesc => 'Find exactly what you are looking for.';
+
+  @override
+  String get featMapTitle => 'Interactive map';
+
+  @override
+  String get featMapDesc => 'See the location and surroundings.';
+
+  @override
+  String get featContactTitle => 'Direct contact';
+
+  @override
+  String get featContactDesc => 'Talk to the advertiser via WhatsApp or phone.';
+
+  @override
+  String get featFavoritesTitle => 'Favorites and history';
+
+  @override
+  String get featFavoritesDesc => 'Save the properties you like the most.';
+
+  @override
+  String get featNotificationsTitle => 'Real-time notifications';
+
+  @override
+  String get featNotificationsDesc => 'Never miss a new opportunity.';
+
+  @override
+  String get comparar => 'Compare';
+
+  @override
+  String get comparando => 'Comparing';
+
+  @override
+  String get adicionarComparacao => 'Add to comparison';
+
+  @override
+  String get limiteComparacao => 'Maximum of 3 properties in the comparison.';
+
+  @override
+  String imovelAdicionadoComparacao(Object count) {
+    return 'Property added to comparison ($count/3)';
+  }
+
+  @override
+  String get comparacaoVaziaTitulo => 'No properties to compare';
+
+  @override
+  String get comparacaoVaziaSubtitulo =>
+      'Add properties to the comparison to see them side by side.';
+
+  @override
+  String get destaques => 'Highlights';
+
+  @override
+  String get maisBarato => 'Cheapest';
+
+  @override
+  String get melhorValor => 'Best value';
+
+  @override
+  String get imagens => 'Images';
+
+  @override
+  String get acoes => 'Actions';
+
+  @override
+  String get limparComparacao => 'Clear comparison';
+
+  @override
+  String get limparComparacaoConfirmacao =>
+      'Remove all properties from the comparison?';
+
+  @override
+  String get precoPorM2 => 'Price per m²';
+
+  @override
+  String get verImovel => 'View property';
+
+  @override
+  String get filtros => 'Filters';
+
+  @override
+  String get finalidade => 'Purpose';
+
+  @override
+  String get residencial => 'Residential';
+
+  @override
+  String get minimo => 'Minimum';
+
+  @override
+  String get maximo => 'Maximum';
+
+  @override
+  String get meusAnuncios => 'My listings';
+
+  @override
+  String get definicoes => 'Settings';
+
+  @override
+  String get verificado => 'Verified';
+
+  @override
+  String get anuncios => 'Listings';
+
+  @override
+  String get novoAnuncio => 'New listing';
+
+  @override
+  String get semAnuncios => 'You have no listings yet';
+
+  @override
+  String get semAnunciosSubtitulo =>
+      'Publish a property to start receiving contacts.';
+
+  @override
+  String get anuncioAtivo => 'Active';
+
+  @override
+  String get anuncioInativo => 'Inactive';
+
+  @override
+  String get ativar => 'Activate';
+
+  @override
+  String get desativar => 'Deactivate';
+
+  @override
+  String get arrendar => 'Rent';
+
+  @override
+  String get reportar => 'Report';
+
+  @override
+  String get reportarAnuncio => 'Report listing';
+
+  @override
+  String get motivo => 'Reason';
+
+  @override
+  String get detalhesOpcionais => 'Details (optional)';
+
+  @override
+  String get enviarDenuncia => 'Send report';
+
+  @override
+  String get denunciaEnviada => 'Report sent. Thank you for your help.';
+
+  @override
+  String get erroEnviarDenuncia => 'Error sending report';
+
+  @override
+  String get selecionarMotivo => 'Select a reason';
+
+  @override
+  String get motivoSpam => 'Spam';
+
+  @override
+  String get motivoInformacaoFalsa => 'False information';
+
+  @override
+  String get motivoConteudoInapropriado => 'Inappropriate content';
+
+  @override
+  String get motivoBurla => 'Scam / fraud';
+
+  @override
+  String get motivoOutro => 'Other';
+
+  @override
+  String get denuncias => 'Reports';
+
+  @override
+  String get semDenuncias => 'No reports';
+
+  @override
+  String get todasAsOpcoes => 'All';
+
+  @override
+  String get emAnalise => 'Under review';
+
+  @override
+  String get resolvida => 'Resolved';
+
+  @override
+  String get dispensada => 'Dismissed';
+
+  @override
+  String get denunciadoPor => 'Reported by';
+
+  @override
+  String get ocultarAnuncio => 'Hide listing';
+
+  @override
+  String get anuncioOcultado => 'Listing hidden';
+
+  @override
+  String get verificarAnunciante => 'Verify advertiser';
+
+  @override
+  String get retirarVerificacao => 'Remove verification';
+
+  @override
+  String get anuncianteVerificado => 'Verified advertiser';
+
+  @override
+  String get verificacaoAlterada => 'Verification updated';
+
+  @override
+  String get erroVerificacao => 'Error updating verification';
+
+  @override
+  String get marcarResolvida => 'Mark resolved';
+
+  @override
+  String get dispensar => 'Dismiss';
+
+  @override
+  String get erroAcaoModeracao => 'Error performing moderation action';
+
+  @override
+  String get acaoConcluida => 'Action completed';
+
+  @override
+  String get reportarRequerLogin => 'Sign in to report listings';
+
+  @override
+  String get semLigacao => 'No internet connection';
+
+  @override
+  String get reproducaoAutomatica => 'Autoplay';
+
+  @override
+  String get reproducaoAutomaticaDesc => 'Play feed videos automatically';
 }

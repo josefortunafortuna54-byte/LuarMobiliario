@@ -6,7 +6,6 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/models/land_model.dart';
 import '../../core/models/property_model.dart';
-import '../../core/providers/auth_provider.dart';
 import '../../core/providers/land_provider.dart';
 import '../../core/providers/property_provider.dart';
 import '../../core/theme/app_palette.dart';
@@ -20,14 +19,20 @@ import '../../widgets/search_widget.dart';
 import '../../widgets/settings_sheet.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key, this.embedded = false, this.onSelectTab});
+
+  /// Quando embutido num shell com barra de navegação própria, esconde a
+  /// barra inferior interna.
+  final bool embedded;
+
+  /// Permite ao shell tratar a navegação por separadores (ex.: Descobrir).
+  final ValueChanged<int>? onSelectTab;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _currentBottomNav = 0;
   int _logoTapCount = 0;
 
   @override
@@ -55,7 +60,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final palette = context.palette;
     final padding = Responsive.horizontalPadding(context);
     final isDesktop = Responsive.isDesktop(context);
-    final isGuest = context.watch<AuthProvider>().user == null;
 
     return Scaffold(
       backgroundColor: palette.background,
@@ -92,7 +96,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       floatingActionButton: _buildWhatsAppFAB(),
-      bottomNavigationBar: isDesktop ? null : _buildBottomNav(isGuest: isGuest),
     );
   }
 
@@ -191,7 +194,11 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 14),
           OutlinedButton.icon(
             onPressed: () {
-              Navigator.of(context).pushNamed(AppRoutes.discover);
+              if (widget.onSelectTab != null) {
+                widget.onSelectTab!(1);
+              } else {
+                Navigator.of(context).pushNamed(AppRoutes.discover);
+              }
             },
             icon: const Icon(Icons.play_circle_outline_rounded, size: 20),
             label: Text(l10n.descobrir),
@@ -485,6 +492,7 @@ class _HomeScreenState extends State<HomeScreen> {
       bedrooms: property.bedrooms,
       bathrooms: property.bathrooms,
       area: property.area,
+      agentVerified: property.agentVerified,
       onTap: () {
         Navigator.of(
           context,
@@ -601,6 +609,7 @@ class _HomeScreenState extends State<HomeScreen> {
       price: land.price,
       badgeLabel: badgeLabel,
       features: land.features.take(3).toList(),
+      agentVerified: land.agentVerified,
       onTap: () {
         Navigator.of(
           context,
@@ -895,118 +904,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildBottomNav({bool isGuest = false}) {
-    final l10n = AppLocalizations.of(context);
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.navy,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.15),
-            blurRadius: 16,
-            offset: const Offset(0, -4),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildNavItem(
-                icon: Icons.home_outlined,
-                activeIcon: Icons.home_rounded,
-                label: l10n.inicio,
-                index: 0,
-              ),
-              _buildNavItem(
-                icon: Icons.play_circle_outline_rounded,
-                activeIcon: Icons.play_circle_rounded,
-                label: l10n.descobrir,
-                index: 4,
-              ),
-              _buildNavItem(
-                icon: Icons.search_outlined,
-                activeIcon: Icons.search_rounded,
-                label: l10n.pesquisar,
-                index: 1,
-              ),
-              if (!isGuest) ...[
-                _buildNavItem(
-                  icon: Icons.favorite_outline,
-                  activeIcon: Icons.favorite_rounded,
-                  label: l10n.favoritos,
-                  index: 2,
-                ),
-                _buildNavItem(
-                  icon: Icons.person_outline,
-                  activeIcon: Icons.person_rounded,
-                  label: l10n.perfil,
-                  index: 3,
-                ),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem({
-    required IconData icon,
-    required IconData activeIcon,
-    required String label,
-    required int index,
-  }) {
-    final palette = context.palette;
-    final isSelected = _currentBottomNav == index;
-
-    return GestureDetector(
-      onTap: () {
-        if (index == 1) {
-          Navigator.of(context).pushNamed(AppRoutes.search);
-        } else if (index == 2) {
-          Navigator.of(context).pushNamed(AppRoutes.favorites);
-        } else if (index == 3) {
-          Navigator.of(context).pushNamed(AppRoutes.profile);
-        } else if (index == 4) {
-          Navigator.of(context).pushNamed(AppRoutes.discover);
-        } else {
-          setState(() => _currentBottomNav = index);
-        }
-      },
-      behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.gold.withValues(alpha: 0.12)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              isSelected ? activeIcon : icon,
-              size: 24,
-              color: isSelected ? AppColors.gold : palette.textMuted,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: AppTextStyles.bodyTiny.copyWith(
-                color: isSelected ? AppColors.gold : palette.textMuted,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
 class _CategoryData {

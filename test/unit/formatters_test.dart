@@ -4,19 +4,19 @@ import 'package:luar_company/core/utils/formatters.dart';
 void main() {
   group('formatPrice', () {
     test('formats zero', () {
-      expect(formatPrice(0), 'AOA 0');
+      expect(formatPrice(0), '0 Kz');
     });
 
     test('formats small value without thousands separator', () {
-      expect(formatPrice(500), 'AOA 500');
+      expect(formatPrice(500), '500 Kz');
     });
 
     test('formats value with one thousands separator', () {
-      expect(formatPrice(1500000), 'AOA 1.500.000');
+      expect(formatPrice(1500000), '1.500.000 Kz');
     });
 
     test('formats large value with multiple separators', () {
-      expect(formatPrice(15000000), 'AOA 15.000.000');
+      expect(formatPrice(15000000), '15.000.000 Kz');
     });
   });
 
@@ -128,16 +128,16 @@ void main() {
   });
 
   group('formatPriceCurrency', () {
-    test('prepends AOA prefix', () {
-      expect(formatPriceCurrency(1500000), 'AOA 1.500.000');
+    test('appends Kz suffix', () {
+      expect(formatPriceCurrency(1500000), '1.500.000 Kz');
     });
 
     test('formats zero', () {
-      expect(formatPriceCurrency(0), 'AOA 0');
+      expect(formatPriceCurrency(0), '0 Kz');
     });
 
     test('formats large value', () {
-      expect(formatPriceCurrency(500000000), 'AOA 500.000.000');
+      expect(formatPriceCurrency(500000000), '500.000.000 Kz');
     });
   });
 }

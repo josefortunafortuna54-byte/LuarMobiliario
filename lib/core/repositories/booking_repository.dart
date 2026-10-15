@@ -41,6 +41,28 @@ class BookingRepository {
   }
 
   Future<BookingModel> create(BookingModel booking) async {
+    // Marcação de convidado (sem conta): criar via RPC para nunca expor
+    // a listagem anónima de marcações na tabela.
+    if (booking.userId == null) {
+      final response = await _client
+          .rpc(
+            'create_guest_booking',
+            params: {
+              'p_property_id':
+                  booking.propertyId.isEmpty ? null : booking.propertyId,
+              'p_land_id': booking.landId,
+              'p_user_name': booking.userName,
+              'p_user_phone': booking.userPhone,
+              'p_date': booking.date.toIso8601String().split('T').first,
+              'p_time': booking.time,
+              'p_notes': booking.notes,
+            },
+          )
+          .single();
+
+      return BookingModel.fromJson(response);
+    }
+
     final data = booking.toJson()..remove('id');
 
     final response = await _client

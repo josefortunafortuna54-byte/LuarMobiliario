@@ -3,11 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../core/constants/app_categories.dart';
 import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_constants.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/models/property_model.dart';
+import '../../core/providers/comparison_provider.dart';
 import '../../core/providers/search_provider.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/utils/routes.dart';
@@ -44,13 +43,9 @@ class _SearchScreenState extends State<SearchScreen> {
     });
   }
 
-  void _openFilterSheet() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => const _FilterBottomSheet(),
-    );
+  /// Abre o ecrã "Filtros" (design de referência) como rota própria.
+  void _openFilters() {
+    Navigator.of(context).pushNamed(AppRoutes.filters);
   }
 
   @override
@@ -113,7 +108,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 provider.setFilter(query: value);
                 provider.search();
               },
-              onFilterTap: _openFilterSheet,
+              onFilterTap: _openFilters,
             ),
           ),
           Expanded(
@@ -142,7 +137,7 @@ class _SearchScreenState extends State<SearchScreen> {
     if (provider.query.isNotEmpty) {
       chips.add(
         _FilterChipData('"${provider.query}"', () {
-          provider.setFilter(query: '');
+          provider.removeFilter('query');
           _searchController.clear();
           provider.search();
         }),
@@ -158,26 +153,52 @@ class _SearchScreenState extends State<SearchScreen> {
     }
     if (provider.propertyType != null) {
       chips.add(
-        _FilterChipData(provider.propertyType!, () {
-          provider.setFilter(propertyType: null);
-          provider.search();
-        }),
+        _FilterChipData(
+          provider.propertyType!,
+          () => _removeFilter(provider, 'propertyType'),
+        ),
       );
     }
     if (provider.landType != null) {
       chips.add(
-        _FilterChipData(provider.landType!, () {
-          provider.setFilter(landType: null);
-          provider.search();
-        }),
+        _FilterChipData(
+          provider.landType!,
+          () => _removeFilter(provider, 'landType'),
+        ),
+      );
+    }
+    if (provider.province != null) {
+      chips.add(
+        _FilterChipData(
+          provider.province!,
+          () => _removeFilter(provider, 'province'),
+        ),
       );
     }
     if (provider.city != null) {
       chips.add(
-        _FilterChipData(provider.city!, () {
-          provider.setFilter(city: null);
-          provider.search();
-        }),
+        _FilterChipData(
+          provider.city!,
+          () => _removeFilter(provider, 'city'),
+        ),
+      );
+    }
+    if (provider.municipality != null) {
+      chips.add(
+        _FilterChipData(
+          provider.municipality!,
+          () => _removeFilter(provider, 'municipality'),
+        ),
+      );
+    }
+    if (provider.purpose != null) {
+      chips.add(
+        _FilterChipData(
+          provider.purpose == 'residential'
+              ? l10n.residencial
+              : l10n.comercial,
+          () => _removeFilter(provider, 'purpose'),
+        ),
       );
     }
     if (provider.minPrice != null) {
@@ -257,27 +278,55 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   void _removeFilter(SearchProvider provider, String filter) {
-    switch (filter) {
-      case 'transactionType':
-        provider.setFilter(transactionType: null);
-        break;
-      case 'minPrice':
-        provider.setFilter(minPrice: null);
-        break;
-      case 'maxPrice':
-        provider.setFilter(maxPrice: null);
-        break;
-      case 'bedrooms':
-        provider.setFilter(bedrooms: null);
-        break;
-      case 'bathrooms':
-        provider.setFilter(bathrooms: null);
-        break;
-      case 'garage':
-        provider.setFilter(garage: null);
-        break;
-    }
+    provider.removeFilter(filter);
     provider.search();
+  }
+
+  void _toggleComparison(
+    BuildContext context,
+    ComparisonProvider comparison,
+    PropertyModel property,
+  ) {
+    final l10n = AppLocalizations.of(context);
+    final wasSelected = comparison.isSelected(property.id);
+
+    if (!wasSelected && comparison.isFull) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.limiteComparacao),
+          backgroundColor: AppColors.navy,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      );
+      return;
+    }
+
+    comparison.toggle(property);
+
+    if (!wasSelected && comparison.canCompare) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            l10n.imovelAdicionadoComparacao(comparison.count),
+          ),
+          backgroundColor: AppColors.gold,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          action: SnackBarAction(
+            label: l10n.comparar,
+            textColor: AppColors.white,
+            onPressed: () {
+              Navigator.of(context).pushNamed(AppRoutes.comparison);
+            },
+          ),
+        ),
+      );
+    }
   }
 
   Widget _buildResults(SearchProvider provider) {
@@ -353,66 +402,95 @@ class _SearchScreenState extends State<SearchScreen> {
     final properties = provider.propertyResults;
     final lands = provider.landResults;
 
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        if (properties.isNotEmpty) ...[
-          Text(
-            l10n.contarImoveis(properties.length),
-            style: AppTextStyles.h6.copyWith(color: palette.textTitle),
-          ),
-          const SizedBox(height: 12),
-          ...properties.map(
-            (p) => Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: PropertyCard(
-                imageUrl: p.images.isNotEmpty ? p.images.first : '',
-                title: p.title,
-                location: '${p.neighborhood}, ${p.city}',
-                price: p.price,
-                listingType: p.transactionType == TransactionType.sale
-                    ? PropertyListingType.venda
-                    : PropertyListingType.arrendamento,
-                bedrooms: p.bedrooms,
-                bathrooms: p.bathrooms,
-                area: p.area,
-                onTap: () => Navigator.pushNamed(
-                  context,
-                  AppRoutes.propertyDetail,
-                  arguments: p.id,
+    return NotificationListener<ScrollNotification>(
+      onNotification: (notification) {
+        if (notification.metrics.extentAfter < 400 &&
+            provider.hasMore &&
+            !provider.isLoadingMore) {
+          provider.loadMore();
+        }
+        return false;
+      },
+      child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          if (properties.isNotEmpty) ...[
+            Text(
+              l10n.contarImoveis(properties.length),
+              style: AppTextStyles.h6.copyWith(color: palette.textTitle),
+            ),
+            const SizedBox(height: 12),
+            Consumer<ComparisonProvider>(
+              builder: (context, comparison, _) {
+                return Column(
+                  children: properties.map(
+                    (p) => Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: PropertyCard(
+                        imageUrl: p.images.isNotEmpty ? p.images.first : '',
+                        title: p.title,
+                        location: '${p.neighborhood}, ${p.city}',
+                        price: p.price,
+                        listingType: p.transactionType == TransactionType.sale
+                            ? PropertyListingType.venda
+                            : PropertyListingType.arrendamento,
+                        bedrooms: p.bedrooms,
+                        bathrooms: p.bathrooms,
+                        area: p.area,
+                        isCompared: comparison.isSelected(p.id),
+                        agentVerified: p.agentVerified,
+                        onCompareTap: () => _toggleComparison(
+                          context,
+                          comparison,
+                          p,
+                        ),
+                        onTap: () => Navigator.pushNamed(
+                          context,
+                          AppRoutes.propertyDetail,
+                          arguments: p.id,
+                        ),
+                      ),
+                    ),
+                  ).toList(),
+                );
+              },
+            ),
+          ],
+          if (lands.isNotEmpty) ...[
+            Text(
+              l10n.terrenosCount(lands.length),
+              style: AppTextStyles.h6.copyWith(color: palette.textTitle),
+            ),
+            const SizedBox(height: 12),
+            ...lands.map(
+              (l) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: LandCard(
+                  imageUrl: l.images.isNotEmpty ? l.images.first : '',
+                  title: l.title,
+                  location: '${l.neighborhood}, ${l.city}',
+                  area: l.area,
+                  price: l.price,
+                  badgeLabel: l.type.name.toUpperCase(),
+                  features: l.features,
+                  agentVerified: l.agentVerified,
+                  onTap: () => Navigator.pushNamed(
+                    context,
+                    AppRoutes.landDetail,
+                    arguments: l.id,
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
-        if (lands.isNotEmpty) ...[
-          Text(
-            l10n.terrenosCount(lands.length),
-            style: AppTextStyles.h6.copyWith(color: palette.textTitle),
-          ),
-          const SizedBox(height: 12),
-          ...lands.map(
-            (l) => Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: LandCard(
-                imageUrl: l.images.isNotEmpty ? l.images.first : '',
-                title: l.title,
-                location: '${l.neighborhood}, ${l.city}',
-                area: l.area,
-                price: l.price,
-                badgeLabel: l.type.name.toUpperCase(),
-                features: l.features,
-                onTap: () => Navigator.pushNamed(
-                  context,
-                  AppRoutes.landDetail,
-                  arguments: l.id,
-                ),
-              ),
+          ],
+          if (properties.isEmpty && lands.isEmpty) _buildEmptyState(),
+          if (provider.isLoadingMore)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Center(child: CircularProgressIndicator()),
             ),
-          ),
         ],
-        if (properties.isEmpty && lands.isEmpty) _buildEmptyState(),
-      ],
+      ),
     );
   }
 }
@@ -421,582 +499,4 @@ class _FilterChipData {
   final String label;
   final VoidCallback onRemove;
   const _FilterChipData(this.label, this.onRemove);
-}
-
-class _FilterBottomSheet extends StatefulWidget {
-  const _FilterBottomSheet();
-
-  @override
-  State<_FilterBottomSheet> createState() => _FilterBottomSheetState();
-}
-
-class _FilterBottomSheetState extends State<_FilterBottomSheet> {
-  String? _selectedTransactionType;
-  String? _selectedPropertyType;
-  String? _selectedLandType;
-  String? _selectedCity;
-  double _minPrice = 0;
-  double _maxPrice = 50000000;
-  double _minArea = 0;
-  double _maxArea = 10000;
-  int? _selectedBedrooms;
-  int? _selectedBathrooms;
-  int? _selectedGarage;
-
-  final List<String> _cities = [
-    'Luanda',
-    'Bengo',
-    'Benguela',
-    'Bié',
-    'Cabinda',
-    'Cuando-Cubango',
-    'Cuanza Norte',
-    'Cuanza Sul',
-    'Cunene',
-    'Huambo',
-    'Huíla',
-    'Icolo e Bengo',
-    'Luanda Norte',
-    'Lunda Norte',
-    'Lunda Sul',
-    'Malanje',
-    'Moxico',
-    'Namibe',
-    'Uíge',
-    'Zaire',
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    final provider = context.read<SearchProvider>();
-    _selectedTransactionType = provider.transactionType;
-    _selectedPropertyType = provider.propertyType;
-    _selectedLandType = provider.landType;
-    _selectedCity = provider.city;
-    _minPrice = provider.minPrice ?? 0;
-    _maxPrice = provider.maxPrice ?? 50000000;
-    _minArea = provider.minArea ?? 0;
-    _maxArea = provider.maxArea ?? 10000;
-    _selectedBedrooms = provider.bedrooms;
-    _selectedBathrooms = provider.bathrooms;
-    _selectedGarage = provider.garage;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.85,
-      decoration: BoxDecoration(
-        color: context.palette.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      child: Column(
-        children: [
-          _buildHandle(),
-          _buildHeader(),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSectionTitle(l10n.tipoTransacao),
-                  const SizedBox(height: 10),
-                  _buildTransactionChips(),
-                  const SizedBox(height: 24),
-                  _buildSectionTitle(l10n.tipoImovel),
-                  const SizedBox(height: 10),
-                  _buildPropertyTypeChips(),
-                  const SizedBox(height: 24),
-                  _buildSectionTitle(l10n.tipoTerreno),
-                  const SizedBox(height: 10),
-                  _buildLandTypeChips(),
-                  const SizedBox(height: 24),
-                  _buildSectionTitle(l10n.cidade),
-                  const SizedBox(height: 10),
-                  _buildCityDropdown(),
-                  const SizedBox(height: 24),
-                  _buildSectionTitle(l10n.faixaPreco),
-                  const SizedBox(height: 10),
-                  _buildPriceRange(),
-                  const SizedBox(height: 24),
-                  _buildSectionTitle(l10n.areaM2),
-                  const SizedBox(height: 10),
-                  _buildAreaRange(),
-                  const SizedBox(height: 24),
-                  _buildSectionTitle(l10n.quartosLabel),
-                  const SizedBox(height: 10),
-                  _buildOptionsRow(
-                    options: AppConstants.bedroomOptions,
-                    selectedIndex: _selectedBedrooms != null
-                        ? _selectedBedrooms! - 1
-                        : null,
-                    onSelected: (i) {
-                      setState(() {
-                        _selectedBedrooms = _selectedBedrooms == i + 1
-                            ? null
-                            : i + 1;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 24),
-                  _buildSectionTitle(l10n.casasDeBanhoLabel),
-                  const SizedBox(height: 10),
-                  _buildOptionsRow(
-                    options: AppConstants.bedroomOptions,
-                    selectedIndex: _selectedBathrooms != null
-                        ? _selectedBathrooms! - 1
-                        : null,
-                    onSelected: (i) {
-                      setState(() {
-                        _selectedBathrooms = _selectedBathrooms == i + 1
-                            ? null
-                            : i + 1;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 24),
-                  _buildSectionTitle(l10n.garagemLabel),
-                  const SizedBox(height: 10),
-                  _buildOptionsRow(
-                    options: AppConstants.parkingOptions,
-                    selectedIndex: _selectedGarage != null
-                        ? _selectedGarage! - 1
-                        : null,
-                    onSelected: (i) {
-                      setState(() {
-                        _selectedGarage = _selectedGarage == i + 1
-                            ? null
-                            : i + 1;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 32),
-                ],
-              ),
-            ),
-          ),
-          _buildBottomBar(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHandle() {
-    final palette = context.palette;
-    return Center(
-      child: Container(
-        margin: const EdgeInsets.only(top: 12),
-        width: 40,
-        height: 4,
-        decoration: BoxDecoration(
-          color: palette.textMuted,
-          borderRadius: BorderRadius.circular(2),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    final l10n = AppLocalizations.of(context);
-    final palette = context.palette;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
-      child: Row(
-        children: [
-          Text(
-            l10n.aplicarFiltros,
-            style: AppTextStyles.h5.copyWith(color: palette.textTitle),
-          ),
-          const Spacer(),
-          TextButton(
-            onPressed: () {
-              setState(() {
-                _selectedTransactionType = null;
-                _selectedPropertyType = null;
-                _selectedLandType = null;
-                _selectedCity = null;
-                _minPrice = 0;
-                _maxPrice = 50000000;
-                _minArea = 0;
-                _maxArea = 10000;
-                _selectedBedrooms = null;
-                _selectedBathrooms = null;
-                _selectedGarage = null;
-              });
-            },
-            child: Text(
-              l10n.limparTudo,
-              style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.gold,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: AppTextStyles.labelLarge.copyWith(
-        color: context.palette.textTitle,
-      ),
-    );
-  }
-
-  Widget _buildTransactionChips() {
-    final types = ['sale', 'rent'];
-    final l10n = AppLocalizations.of(context);
-    final palette = context.palette;
-    final labels = [l10n.venda, l10n.arrendamento];
-
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: List.generate(types.length, (i) {
-        final isSelected = _selectedTransactionType == types[i];
-        return GestureDetector(
-          onTap: () {
-            setState(() {
-              _selectedTransactionType = isSelected ? null : types[i];
-            });
-          },
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-            decoration: BoxDecoration(
-              color: isSelected ? AppColors.navy : palette.border,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: isSelected ? AppColors.navy : palette.borderStrong,
-              ),
-            ),
-            child: Text(
-              labels[i],
-              style: AppTextStyles.bodySmall.copyWith(
-                color: isSelected ? AppColors.white : palette.textBody,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        );
-      }),
-    );
-  }
-
-  Widget _buildPropertyTypeChips() {
-    final types = propertyCategories.map((c) => c.key).toList();
-    final l10n = AppLocalizations.of(context);
-    final palette = context.palette;
-    final labels = propertyCategories
-        .map((c) => propertyCategoryLabel(c.key, l10n))
-        .toList();
-
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: List.generate(types.length, (i) {
-        final isSelected = _selectedPropertyType == types[i];
-        return GestureDetector(
-          onTap: () {
-            setState(() {
-              _selectedPropertyType = isSelected ? null : types[i];
-            });
-          },
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-            decoration: BoxDecoration(
-              color: isSelected ? AppColors.navy : palette.border,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: isSelected ? AppColors.navy : palette.borderStrong,
-              ),
-            ),
-            child: Text(
-              labels[i],
-              style: AppTextStyles.bodySmall.copyWith(
-                color: isSelected ? AppColors.white : palette.textBody,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        );
-      }),
-    );
-  }
-
-  Widget _buildLandTypeChips() {
-    final types = [
-      'urban',
-      'agricultural',
-      'industrial',
-      'commercial',
-      'lot',
-      'farm',
-    ];
-    final l10n = AppLocalizations.of(context);
-    final palette = context.palette;
-    final labels = [
-      l10n.urbano,
-      l10n.agricola,
-      l10n.industrial,
-      l10n.comercial,
-      l10n.lote,
-      l10n.fazenda,
-    ];
-
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: List.generate(types.length, (i) {
-        final isSelected = _selectedLandType == types[i];
-        return GestureDetector(
-          onTap: () {
-            setState(() {
-              _selectedLandType = isSelected ? null : types[i];
-            });
-          },
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-            decoration: BoxDecoration(
-              color: isSelected ? AppColors.navy : palette.border,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: isSelected ? AppColors.navy : palette.borderStrong,
-              ),
-            ),
-            child: Text(
-              labels[i],
-              style: AppTextStyles.bodySmall.copyWith(
-                color: isSelected ? AppColors.white : palette.textBody,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        );
-      }),
-    );
-  }
-
-  Widget _buildCityDropdown() {
-    final palette = context.palette;
-    final l10n = AppLocalizations.of(context);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: palette.inputFill,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: palette.borderStrong),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          isExpanded: true,
-          value: _selectedCity,
-          hint: Text(
-            l10n.selecioneCidade,
-            style: AppTextStyles.bodyMedium.copyWith(color: palette.textMuted),
-          ),
-          items: _cities.map((city) {
-            return DropdownMenuItem(
-              value: city,
-              child: Text(city, style: AppTextStyles.bodyMedium),
-            );
-          }).toList(),
-          onChanged: (value) {
-            setState(() {
-              _selectedCity = value;
-            });
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPriceRange() {
-    final palette = context.palette;
-    final minLabel = _minPrice == 0
-        ? 'Min'
-        : 'AOA ${_formatCompact(_minPrice)}';
-    final maxLabel = _maxPrice >= 50000000
-        ? 'Max'
-        : 'AOA ${_formatCompact(_maxPrice)}';
-
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              minLabel,
-              style: AppTextStyles.bodySmall.copyWith(color: palette.textBody),
-            ),
-            Text(
-              maxLabel,
-              style: AppTextStyles.bodySmall.copyWith(color: palette.textBody),
-            ),
-          ],
-        ),
-        RangeSlider(
-          values: RangeValues(_minPrice, _maxPrice),
-          min: 0,
-          max: 50000000,
-          divisions: 50,
-          activeColor: AppColors.gold,
-          inactiveColor: palette.borderStrong,
-          onChanged: (values) {
-            setState(() {
-              _minPrice = values.start;
-              _maxPrice = values.end;
-            });
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAreaRange() {
-    final palette = context.palette;
-    final minLabel = _minArea == 0
-        ? 'Min'
-        : '${_minArea.toStringAsFixed(0)} m²';
-    final maxLabel = _maxArea >= 10000
-        ? 'Max'
-        : '${_maxArea.toStringAsFixed(0)} m²';
-
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              minLabel,
-              style: AppTextStyles.bodySmall.copyWith(color: palette.textBody),
-            ),
-            Text(
-              maxLabel,
-              style: AppTextStyles.bodySmall.copyWith(color: palette.textBody),
-            ),
-          ],
-        ),
-        RangeSlider(
-          values: RangeValues(_minArea, _maxArea),
-          min: 0,
-          max: 10000,
-          divisions: 100,
-          activeColor: AppColors.gold,
-          inactiveColor: palette.borderStrong,
-          onChanged: (values) {
-            setState(() {
-              _minArea = values.start;
-              _maxArea = values.end;
-            });
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildOptionsRow({
-    required List<String> options,
-    required int? selectedIndex,
-    required ValueChanged<int> onSelected,
-  }) {
-    final palette = context.palette;
-    return Row(
-      children: List.generate(options.length, (i) {
-        final isSelected = selectedIndex == i;
-        return Expanded(
-          child: GestureDetector(
-            onTap: () => onSelected(i),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              margin: EdgeInsets.only(right: i < options.length - 1 ? 8 : 0),
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                color: isSelected ? AppColors.navy : palette.border,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: isSelected ? AppColors.navy : palette.borderStrong,
-                ),
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                options[i],
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: isSelected ? AppColors.white : palette.textBody,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-        );
-      }),
-    );
-  }
-
-  Widget _buildBottomBar() {
-    final palette = context.palette;
-    final l10n = AppLocalizations.of(context);
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
-      decoration: BoxDecoration(
-        color: palette.surface,
-        border: Border(top: BorderSide(color: palette.borderStrong)),
-      ),
-      child: SizedBox(
-        width: double.infinity,
-        height: 52,
-        child: ElevatedButton(
-          onPressed: () {
-            final provider = context.read<SearchProvider>();
-            provider.setFilter(
-              transactionType: _selectedTransactionType,
-              propertyType: _selectedPropertyType,
-              landType: _selectedLandType,
-              city: _selectedCity,
-              minPrice: _minPrice > 0 ? _minPrice : null,
-              maxPrice: _maxPrice < 50000000 ? _maxPrice : null,
-              minArea: _minArea > 0 ? _minArea : null,
-              maxArea: _maxArea < 10000 ? _maxArea : null,
-              bedrooms: _selectedBedrooms,
-              bathrooms: _selectedBathrooms,
-              garage: _selectedGarage,
-            );
-            provider.search();
-            Navigator.pop(context);
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.gold,
-            foregroundColor: AppColors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            elevation: 4,
-            shadowColor: AppColors.gold.withValues(alpha: 0.4),
-          ),
-          child: Text(
-            l10n.aplicarFiltros,
-            style: AppTextStyles.buttonLarge.copyWith(color: AppColors.white),
-          ),
-        ),
-      ),
-    );
-  }
-
-  String _formatCompact(double value) {
-    if (value >= 1000000) {
-      return '${(value / 1000000).toStringAsFixed(1)}M';
-    }
-    if (value >= 1000) {
-      return '${(value / 1000).toStringAsFixed(0)}K';
-    }
-    return value.toStringAsFixed(0);
-  }
 }

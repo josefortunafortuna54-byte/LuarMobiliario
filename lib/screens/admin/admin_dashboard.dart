@@ -246,6 +246,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
         route: AppRoutes.adminLands,
       ),
       (
+        icon: Icons.flag_outlined,
+        title: l10n.denuncias,
+        route: AppRoutes.adminReports,
+      ),
+      (
         icon: Icons.handshake_outlined,
         title: l10n.verParceiros,
         route: AppRoutes.partners,

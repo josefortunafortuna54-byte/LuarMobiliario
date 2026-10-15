@@ -653,7 +653,7 @@ abstract class AppLocalizations {
   /// No description provided for @precoAOA.
   ///
   /// In pt, this message translates to:
-  /// **'Preço (AOA)'**
+  /// **'Preço (Kz)'**
   String get precoAOA;
 
   /// No description provided for @tipoTransacao.
@@ -1031,13 +1031,13 @@ abstract class AppLocalizations {
   /// No description provided for @maxPreco.
   ///
   /// In pt, this message translates to:
-  /// **'Max: AOA {v}'**
+  /// **'Máx: Kz {v}'**
   String maxPreco(Object v);
 
   /// No description provided for @minPreco.
   ///
   /// In pt, this message translates to:
-  /// **'Min: AOA {v}'**
+  /// **'Mín: Kz {v}'**
   String minPreco(Object v);
 
   /// No description provided for @selecioneCidade.
@@ -1045,6 +1045,18 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Selecione a cidade'**
   String get selecioneCidade;
+
+  /// No description provided for @provincia.
+  ///
+  /// In pt, this message translates to:
+  /// **'Província'**
+  String get provincia;
+
+  /// No description provided for @selecioneProvincia.
+  ///
+  /// In pt, this message translates to:
+  /// **'Selecione a província'**
+  String get selecioneProvincia;
 
   /// No description provided for @cidadeLuandaNorte.
   ///
@@ -1889,7 +1901,7 @@ abstract class AppLocalizations {
   /// No description provided for @preco.
   ///
   /// In pt, this message translates to:
-  /// **'Preço (AOA)'**
+  /// **'Preço (Kz)'**
   String get preco;
 
   /// No description provided for @telefoneContato.
@@ -1973,7 +1985,7 @@ abstract class AppLocalizations {
   /// No description provided for @precoM2.
   ///
   /// In pt, this message translates to:
-  /// **'Preço (AOA/m²)'**
+  /// **'Preço (Kz/m²)'**
   String get precoM2;
 
   /// No description provided for @longitude.
@@ -2857,6 +2869,510 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Contactar'**
   String get contactar;
+
+  /// No description provided for @welcomeHeadline.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mais que imóveis. É o seu próximo capítulo.'**
+  String get welcomeHeadline;
+
+  /// No description provided for @whyChooseTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Por que escolher o Luar Mobiliário?'**
+  String get whyChooseTitle;
+
+  /// No description provided for @featVideosTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vídeos em alta definição'**
+  String get featVideosTitle;
+
+  /// No description provided for @featVideosDesc.
+  ///
+  /// In pt, this message translates to:
+  /// **'Veja os imóveis como se estivesse lá.'**
+  String get featVideosDesc;
+
+  /// No description provided for @featVerticalTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Navegação vertical'**
+  String get featVerticalTitle;
+
+  /// No description provided for @featVerticalDesc.
+  ///
+  /// In pt, this message translates to:
+  /// **'Deslize para cima e descubra o próximo imóvel.'**
+  String get featVerticalDesc;
+
+  /// No description provided for @featSearchTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Busca inteligente'**
+  String get featSearchTitle;
+
+  /// No description provided for @featSearchDesc.
+  ///
+  /// In pt, this message translates to:
+  /// **'Encontre exatamente o que procura.'**
+  String get featSearchDesc;
+
+  /// No description provided for @featMapTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mapa interativo'**
+  String get featMapTitle;
+
+  /// No description provided for @featMapDesc.
+  ///
+  /// In pt, this message translates to:
+  /// **'Veja a localização e arredores.'**
+  String get featMapDesc;
+
+  /// No description provided for @featContactTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Contacto direto'**
+  String get featContactTitle;
+
+  /// No description provided for @featContactDesc.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fale com o anunciante via WhatsApp ou telefone.'**
+  String get featContactDesc;
+
+  /// No description provided for @featFavoritesTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Favoritos e histórico'**
+  String get featFavoritesTitle;
+
+  /// No description provided for @featFavoritesDesc.
+  ///
+  /// In pt, this message translates to:
+  /// **'Guarde os imóveis que mais gosta.'**
+  String get featFavoritesDesc;
+
+  /// No description provided for @featNotificationsTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Notificações em tempo real'**
+  String get featNotificationsTitle;
+
+  /// No description provided for @featNotificationsDesc.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não perca novas oportunidades.'**
+  String get featNotificationsDesc;
+
+  /// No description provided for @comparar.
+  ///
+  /// In pt, this message translates to:
+  /// **'Comparar'**
+  String get comparar;
+
+  /// No description provided for @comparando.
+  ///
+  /// In pt, this message translates to:
+  /// **'Comparando'**
+  String get comparando;
+
+  /// No description provided for @adicionarComparacao.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar à comparação'**
+  String get adicionarComparacao;
+
+  /// No description provided for @limiteComparacao.
+  ///
+  /// In pt, this message translates to:
+  /// **'Máximo de 3 imóveis na comparação.'**
+  String get limiteComparacao;
+
+  /// No description provided for @imovelAdicionadoComparacao.
+  ///
+  /// In pt, this message translates to:
+  /// **'Imóvel adicionado à comparação ({count}/3)'**
+  String imovelAdicionadoComparacao(Object count);
+
+  /// No description provided for @comparacaoVaziaTitulo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem imóveis para comparar'**
+  String get comparacaoVaziaTitulo;
+
+  /// No description provided for @comparacaoVaziaSubtitulo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicione imóveis à comparação para os ver lado a lado.'**
+  String get comparacaoVaziaSubtitulo;
+
+  /// No description provided for @destaques.
+  ///
+  /// In pt, this message translates to:
+  /// **'Destaques'**
+  String get destaques;
+
+  /// No description provided for @maisBarato.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mais barato'**
+  String get maisBarato;
+
+  /// No description provided for @melhorValor.
+  ///
+  /// In pt, this message translates to:
+  /// **'Melhor valor'**
+  String get melhorValor;
+
+  /// No description provided for @imagens.
+  ///
+  /// In pt, this message translates to:
+  /// **'Imagens'**
+  String get imagens;
+
+  /// No description provided for @acoes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ações'**
+  String get acoes;
+
+  /// No description provided for @limparComparacao.
+  ///
+  /// In pt, this message translates to:
+  /// **'Limpar comparação'**
+  String get limparComparacao;
+
+  /// No description provided for @limparComparacaoConfirmacao.
+  ///
+  /// In pt, this message translates to:
+  /// **'Remover todos os imóveis da comparação?'**
+  String get limparComparacaoConfirmacao;
+
+  /// No description provided for @precoPorM2.
+  ///
+  /// In pt, this message translates to:
+  /// **'Preço por m²'**
+  String get precoPorM2;
+
+  /// No description provided for @verImovel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ver imóvel'**
+  String get verImovel;
+
+  /// No description provided for @filtros.
+  ///
+  /// In pt, this message translates to:
+  /// **'Filtros'**
+  String get filtros;
+
+  /// No description provided for @finalidade.
+  ///
+  /// In pt, this message translates to:
+  /// **'Finalidade'**
+  String get finalidade;
+
+  /// No description provided for @residencial.
+  ///
+  /// In pt, this message translates to:
+  /// **'Residencial'**
+  String get residencial;
+
+  /// No description provided for @minimo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mínimo'**
+  String get minimo;
+
+  /// No description provided for @maximo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Máximo'**
+  String get maximo;
+
+  /// No description provided for @meusAnuncios.
+  ///
+  /// In pt, this message translates to:
+  /// **'Os meus anúncios'**
+  String get meusAnuncios;
+
+  /// No description provided for @definicoes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Definições'**
+  String get definicoes;
+
+  /// No description provided for @verificado.
+  ///
+  /// In pt, this message translates to:
+  /// **'Verificado'**
+  String get verificado;
+
+  /// No description provided for @anuncios.
+  ///
+  /// In pt, this message translates to:
+  /// **'Anúncios'**
+  String get anuncios;
+
+  /// No description provided for @novoAnuncio.
+  ///
+  /// In pt, this message translates to:
+  /// **'Novo anúncio'**
+  String get novoAnuncio;
+
+  /// No description provided for @semAnuncios.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ainda não tem anúncios'**
+  String get semAnuncios;
+
+  /// No description provided for @semAnunciosSubtitulo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Publique um imóvel para começar a receber contactos.'**
+  String get semAnunciosSubtitulo;
+
+  /// No description provided for @anuncioAtivo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ativo'**
+  String get anuncioAtivo;
+
+  /// No description provided for @anuncioInativo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Inativo'**
+  String get anuncioInativo;
+
+  /// No description provided for @ativar.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ativar'**
+  String get ativar;
+
+  /// No description provided for @desativar.
+  ///
+  /// In pt, this message translates to:
+  /// **'Desativar'**
+  String get desativar;
+
+  /// No description provided for @arrendar.
+  ///
+  /// In pt, this message translates to:
+  /// **'Arrendar'**
+  String get arrendar;
+
+  /// No description provided for @reportar.
+  ///
+  /// In pt, this message translates to:
+  /// **'Reportar'**
+  String get reportar;
+
+  /// No description provided for @reportarAnuncio.
+  ///
+  /// In pt, this message translates to:
+  /// **'Reportar anúncio'**
+  String get reportarAnuncio;
+
+  /// No description provided for @motivo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Motivo'**
+  String get motivo;
+
+  /// No description provided for @detalhesOpcionais.
+  ///
+  /// In pt, this message translates to:
+  /// **'Detalhes (opcional)'**
+  String get detalhesOpcionais;
+
+  /// No description provided for @enviarDenuncia.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enviar denúncia'**
+  String get enviarDenuncia;
+
+  /// No description provided for @denunciaEnviada.
+  ///
+  /// In pt, this message translates to:
+  /// **'Denúncia enviada. Obrigado pela ajuda.'**
+  String get denunciaEnviada;
+
+  /// No description provided for @erroEnviarDenuncia.
+  ///
+  /// In pt, this message translates to:
+  /// **'Erro ao enviar denúncia'**
+  String get erroEnviarDenuncia;
+
+  /// No description provided for @selecionarMotivo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Selecione um motivo'**
+  String get selecionarMotivo;
+
+  /// No description provided for @motivoSpam.
+  ///
+  /// In pt, this message translates to:
+  /// **'Spam'**
+  String get motivoSpam;
+
+  /// No description provided for @motivoInformacaoFalsa.
+  ///
+  /// In pt, this message translates to:
+  /// **'Informação falsa'**
+  String get motivoInformacaoFalsa;
+
+  /// No description provided for @motivoConteudoInapropriado.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conteúdo impróprio'**
+  String get motivoConteudoInapropriado;
+
+  /// No description provided for @motivoBurla.
+  ///
+  /// In pt, this message translates to:
+  /// **'Burla / fraude'**
+  String get motivoBurla;
+
+  /// No description provided for @motivoOutro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Outro'**
+  String get motivoOutro;
+
+  /// No description provided for @denuncias.
+  ///
+  /// In pt, this message translates to:
+  /// **'Denúncias'**
+  String get denuncias;
+
+  /// No description provided for @semDenuncias.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem denúncias'**
+  String get semDenuncias;
+
+  /// No description provided for @todasAsOpcoes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todas'**
+  String get todasAsOpcoes;
+
+  /// No description provided for @emAnalise.
+  ///
+  /// In pt, this message translates to:
+  /// **'Em análise'**
+  String get emAnalise;
+
+  /// No description provided for @resolvida.
+  ///
+  /// In pt, this message translates to:
+  /// **'Resolvida'**
+  String get resolvida;
+
+  /// No description provided for @dispensada.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dispensada'**
+  String get dispensada;
+
+  /// No description provided for @denunciadoPor.
+  ///
+  /// In pt, this message translates to:
+  /// **'Denunciado por'**
+  String get denunciadoPor;
+
+  /// No description provided for @ocultarAnuncio.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ocultar anúncio'**
+  String get ocultarAnuncio;
+
+  /// No description provided for @anuncioOcultado.
+  ///
+  /// In pt, this message translates to:
+  /// **'Anúncio ocultado'**
+  String get anuncioOcultado;
+
+  /// No description provided for @verificarAnunciante.
+  ///
+  /// In pt, this message translates to:
+  /// **'Verificar anunciante'**
+  String get verificarAnunciante;
+
+  /// No description provided for @retirarVerificacao.
+  ///
+  /// In pt, this message translates to:
+  /// **'Retirar verificação'**
+  String get retirarVerificacao;
+
+  /// No description provided for @anuncianteVerificado.
+  ///
+  /// In pt, this message translates to:
+  /// **'Anunciante verificado'**
+  String get anuncianteVerificado;
+
+  /// No description provided for @verificacaoAlterada.
+  ///
+  /// In pt, this message translates to:
+  /// **'Verificação alterada'**
+  String get verificacaoAlterada;
+
+  /// No description provided for @erroVerificacao.
+  ///
+  /// In pt, this message translates to:
+  /// **'Erro ao alterar verificação'**
+  String get erroVerificacao;
+
+  /// No description provided for @marcarResolvida.
+  ///
+  /// In pt, this message translates to:
+  /// **'Marcar resolvida'**
+  String get marcarResolvida;
+
+  /// No description provided for @dispensar.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dispensar'**
+  String get dispensar;
+
+  /// No description provided for @erroAcaoModeracao.
+  ///
+  /// In pt, this message translates to:
+  /// **'Erro ao executar ação de moderação'**
+  String get erroAcaoModeracao;
+
+  /// No description provided for @acaoConcluida.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ação concluída'**
+  String get acaoConcluida;
+
+  /// No description provided for @reportarRequerLogin.
+  ///
+  /// In pt, this message translates to:
+  /// **'Inicie sessão para reportar anúncios'**
+  String get reportarRequerLogin;
+
+  /// No description provided for @semLigacao.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem ligação à internet'**
+  String get semLigacao;
+
+  /// No description provided for @reproducaoAutomatica.
+  ///
+  /// In pt, this message translates to:
+  /// **'Reprodução automática'**
+  String get reproducaoAutomatica;
+
+  /// No description provided for @reproducaoAutomaticaDesc.
+  ///
+  /// In pt, this message translates to:
+  /// **'Reproduzir vídeos do feed sem toque'**
+  String get reproducaoAutomaticaDesc;
 }
 
 class _AppLocalizationsDelegate

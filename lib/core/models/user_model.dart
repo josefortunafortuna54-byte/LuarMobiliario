@@ -16,6 +16,9 @@ class UserModel {
   final String phone;
   final String avatarUrl;
   final UserRole role;
+  final bool verified;
+  final String verificationNote;
+  final DateTime? verifiedAt;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -26,6 +29,9 @@ class UserModel {
     required this.phone,
     required this.avatarUrl,
     required this.role,
+    this.verified = false,
+    this.verificationNote = '',
+    this.verifiedAt,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -38,6 +44,11 @@ class UserModel {
       phone: json['phone'] as String? ?? '',
       avatarUrl: json['avatar_url'] as String? ?? '',
       role: _roleFromString(json['role'] as String? ?? 'client'),
+      verified: json['verified'] as bool? ?? false,
+      verificationNote: json['verification_note'] as String? ?? '',
+      verifiedAt: json['verified_at'] != null
+          ? DateTime.tryParse(json['verified_at'] as String)
+          : null,
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'] as String)
           : DateTime.now(),
@@ -55,6 +66,7 @@ class UserModel {
       'phone': phone,
       'avatar_url': avatarUrl,
       'role': _roleToString(role),
+      'verification_note': verificationNote,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
     };
@@ -67,6 +79,9 @@ class UserModel {
     String? phone,
     String? avatarUrl,
     UserRole? role,
+    bool? verified,
+    String? verificationNote,
+    DateTime? verifiedAt,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -77,6 +92,9 @@ class UserModel {
       phone: phone ?? this.phone,
       avatarUrl: avatarUrl ?? this.avatarUrl,
       role: role ?? this.role,
+      verified: verified ?? this.verified,
+      verificationNote: verificationNote ?? this.verificationNote,
+      verifiedAt: verifiedAt ?? this.verifiedAt,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

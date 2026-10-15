@@ -228,25 +228,25 @@ void main() {
         expect(find.text('Arrendamento'), findsWidgets);
       });
 
-      testWidgets('displays formatted price with AOA prefix', (tester) async {
+      testWidgets('displays formatted price with Kz suffix', (tester) async {
         await tester.pumpWidget(wrapInApp(createCard(price: 15000000)));
         await tester.pumpAndSettle();
 
-        expect(find.text('AOA 15.000.000'), findsOneWidget);
+        expect(find.text('15.000.000 Kz'), findsOneWidget);
       });
 
       testWidgets('formats price with dot separators', (tester) async {
         await tester.pumpWidget(wrapInApp(createCard(price: 1500000)));
         await tester.pumpAndSettle();
 
-        expect(find.text('AOA 1.500.000'), findsOneWidget);
+        expect(find.text('1.500.000 Kz'), findsOneWidget);
       });
 
       testWidgets('formats small price without separators', (tester) async {
         await tester.pumpWidget(wrapInApp(createCard(price: 500)));
         await tester.pumpAndSettle();
 
-        expect(find.text('AOA 500'), findsOneWidget);
+        expect(find.text('500 Kz'), findsOneWidget);
       });
 
       testWidgets('shows bedroom count', (tester) async {
@@ -352,7 +352,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('AOA 2.500.000'), findsOneWidget);
+        expect(find.text('2.500.000 Kz'), findsOneWidget);
       });
 
       testWidgets('calls onTap on horizontal card', (tester) async {

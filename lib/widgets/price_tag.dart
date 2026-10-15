@@ -30,14 +30,14 @@ class PriceTag extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final formattedPrice = formatPriceRaw(price);
-    final currency = showCurrency ? 'AOA ' : '';
+    final text = showCurrency ? '$formattedPrice Kz' : formattedPrice;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.baseline,
       textBaseline: TextBaseline.alphabetic,
       children: [
-        Text('$currency$formattedPrice', style: _textStyle),
+        Text(text, style: _textStyle),
         if (isRent) ...[
           const SizedBox(width: 2),
           Text(

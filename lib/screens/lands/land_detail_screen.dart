@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -7,10 +8,13 @@ import '../../core/constants/app_colors.dart';
 
 import '../../core/constants/app_text_styles.dart';
 import '../../core/models/land_model.dart';
+import '../../core/models/report_model.dart';
 import '../../core/providers/land_provider.dart';
 import '../../core/providers/favorite_provider.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/theme/app_palette.dart';
+import '../../core/utils/deep_links.dart';
+import '../../core/utils/formatters.dart';
 import '../../core/utils/routes.dart';
 import '../../l10n/app_localizations.dart';
 import '../../screens/bookings/booking_bottom_sheet.dart';
@@ -18,6 +22,8 @@ import '../../screens/videos/video_viewer_screen.dart';
 import '../../widgets/loading_widget.dart';
 import '../../widgets/avatar_widget.dart';
 import '../../widgets/feature_chip.dart';
+import '../../widgets/report_dialog.dart';
+import '../../widgets/verified_badge.dart';
 
 class LandDetailScreen extends StatefulWidget {
   const LandDetailScreen({super.key});
@@ -171,9 +177,9 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
             SharePlus.instance.share(
               ShareParams(
                 text:
-                    '${land.title} - AOA ${land.price.toStringAsFixed(0)}\n'
+                    '${land.title} - ${formatPrice(land.price)}\n'
                     '${l10n.localizacao}: $location\n'
-                    '${l10n.verEmLuar}',
+                    '${DeepLinks.land(land.id)}',
               ),
             );
           },
@@ -194,6 +200,15 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
                 : Icons.favorite_border_rounded,
             color: _isFavorite ? AppColors.gold : AppColors.white,
           ),
+        ),
+        IconButton(
+          onPressed: () => showReportDialog(
+            context,
+            targetType: ReportTarget.land,
+            targetId: land.id,
+          ),
+          icon: const Icon(Icons.flag_outlined, color: AppColors.white),
+          tooltip: l10n.reportar,
         ),
         const SizedBox(width: 4),
       ],
@@ -218,10 +233,11 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
                     return Stack(
                       fit: StackFit.expand,
                       children: [
-                        Image.network(
-                          images[index],
+                        CachedNetworkImage(
+                          imageUrl: images[index],
                           fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) => Container(
+                          memCacheWidth: 1080,
+                          errorWidget: (_, _, _) => Container(
                             color: palette.surfaceAlt,
                             child: Icon(
                               Icons.landscape_rounded,
@@ -451,7 +467,7 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'AOA ${land.price.toStringAsFixed(0)}',
+            formatPrice(land.price),
             style: AppTextStyles.priceLarge,
           ),
           if (isRent)
@@ -698,6 +714,10 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
                           color: palette.textTitle,
                         ),
                       ),
+                      if (land.agentVerified) ...[
+                        const SizedBox(height: 4),
+                        const VerifiedBadge(),
+                      ],
                       const SizedBox(height: 4),
                       Text(
                         land.agentPhone,

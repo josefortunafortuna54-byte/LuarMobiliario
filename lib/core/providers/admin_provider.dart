@@ -73,6 +73,31 @@ class AdminProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> setUserVerified({
+    required String userId,
+    required bool verified,
+    required String actorId,
+  }) async {
+    try {
+      await _repository.setUserVerified(
+        userId: userId,
+        verified: verified,
+        adminId: actorId,
+      );
+
+      final index = _allUsers.indexWhere((u) => u.id == userId);
+      if (index != -1) {
+        _allUsers[index] = _allUsers[index].copyWith(verified: verified);
+        notifyListeners();
+      }
+      return true;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
+
   Future<bool> deleteUser(String userId) async {
     try {
       await _repository.deleteUser(userId);

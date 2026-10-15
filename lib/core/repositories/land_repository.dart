@@ -52,6 +52,9 @@ class LandRepository {
           case 'transactionType':
             query = query.eq('transaction_type', entry.value);
             break;
+          case 'province':
+            query = query.ilike('province', '%${entry.value}%');
+            break;
           case 'city':
             query = query.ilike('city', '%${entry.value}%');
             break;
@@ -103,7 +106,7 @@ class LandRepository {
   Future<List<LandModel>> fetchFeatured({int limit = 10}) async {
     final response = await _client
         .from('lands')
-        .select('*, land_images(image_url)')
+        .select('*, land_images(image_url), land_videos(video_url)')
         .eq('is_featured', true)
         .eq('is_available', true)
         .order('created_at', ascending: false)
@@ -115,7 +118,7 @@ class LandRepository {
   Future<LandModel> fetchById(String id) async {
     final response = await _client
         .from('lands')
-        .select('*, land_images(image_url)')
+        .select('*, land_images(image_url), land_videos(video_url)')
         .eq('id', id)
         .single();
 
@@ -204,6 +207,7 @@ class LandRepository {
     String? query,
     String? type,
     String? transactionType,
+    String? province,
     String? city,
     String? municipality,
     String? neighborhood,
@@ -211,17 +215,28 @@ class LandRepository {
     double? maxPrice,
     double? minArea,
     double? maxArea,
+    int page = 0,
+    int pageSize = AppConstants.defaultPageSize,
+    String orderBy = 'created_at',
+    bool ascending = false,
   }) async {
-    var queryBuilder = _client.from('lands').select().eq('is_available', true);
+    var queryBuilder = _client
+        .from('lands')
+        .select('*, land_images(image_url), land_videos(video_url)')
+        .eq('is_available', true);
 
     if (query != null && query.isNotEmpty) {
       queryBuilder = queryBuilder.or(
-        'title.ilike.%$query%,description.ilike.%$query%,address.ilike.%$query%,city.ilike.%$query%,municipality.ilike.%$query%,neighborhood.ilike.%$query%',
+        'title.ilike.%$query%,description.ilike.%$query%,address.ilike.%$query%,province.ilike.%$query%,city.ilike.%$query%,municipality.ilike.%$query%,neighborhood.ilike.%$query%',
       );
     }
 
     if (transactionType != null) {
       queryBuilder = queryBuilder.eq('transaction_type', transactionType);
+    }
+
+    if (province != null) {
+      queryBuilder = queryBuilder.ilike('province', '%$province%');
     }
 
     if (city != null) {
@@ -256,21 +271,48 @@ class LandRepository {
       queryBuilder = queryBuilder.eq('type', type);
     }
 
-    final response = await queryBuilder
-        .order('created_at', ascending: false)
-        .limit(AppConstants.defaultPageSize);
+    final from = page * pageSize;
+    final to = from + pageSize - 1;
 
-    return (response as List)
-        .map((json) => LandModel.fromJson(json as Map<String, dynamic>))
-        .toList();
+    final response = await queryBuilder
+        .order(orderBy, ascending: ascending)
+        .range(from, to);
+
+    return _mapResponse(response as List);
+  }
+
+  /// Terrenos do agente (inclui os indisponíveis, para gestão própria).
+  Future<List<LandModel>> fetchByAgent(String agentId) async {
+    final response = await _client
+        .from('lands')
+        .select('*, land_images(image_url), land_videos(video_url)')
+        .eq('agent_id', agentId)
+        .order('created_at', ascending: false);
+
+    return _mapResponse(response as List);
+  }
+
+  /// Número de terrenos do agente (estatística do perfil).
+  Future<int> countByAgent(String agentId) async {
+    final response = await _client
+        .from('lands')
+        .select('id')
+        .eq('agent_id', agentId);
+    return (response as List).length;
+  }
+
+  /// Ativa ou desativa a publicação de um terreno do próprio agente.
+  Future<void> setAvailable(String id, bool available) async {
+    await _client.from('lands').update({'is_available': available}).eq('id', id);
   }
 
   Future<List<LandModel>> fetchByIds(List<String> ids) async {
     if (ids.isEmpty) return [];
-    final response = await _client.from('lands').select().inFilter('id', ids);
+    final response = await _client
+        .from('lands')
+        .select('*, land_images(image_url), land_videos(video_url)')
+        .inFilter('id', ids);
 
-    return (response as List)
-        .map((json) => LandModel.fromJson(json as Map<String, dynamic>))
-        .toList();
+    return _mapResponse(response as List);
   }
 }

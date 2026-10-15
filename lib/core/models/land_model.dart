@@ -29,6 +29,7 @@ class LandModel {
   final double price;
   final double area;
   final String address;
+  final String province;
   final String city;
   final String municipality;
   final String neighborhood;
@@ -40,6 +41,7 @@ class LandModel {
   final String? agentId;
   final String agentName;
   final String agentPhone;
+  final bool agentVerified;
   final bool isFeatured;
   final bool isAvailable;
   final DateTime createdAt;
@@ -54,6 +56,7 @@ class LandModel {
     required this.price,
     required this.area,
     required this.address,
+    this.province = '',
     required this.city,
     required this.municipality,
     required this.neighborhood,
@@ -65,6 +68,7 @@ class LandModel {
     this.agentId,
     required this.agentName,
     required this.agentPhone,
+    this.agentVerified = false,
     required this.isFeatured,
     required this.isAvailable,
     required this.createdAt,
@@ -83,6 +87,7 @@ class LandModel {
       price: (json['price'] as num?)?.toDouble() ?? 0.0,
       area: (json['area'] as num?)?.toDouble() ?? 0.0,
       address: json['address'] as String? ?? '',
+      province: json['province'] as String? ?? '',
       city: json['city'] as String? ?? '',
       municipality: json['municipality'] as String? ?? '',
       neighborhood: json['neighborhood'] as String? ?? '',
@@ -106,6 +111,7 @@ class LandModel {
       agentId: json['agent_id'] as String?,
       agentName: json['agent_name'] as String? ?? '',
       agentPhone: json['agent_phone'] as String? ?? '',
+      agentVerified: json['agent_verified'] as bool? ?? false,
       isFeatured: json['is_featured'] as bool? ?? false,
       isAvailable: json['is_available'] as bool? ?? true,
       createdAt: json['created_at'] != null
@@ -127,6 +133,7 @@ class LandModel {
       'price': price,
       'area': area,
       'address': address,
+      'province': province,
       'city': city,
       'municipality': municipality,
       'neighborhood': neighborhood,
@@ -154,6 +161,7 @@ class LandModel {
     double? price,
     double? area,
     String? address,
+    String? province,
     String? city,
     String? municipality,
     String? neighborhood,
@@ -165,6 +173,7 @@ class LandModel {
     String? agentId,
     String? agentName,
     String? agentPhone,
+    bool? agentVerified,
     bool? isFeatured,
     bool? isAvailable,
     DateTime? createdAt,
@@ -179,6 +188,7 @@ class LandModel {
       price: price ?? this.price,
       area: area ?? this.area,
       address: address ?? this.address,
+      province: province ?? this.province,
       city: city ?? this.city,
       municipality: municipality ?? this.municipality,
       neighborhood: neighborhood ?? this.neighborhood,
@@ -190,6 +200,7 @@ class LandModel {
       agentId: agentId ?? this.agentId,
       agentName: agentName ?? this.agentName,
       agentPhone: agentPhone ?? this.agentPhone,
+      agentVerified: agentVerified ?? this.agentVerified,
       isFeatured: isFeatured ?? this.isFeatured,
       isAvailable: isAvailable ?? this.isAvailable,
       createdAt: createdAt ?? this.createdAt,

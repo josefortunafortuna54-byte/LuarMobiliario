@@ -32,6 +32,7 @@ class PropertyModel {
   final int bathrooms;
   final int garage;
   final String address;
+  final String province;
   final String city;
   final String municipality;
   final String neighborhood;
@@ -43,6 +44,7 @@ class PropertyModel {
   final String? agentId;
   final String agentName;
   final String agentPhone;
+  final bool agentVerified;
   final bool isFeatured;
   final bool isAvailable;
   final DateTime createdAt;
@@ -60,6 +62,7 @@ class PropertyModel {
     required this.bathrooms,
     required this.garage,
     required this.address,
+    this.province = '',
     required this.city,
     required this.municipality,
     required this.neighborhood,
@@ -71,6 +74,7 @@ class PropertyModel {
     this.agentId,
     required this.agentName,
     required this.agentPhone,
+    this.agentVerified = false,
     required this.isFeatured,
     required this.isAvailable,
     required this.createdAt,
@@ -92,6 +96,7 @@ class PropertyModel {
       bathrooms: (json['bathrooms'] as num?)?.toInt() ?? 0,
       garage: (json['garage'] as num?)?.toInt() ?? 0,
       address: json['address'] as String? ?? '',
+      province: json['province'] as String? ?? '',
       city: json['city'] as String? ?? '',
       municipality: json['municipality'] as String? ?? '',
       neighborhood: json['neighborhood'] as String? ?? '',
@@ -115,6 +120,7 @@ class PropertyModel {
       agentId: json['agent_id'] as String?,
       agentName: json['agent_name'] as String? ?? '',
       agentPhone: json['agent_phone'] as String? ?? '',
+      agentVerified: json['agent_verified'] as bool? ?? false,
       isFeatured: json['is_featured'] as bool? ?? false,
       isAvailable: json['is_available'] as bool? ?? true,
       createdAt: json['created_at'] != null
@@ -139,6 +145,7 @@ class PropertyModel {
       'bathrooms': bathrooms,
       'garage': garage,
       'address': address,
+      'province': province,
       'city': city,
       'municipality': municipality,
       'neighborhood': neighborhood,
@@ -169,6 +176,7 @@ class PropertyModel {
     int? bathrooms,
     int? garage,
     String? address,
+    String? province,
     String? city,
     String? municipality,
     String? neighborhood,
@@ -180,6 +188,7 @@ class PropertyModel {
     String? agentId,
     String? agentName,
     String? agentPhone,
+    bool? agentVerified,
     bool? isFeatured,
     bool? isAvailable,
     DateTime? createdAt,
@@ -197,6 +206,7 @@ class PropertyModel {
       bathrooms: bathrooms ?? this.bathrooms,
       garage: garage ?? this.garage,
       address: address ?? this.address,
+      province: province ?? this.province,
       city: city ?? this.city,
       municipality: municipality ?? this.municipality,
       neighborhood: neighborhood ?? this.neighborhood,
@@ -208,6 +218,7 @@ class PropertyModel {
       agentId: agentId ?? this.agentId,
       agentName: agentName ?? this.agentName,
       agentPhone: agentPhone ?? this.agentPhone,
+      agentVerified: agentVerified ?? this.agentVerified,
       isFeatured: isFeatured ?? this.isFeatured,
       isAvailable: isAvailable ?? this.isAvailable,
       createdAt: createdAt ?? this.createdAt,

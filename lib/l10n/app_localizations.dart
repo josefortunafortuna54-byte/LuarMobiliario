@@ -2821,6 +2821,42 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Não foi possível selecionar o vídeo. Tente novamente.'**
   String get erroSelecionarVideo;
+
+  /// No description provided for @descobrir.
+  ///
+  /// In pt, this message translates to:
+  /// **'Descobrir'**
+  String get descobrir;
+
+  /// No description provided for @descobrirDeslizar.
+  ///
+  /// In pt, this message translates to:
+  /// **'Deslize para cima para ver mais imóveis'**
+  String get descobrirDeslizar;
+
+  /// No description provided for @descobrirVazioTitulo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem imóveis para descobrir'**
+  String get descobrirVazioTitulo;
+
+  /// No description provided for @descobrirVazioSubtitulo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Volte mais tarde para ver novos imóveis.'**
+  String get descobrirVazioSubtitulo;
+
+  /// No description provided for @descobrirErro.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível carregar o feed.'**
+  String get descobrirErro;
+
+  /// No description provided for @contactar.
+  ///
+  /// In pt, this message translates to:
+  /// **'Contactar'**
+  String get contactar;
 }
 
 class _AppLocalizationsDelegate

@@ -59,3 +59,6 @@ android/.kotlin/
 
 # Supabase CLI artifacts
 supabase/.temp/
+
+# Credenciais admin locais (nunca versionar)
+supabase/set_admin_passcode.sql

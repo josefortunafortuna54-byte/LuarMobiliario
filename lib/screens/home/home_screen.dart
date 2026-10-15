@@ -188,6 +188,25 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.of(context).pushNamed(AppRoutes.properties);
             },
           ),
+          const SizedBox(height: 14),
+          OutlinedButton.icon(
+            onPressed: () {
+              Navigator.of(context).pushNamed(AppRoutes.discover);
+            },
+            icon: const Icon(Icons.play_circle_outline_rounded, size: 20),
+            label: Text(l10n.descobrir),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.white,
+              side: BorderSide(
+                color: AppColors.white.withValues(alpha: 0.4),
+                width: 1.2,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -902,6 +921,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 index: 0,
               ),
               _buildNavItem(
+                icon: Icons.play_circle_outline_rounded,
+                activeIcon: Icons.play_circle_rounded,
+                label: l10n.descobrir,
+                index: 4,
+              ),
+              _buildNavItem(
                 icon: Icons.search_outlined,
                 activeIcon: Icons.search_rounded,
                 label: l10n.pesquisar,
@@ -945,6 +970,8 @@ class _HomeScreenState extends State<HomeScreen> {
           Navigator.of(context).pushNamed(AppRoutes.favorites);
         } else if (index == 3) {
           Navigator.of(context).pushNamed(AppRoutes.profile);
+        } else if (index == 4) {
+          Navigator.of(context).pushNamed(AppRoutes.discover);
         } else {
           setState(() => _currentBottomNav = index);
         }

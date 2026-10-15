@@ -1468,4 +1468,23 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get erroSelecionarVideo =>
       'Could not select the video. Please try again.';
+
+  @override
+  String get descobrir => 'Discover';
+
+  @override
+  String get descobrirDeslizar => 'Swipe up to see more properties';
+
+  @override
+  String get descobrirVazioTitulo => 'No properties to discover';
+
+  @override
+  String get descobrirVazioSubtitulo =>
+      'Come back later to see new properties.';
+
+  @override
+  String get descobrirErro => 'Could not load the feed.';
+
+  @override
+  String get contactar => 'Contact';
 }

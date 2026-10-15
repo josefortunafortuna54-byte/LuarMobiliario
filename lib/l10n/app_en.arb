@@ -453,5 +453,11 @@
   "erroCarregarVideo": "Could not load the video",
   "limiteVideos": "Limit of {max} videos reached",
   "videoMuitoGrande": "The video is too large (max {max} MB).",
-  "erroSelecionarVideo": "Could not select the video. Please try again."
+  "erroSelecionarVideo": "Could not select the video. Please try again.",
+  "descobrir": "Discover",
+  "descobrirDeslizar": "Swipe up to see more properties",
+  "descobrirVazioTitulo": "No properties to discover",
+  "descobrirVazioSubtitulo": "Come back later to see new properties.",
+  "descobrirErro": "Could not load the feed.",
+  "contactar": "Contact"
 }

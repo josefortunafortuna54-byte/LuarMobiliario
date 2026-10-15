@@ -4,6 +4,7 @@ import '../../screens/splash/splash_screen.dart';
 import '../../screens/welcome/welcome_screen.dart';
 import '../../screens/auth/admin_login_screen.dart';
 import '../../screens/home/home_screen.dart';
+import '../../screens/discover/discover_screen.dart';
 import '../../screens/search/search_screen.dart';
 import '../../screens/properties/properties_screen.dart';
 import '../../screens/properties/property_detail_screen.dart';
@@ -30,6 +31,7 @@ abstract final class AppRoutes {
   static const String welcome = '/welcome';
   static const String adminLogin = '/admin-login';
   static const String home = '/home';
+  static const String discover = '/discover';
   static const String search = '/search';
   static const String properties = '/properties';
   static const String propertyDetail = '/properties/:id';
@@ -83,6 +85,9 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
 
     case AppRoutes.home:
       return _buildRoute(const HomeScreen(), settings);
+
+    case AppRoutes.discover:
+      return _buildRoute(const DiscoverScreen(), settings);
 
     case AppRoutes.search:
       return _buildRoute(const SearchScreen(), settings);

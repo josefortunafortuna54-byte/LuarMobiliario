@@ -11,26 +11,48 @@ class VideoPlayerWidget extends StatefulWidget {
   final bool autoPlay;
   final bool looping;
 
+  /// Controla se o vídeo pode reproduzir. No feed vertical (Luar Discover),
+  /// apenas a página ativa deve ter [isActive] a `true`.
+  final bool isActive;
+
   const VideoPlayerWidget({
     super.key,
     required this.url,
     this.autoPlay = false,
     this.looping = false,
+    this.isActive = true,
   });
 
   @override
   State<VideoPlayerWidget> createState() => _VideoPlayerWidgetState();
 }
 
-class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
+class _VideoPlayerWidgetState extends State<VideoPlayerWidget>
+    with WidgetsBindingObserver {
   VideoPlayerController? _controller;
   bool _initialized = false;
   bool _hasError = false;
+  bool _isAppActive = true;
+  bool _userPaused = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _initialize();
+  }
+
+  @override
+  void didUpdateWidget(covariant VideoPlayerWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.url != widget.url) {
+      _reinitialize();
+      return;
+    }
+    if (oldWidget.isActive != widget.isActive ||
+        oldWidget.autoPlay != widget.autoPlay) {
+      _syncPlayback();
+    }
   }
 
   Future<void> _initialize() async {
@@ -39,17 +61,53 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     try {
       await controller.initialize();
       await controller.setLooping(widget.looping);
-      if (widget.autoPlay) {
-        await controller.play();
-      }
+      _syncPlayback();
       if (mounted) setState(() => _initialized = true);
     } catch (_) {
       if (mounted) setState(() => _hasError = true);
     }
   }
 
+  Future<void> _reinitialize() async {
+    final old = _controller;
+    _controller = null;
+    _initialized = false;
+    _hasError = false;
+    _userPaused = false;
+    if (mounted) setState(() {});
+    await old?.dispose();
+    await _initialize();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _isAppActive = state == AppLifecycleState.resumed;
+    _syncPlayback();
+  }
+
+  /// Pausa/retoma o vídeo de acordo com o estado ativo, o ciclo de vida da
+  /// aplicação e a preferência do utilizador.
+  Future<void> _syncPlayback() async {
+    final controller = _controller;
+    if (controller == null || !controller.value.isInitialized) return;
+
+    final shouldPlay =
+        widget.autoPlay &&
+        widget.isActive &&
+        _isAppActive &&
+        !_userPaused;
+
+    if (shouldPlay && !controller.value.isPlaying) {
+      await controller.play();
+    } else if (!shouldPlay && controller.value.isPlaying) {
+      await controller.pause();
+    }
+    if (mounted) setState(() {});
+  }
+
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _controller?.dispose();
     super.dispose();
   }
@@ -57,13 +115,8 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   void _togglePlayback() {
     final controller = _controller;
     if (controller == null || !controller.value.isInitialized) return;
-    setState(() {
-      if (controller.value.isPlaying) {
-        controller.pause();
-      } else {
-        controller.play();
-      }
-    });
+    _userPaused = controller.value.isPlaying;
+    _syncPlayback();
   }
 
   @override
@@ -76,7 +129,11 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.videocam_off_outlined, size: 40, color: Colors.white70),
+            const Icon(
+              Icons.videocam_off_outlined,
+              size: 40,
+              color: Colors.white70,
+            ),
             const SizedBox(height: 8),
             Text(
               AppLocalizations.of(context).erroCarregarVideo,

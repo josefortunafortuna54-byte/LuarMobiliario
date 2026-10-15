@@ -453,5 +453,11 @@
   "erroCarregarVideo": "Não foi possível carregar o vídeo",
   "limiteVideos": "Limite de {max} vídeos atingido",
   "videoMuitoGrande": "O vídeo é demasiado grande (máx. {max} MB).",
-  "erroSelecionarVideo": "Não foi possível selecionar o vídeo. Tente novamente."
+  "erroSelecionarVideo": "Não foi possível selecionar o vídeo. Tente novamente.",
+  "descobrir": "Descobrir",
+  "descobrirDeslizar": "Deslize para cima para ver mais imóveis",
+  "descobrirVazioTitulo": "Sem imóveis para descobrir",
+  "descobrirVazioSubtitulo": "Volte mais tarde para ver novos imóveis.",
+  "descobrirErro": "Não foi possível carregar o feed.",
+  "contactar": "Contactar"
 }

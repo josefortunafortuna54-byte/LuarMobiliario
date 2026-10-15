@@ -9,6 +9,7 @@ import 'core/providers/booking_provider.dart';
 import 'core/providers/locale_provider.dart';
 import 'core/providers/message_provider.dart';
 import 'core/providers/admin_provider.dart';
+import 'core/providers/discover_provider.dart';
 import 'core/providers/favorite_provider.dart';
 import 'core/providers/land_provider.dart';
 import 'core/providers/property_provider.dart';
@@ -48,6 +49,7 @@ Future<void> main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()..init()),
         ChangeNotifierProvider(create: (_) => PropertyProvider()),
+        ChangeNotifierProvider(create: (_) => DiscoverProvider()),
         ChangeNotifierProvider(create: (_) => LandProvider()),
         ChangeNotifierProvider(create: (_) => SearchProvider()),
         ChangeNotifierProvider(create: (_) => FavoriteProvider()),

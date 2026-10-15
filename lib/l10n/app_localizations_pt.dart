@@ -1475,4 +1475,23 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get erroSelecionarVideo =>
       'Não foi possível selecionar o vídeo. Tente novamente.';
+
+  @override
+  String get descobrir => 'Descobrir';
+
+  @override
+  String get descobrirDeslizar => 'Deslize para cima para ver mais imóveis';
+
+  @override
+  String get descobrirVazioTitulo => 'Sem imóveis para descobrir';
+
+  @override
+  String get descobrirVazioSubtitulo =>
+      'Volte mais tarde para ver novos imóveis.';
+
+  @override
+  String get descobrirErro => 'Não foi possível carregar o feed.';
+
+  @override
+  String get contactar => 'Contactar';
 }

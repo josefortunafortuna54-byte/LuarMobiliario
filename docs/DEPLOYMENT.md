@@ -78,7 +78,7 @@ Referencie `key.properties` no `android/app/build.gradle.kts`.
 
 ```bash
 cd luar_company
-flutter build ios --release
+flutter build ios --release --dart-define-from-file=.env
 ```
 
 ### Publicação na App Store
@@ -111,7 +111,7 @@ flutter build ios --release
 
 ```bash
 cd luar_company
-flutter build web --release
+flutter build web --release --dart-define-from-file=.env
 ```
 
 Os ficheiros serão gerados em: `build/web/`
@@ -131,7 +131,7 @@ firebase deploy
 
 Configure o build command:
 ```
-Build: flutter build web --release
+Build: flutter build web --release --dart-define-from-file=.env
 Output: build/web
 ```
 
@@ -150,6 +150,8 @@ SUPABASE_URL=https://seu-projeto.supabase.co
 SUPABASE_ANON_KEY=<chave-produção>
 FCM_SENDER_ID=<sender-id-produção>
 FCM_PROJECT_ID=<project-id-produção>
+FCM_API_KEY=<api-key-produção>
+FCM_APP_ID=<app-id-produção>
 ```
 
 ### Desenvolvimento
@@ -159,6 +161,8 @@ SUPABASE_URL=https://seu-projeto-dev.supabase.co
 SUPABASE_ANON_KEY=<chave-dev>
 FCM_SENDER_ID=
 FCM_PROJECT_ID=
+FCM_API_KEY=
+FCM_APP_ID=
 ```
 
 ---
@@ -187,7 +191,7 @@ FCM_PROJECT_ID=
 A versão da aplicação é definida no `pubspec.yaml`:
 
 ```yaml
-version: 1.0.0
+version: 1.0.1+14
 #         │     │
 #         │     └─ Build number (incrementar a cada deploy)
 #         └─ Versão semântica (major.minor.patch)

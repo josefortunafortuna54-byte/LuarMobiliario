@@ -10,11 +10,11 @@ O Supabase é a plataforma backend (BaaS) utilizada no projeto, fornecendo:
 
 - **PostgreSQL** — Base de dados relacional
 - **Supabase Auth** — Autenticação e gestão de utilizadores
-- **Supabase Storage** — Armazenamento de ficheiros (imagens)
+- **Supabase Storage** — Armazenamento de ficheiros (imagens e vídeos)
 - **Row Level Security (RLS)** — Autorização a nível de linha
 
 > **Nota:** O schema SQL completo e atualizado está nas **migrations** em
-> `luar_company/supabase/migrations/` (001 a 007) e resumido em `docs/DATABASE.md`.
+> `luar_company/supabase/migrations/` (001 a 026) e resumido em `docs/DATABASE.md`.
 > Este guia descreve a configuração do projeto e as boas práticas.
 
 ---
@@ -65,7 +65,7 @@ FCM_PROJECT_ID=seu-project-id      # opcional
 ### Tabela `users` e o perfil do utilizador
 
 O perfil em `public.users` usa o **mesmo `id` de `auth.users`**. É criado automaticamente
-pelo trigger `handle_new_user` (migration 007):
+pelo trigger `handle_new_user` (definido na migration 007, restaurado na 023):
 
 ```sql
 CREATE OR REPLACE FUNCTION public.handle_new_user()
@@ -98,16 +98,18 @@ A aplicação também faz `upsert` deste registo após o registo (em `AuthServic
 
 A base de dados contém as seguintes tabelas (definição completa nas migrations):
 
-`users` · `categories` · `locations` · `properties` · `property_images` · `lands` ·
-`land_images` · `favorites` · `bookings` · `messages` · `notifications` · `partners`
+`users` · `categories` · `locations` · `properties` · `property_images` · `property_videos` · `lands` ·
+`land_images` · `land_videos` · `favorites` · `bookings` · `messages` · `notifications` ·
+`device_tokens` · `saved_searches` · `reviews` · `partners` · `reports` · `moderation_log`
 
 **Diferenças importantes face a versões anteriores da documentação:**
 
 - `users` **não** tem coluna `id_auth` — o `id` é o próprio `auth.users.id`
-- `properties`/`lands` **não** têm array `images` — imagens em tabelas filhas (`property_images`, `land_images`)
+- `properties`/`lands` **não** têm array `images` — imagens em tabelas filhas (`property_images`, `land_images`) e vídeos em `property_videos`/`land_videos`
 - `favorites` usa `property_id`/`land_id` separados (não `item_id`/`item_type`)
-- `bookings` usa `property_id NOT NULL` + `date`/`time` (não `scheduled_date` nem `land_id`)
+- `bookings` usa `property_id` **ou** `land_id` (um deles, `CHECK` de alvo único) + `date`/`time` (não `scheduled_date`)
 - `role` é um ENUM (`user_role`), não TEXT
+- `users` tem campos de verificação (`verified`, `verified_at`, …) e `properties`/`lands` têm `province`, `agent_verified` e `views`
 
 Consulte [`docs/DATABASE.md`](DATABASE.md) para o schema detalhado e as políticas RLS.
 
@@ -115,17 +117,18 @@ Consulte [`docs/DATABASE.md`](DATABASE.md) para o schema detalhado e as polític
 
 ## Storage Buckets
 
-Criados e configurados na migration 005:
+Criados e configurados nas migrations 005 (imagens) e 016 (vídeos):
 
 | Bucket | Público | Tamanho Máx | MIME Permitidos |
 |---|---|---|---|
 | `property-images` | Sim | 10 MB | jpeg, png, webp, gif |
 | `avatars` | Sim | 5 MB | jpeg, png, webp |
+| `property-videos` | Sim | 50 MB | mp4, quicktime, webm, x-matroska, 3gpp, x-msvideo |
 
-Policies de storage (migration 007):
-- **Leitura** pública de ambos os buckets
-- **Upload** autenticado
-- **Delete** apenas pelo `owner_id` (dono do objeto)
+Policies de storage:
+- **Leitura** pública dos buckets
+- **Upload/update** restritos a agentes/admins (migration 018)
+- **Delete** apenas pelo `owner_id` (dono do objeto, migration 017)
 
 > Os buckets `documents` e `products` aparecem em documentação antiga mas **não** são
 > criados pelas migrações atuais.
@@ -134,19 +137,24 @@ Policies de storage (migration 007):
 
 ## Row Level Security (RLS)
 
-Todas as tabelas têm RLS ativado. Legenda de políticas ativa (migrations 002–007):
+Todas as tabelas têm RLS ativado. Legenda de políticas ativa (migrations 002–026):
 
 | Tabela | SELECT | INSERT | UPDATE | DELETE |
 |---|---|---|---|---|
-| `users` | próprio ou admin | próprio (`auth.uid() = id`) | próprio; role só por admin | admin |
+| `users` | próprio ou admin | próprio (`auth.uid() = id`) | próprio; role/verificação só por admin | admin |
 | `categories`, `locations` | público | admin | admin | admin |
 | `properties`, `lands` | público | agentes/admins | dono ou admin (com `WITH CHECK`) | admin |
-| `property_images`, `land_images` | público | admin ou agente dono | admin ou agente dono | admin ou agente dono |
+| `property_images`, `land_images`, `property_videos`, `land_videos` | público | admin ou agente dono | admin ou agente dono | admin ou agente dono |
 | `favorites` | próprio | próprio | — | próprio |
-| `bookings` | próprio, agentes, admin | próprio (`auth.uid() = user_id`) | próprio (cancelar) ou agentes/admins | — |
+| `bookings` | próprio, agentes, admin | próprio / RPC convidado | próprio (cancelar) ou agentes/admins | — |
 | `messages` | remetente/destinatário | remetente | remetente/destinatário | — |
 | `notifications` | próprio | admin/RPC | próprio | — |
-| `partners` | público | admin | próprio | admin |
+| `partners` | próprio ou admin (diretório via view `partners_public`) | admin | próprio | admin |
+| `device_tokens` | próprio ou admin | próprio | próprio | próprio ou admin |
+| `saved_searches` | próprio | próprio | próprio | próprio |
+| `reviews` | público | próprio | próprio | próprio |
+| `reports` | próprio ou admin | próprio | admin | admin |
+| `moderation_log` | admin | admin | admin | admin |
 
 Função auxiliar usada nas políticas:
 
@@ -176,8 +184,6 @@ scoop install supabase
 
 ### Aplicar Migrations
 
-> Guia passo-a-passo (CLI e SQL Editor), migrações pendentes e verificação: [`docs/MIGRATIONS.md`](MIGRATIONS.md).
-
 ```bash
 # Login no Supabase
 supabase login
@@ -198,21 +204,21 @@ Alternativamente, execute `scripts/deploy_supabase.sh`, que automatiza estes pas
 
 ## RPC de Notificações
 
-A aplicação envia notificações push através da função RPC `send_notification`, que deve
-existir no Supabase:
+A aplicação envia notificações através da função RPC `send_notification` (criada na
+migration 009 e reforçada na 018 com rate limit por destinatário):
 
 ```sql
--- Exemplo: notificação em tabela + envio FCM (adaptar ao ambiente)
 CREATE OR REPLACE FUNCTION public.send_notification(
   p_user_id UUID,
   p_title TEXT,
   p_body TEXT
 ) RETURNS void AS $$
 BEGIN
+  -- (migration 018) valida autorização, limites de tamanho e rate limit (20/10 min)
   INSERT INTO public.notifications (user_id, title, body)
-  VALUES (p_user_id, p_title, p_body);
+  VALUES (p_user_id, p_title, COALESCE(p_body, ''));
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 ```
 
 ---

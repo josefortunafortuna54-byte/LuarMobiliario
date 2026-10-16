@@ -47,15 +47,20 @@ Perfis de utilizadores.
 | Listar todos (admin) | `.from('users').select()` | Apenas admin |
 
 **Campos:**
-- `id` (UUID, PK) — Chave primária
-- `id_auth` (UUID, FK → auth.users) — Referência Supabase Auth
+- `id` (UUID, PK) — Chave primária (igual a `auth.users.id`, FK `ON DELETE CASCADE`)
 - `name` (TEXT) — Nome completo
 - `email` (TEXT, UNIQUE) — Email
 - `phone` (TEXT) — Telefone
 - `avatar_url` (TEXT) — URL do avatar
-- `role` (TEXT) — `client` | `agent` | `admin`
+- `role` (`user_role`) — `client` | `agent` | `admin`
+- `verified` (BOOLEAN) — Anunciante verificado (só admins alteram)
+- `verification_note` (TEXT) — Nota de moderação
+- `verified_at` (TIMESTAMPTZ) — Data da verificação
+- `verified_by` (UUID, FK → users) — Admin que verificou
 - `created_at` (TIMESTAMPTZ) — Data de criação
 - `updated_at` (TIMESTAMPTZ) — Última atualização
+
+> **Nota:** não existe coluna `id_auth` — o `id` é o próprio `auth.users.id`.
 
 ---
 
@@ -92,19 +97,23 @@ Propriedades imobiliárias.
 - `garage` (INTEGER) — Lugares de estacionamento
 - `address` (TEXT) — Endereço completo
 - `city` (TEXT) — Cidade
+- `province` (TEXT) — Província
 - `municipality` (TEXT) — Município
 - `neighborhood` (TEXT) — Bairro
 - `latitude` (NUMERIC 10,7) — Latitude GPS
 - `longitude` (NUMERIC 10,7) — Longitude GPS
-- `images` (TEXT[]) — URLs das imagens
-- `features` (TEXT[]) — Características (piscina, jardim, etc.)
+- `features` (JSONB) — Características (piscina, jardim, etc.) como array
 - `agent_id` (UUID, FK → users) — Agente responsável
 - `agent_name` (TEXT) — Nome do agente (cache)
 - `agent_phone` (TEXT) — Telefone do agente (cache)
+- `agent_verified` (BOOLEAN) — Badge de anunciante verificado (denormalizado)
 - `is_featured` (BOOLEAN) — Em destaque
 - `is_available` (BOOLEAN) — Disponível
+- `views` (INTEGER) — Contador de visualizações
 - `created_at` (TIMESTAMPTZ) — Data de criação
 - `updated_at` (TIMESTAMPTZ) — Última atualização
+
+> **Nota:** as imagens e vídeos **não** são colunas — vivem nas tabelas filhas `property_images` / `property_videos` (relação 1:N).
 
 ---
 
@@ -130,16 +139,20 @@ Terrenos para venda ou arrendamento.
 - `area` (NUMERIC 10,2)
 - `address` (TEXT)
 - `city` (TEXT)
+- `province` (TEXT)
 - `municipality` (TEXT)
 - `neighborhood` (TEXT)
 - `latitude` / `longitude` (NUMERIC 10,7)
-- `images` (TEXT[])
-- `features` (TEXT[])
+- `features` (JSONB)
 - `agent_id` (UUID, FK → users)
 - `agent_name` / `agent_phone` (TEXT)
+- `agent_verified` (BOOLEAN)
 - `is_featured` (BOOLEAN)
 - `is_available` (BOOLEAN)
+- `views` (INTEGER)
 - `created_at` / `updated_at` (TIMESTAMPTZ)
+
+> **Nota:** as imagens e vídeos **não** são colunas — vivem nas tabelas filhas `land_images` / `land_videos`.
 
 ---
 
@@ -151,16 +164,17 @@ Registos de favoritos.
 |---|---|---|
 | Obter favoritos do utilizador | `.from('favorites').select().eq('user_id', userId)` | Próprio utilizador |
 | Adicionar favorito | `.from('favorites').insert(data)` | Próprio utilizador |
-| Remover favorito | `.from('favorites').delete().eq('user_id', userId).eq('item_id', itemId)` | Próprio utilizador |
-| Verificar se é favorito | `.from('favorites').select().eq('user_id', userId).eq('item_id', itemId)` | Próprio utilizador |
+| Remover favorito | `.from('favorites').delete().eq('user_id', userId).eq('property_id', id)` | Próprio utilizador |
+| Verificar se é favorito | `.from('favorites').select().eq('user_id', userId).eq('property_id', id)` | Próprio utilizador |
+| Contagem pública de gostos | RPC `favorite_counts(property_ids)` | Público |
 
 **Campos:**
 - `id` (UUID, PK)
 - `user_id` (UUID, FK → users)
-- `item_id` (UUID) — ID do item favoritado
-- `item_type` (TEXT) — `property` | `land`
+- `property_id` (UUID, FK → properties, nullable) — imóvel favoritado
+- `land_id` (UUID, FK → lands, nullable) — terreno favoritado
 - `created_at` (TIMESTAMPTZ)
-- **UNIQUE** (user_id, item_id, item_type)
+- **UNIQUE** (user_id, property_id) e **UNIQUE** (user_id, land_id)
 
 ---
 
@@ -171,8 +185,9 @@ Agendamentos de visitas.
 | Operação | Query Supabase | RLS |
 |---|---|---|
 | Obter agendamentos do utilizador | `.from('bookings').select().eq('user_id', userId)` | Próprio utilizador |
-| Criar agendamento | `.from('bookings').insert(data)` | Próprio utilizador |
-| Atualizar estado | `.from('bookings').update({'status': 'confirmed'}).eq('id', id)` | Próprio utilizador |
+| Criar agendamento (conta) | `.from('bookings').insert(data)` | Próprio utilizador |
+| Criar agendamento (convidado) | RPC `create_guest_booking(...)` | Público (anon) |
+| Atualizar estado | `.from('bookings').update({'status': 'confirmed'}).eq('id', id)` | Agente/Admin |
 | Cancelar | `.from('bookings').update({'status': 'cancelled'}).eq('id', id)` | Próprio utilizador |
 
 **Campos:**
@@ -180,10 +195,14 @@ Agendamentos de visitas.
 - `user_id` (UUID, FK → users)
 - `property_id` (UUID, FK → properties, nullable)
 - `land_id` (UUID, FK → lands, nullable)
-- `scheduled_date` (TIMESTAMPTZ) — Data/hora da visita
-- `status` (TEXT) — `pending` | `confirmed` | `cancelled` | `completed`
+- `user_name` / `user_phone` (TEXT) — dados de contacto da marcação
+- `date` (DATE) — Data da visita
+- `time` (TIME) — Hora da visita
+- `status` (`booking_status`) — `pending` | `confirmed` | `cancelled` | `completed`
 - `notes` (TEXT) — Observações
-- `created_at` / `updated_at` (TIMESTAMPTZ)
+- `created_at` (TIMESTAMPTZ)
+
+> `property_id` **ou** `land_id` deve estar preenchido (CHECK de alvo único, migration 015).
 
 ---
 
@@ -215,17 +234,60 @@ Notificações do sistema.
 | Operação | Query Supabase | RLS |
 |---|---|---|
 | Obter notificações | `.from('notifications').select().eq('user_id', userId)` | Próprio utilizador |
-| Criar notificação | `.from('notifications').insert(data)` | Serviço / Admin |
+| Criar notificação | RPC `send_notification(user_id, title, body)` | Autenticado (com rate limit) |
 | Marcar como lida | `.from('notifications').update({'is_read': true}).eq('id', id)` | Próprio utilizador |
 
 **Campos:**
 - `id` (UUID, PK)
 - `user_id` (UUID, FK → users)
 - `title` (TEXT)
-- `message` (TEXT)
-- `type` (TEXT) — Tipo da notificação
+- `body` (TEXT) — Conteúdo da notificação
+- `fcm_token` (TEXT) — Token de push (legacy; usar `device_tokens`)
 - `is_read` (BOOLEAN)
-- `created_at` (TIMESTAMPTZ)
+- `created_at` / `updated_at` (TIMESTAMPTZ)
+
+---
+
+### `reviews`
+
+Avaliações de imóveis (1–5 estrelas).
+
+| Operação | Query Supabase | RLS |
+|---|---|---|
+| Listar avaliações do imóvel | `.from('reviews').select().eq('property_id', id)` | Público |
+| Resumo agregado | `.from('property_review_summary').select().eq('property_id', id)` | Público |
+| Avaliar | `.from('reviews').insert(data)` | Próprio utilizador |
+| Atualizar/remover | `.from('reviews').update(data)/.delete().eq('id', id)` | Próprio autor |
+
+**Campos:** `id`, `property_id` (FK), `user_id` (FK), `rating` (INT 1–5), `comment` (TEXT ≤1000), `created_at`, `updated_at`. **UNIQUE** (property_id, user_id).
+
+---
+
+### `saved_searches`
+
+Pesquisas guardadas por utilizador.
+
+| Operação | Query Supabase | RLS |
+|---|---|---|
+| Listar | `.from('saved_searches').select().eq('user_id', userId)` | Próprio utilizador |
+| Guardar | `.from('saved_searches').insert(data)` | Próprio utilizador |
+| Renomear | `.from('saved_searches').update({'name': n}).eq('id', id)` | Próprio utilizador |
+| Remover | `.from('saved_searches').delete().eq('id', id)` | Próprio utilizador |
+
+**Campos:** `id`, `user_id` (FK), `name` (TEXT 1–60), `filters` (JSONB), `created_at`.
+
+---
+
+### `device_tokens`
+
+Tokens FCM por dispositivo.
+
+| Operação | Query Supabase | RLS |
+|---|---|---|
+| Registar/atualizar token | `.from('device_tokens').upsert(data)` | Próprio utilizador |
+| Remover token | `.from('device_tokens').delete().eq('token', t)` | Próprio utilizador |
+
+**Campos:** `id`, `user_id` (FK), `token` (TEXT, UNIQUE), `platform` (TEXT), `updated_at`.
 
 ---
 
@@ -233,13 +295,19 @@ Notificações do sistema.
 
 | Tabela | Leitura | Escrita | Eliminação |
 |---|---|---|---|
-| `users` | Próprio + Admin | Próprio | — |
-| `properties` | Público | Agente (próprio) | Agente (próprio) / Admin |
-| `lands` | Público | Agente (próprio) | Agente (próprio) / Admin |
+| `users` | Próprio + Admin (público via view `users_public`) | Próprio | Admin |
+| `properties` | Público | Agente (próprio) | Admin |
+| `lands` | Público | Agente (próprio) | Admin |
 | `favorites` | Próprio utilizador | Próprio utilizador | Próprio utilizador |
-| `bookings` | Próprio utilizador | Próprio utilizador | Próprio utilizador |
+| `bookings` | Próprio, agentes e admins | Próprio / RPC convidado | — |
 | `messages` | Próprio (enviadas + recebidas) | Próprio (sender) | — |
-| `notifications` | Próprio utilizador | Serviço / Admin | — |
+| `notifications` | Próprio utilizador | RPC `send_notification` / Admin | — |
+| `partners` | Próprio + Admin (diretório via `partners_public`) | Próprio | Admin |
+| `reviews` | Público | Próprio autor | Próprio autor |
+| `saved_searches` | Próprio utilizador | Próprio utilizador | Próprio utilizador |
+| `device_tokens` | Próprio + Admin | Próprio utilizador | Próprio + Admin |
+| `reports` | Próprio + Admin | Próprio (INSERT) | Admin |
+| `moderation_log` | Admin | Admin | Admin |
 
 ---
 
@@ -248,11 +316,10 @@ Notificações do sistema.
 | Bucket | Leitura | Escrita | Tamanho Máx |
 |---|---|---|---|
 | `property-images` | Público | Autenticado (agente/admin) | 10 MB |
-| `avatars` | Público | Autenticado (próprio) | 10 MB |
-| `documents` | Privado | Autenticado (próprio) | 10 MB |
-| `products` | Público | Autenticado (agente/admin) | 10 MB |
+| `avatars` | Público | Autenticado (próprio) | 5 MB |
+| `property-videos` | Público | Autenticado (agente/admin) | 50 MB |
 
-Formatos aceites: JPEG, PNG, WebP, PDF.
+Formatos aceites: JPEG, PNG, WebP, GIF (imagens) e MP4, MOV, WebM, MKV, 3GPP, AVI (vídeos).
 
 ---
 
@@ -282,30 +349,32 @@ final response = await client
 
 ## Índices na Base de Dados
 
+A lista completa e atualizada de índices está em [`docs/DATABASE.md`](DATABASE.md). Exemplos:
+
 ```sql
 -- Propriedades
 CREATE INDEX idx_properties_city ON properties(city);
 CREATE INDEX idx_properties_type ON properties(type);
-CREATE INDEX idx_properties_transaction ON properties(transaction_type);
+CREATE INDEX idx_properties_transaction_type ON properties(transaction_type);
 CREATE INDEX idx_properties_price ON properties(price);
-CREATE INDEX idx_properties_agent ON properties(agent_id);
-CREATE INDEX idx_properties_featured ON properties(is_featured) WHERE is_featured = true;
-CREATE INDEX idx_properties_available ON properties(is_available) WHERE is_available = true;
+CREATE INDEX idx_properties_agent_id ON properties(agent_id);
+CREATE INDEX idx_properties_is_featured ON properties(is_featured);
+CREATE INDEX idx_properties_is_available ON properties(is_available);
+
+-- Índices compostos/parciais (migration 025)
+CREATE INDEX idx_properties_available_created
+  ON properties(created_at DESC) WHERE is_available = true;
 
 -- Terrenos
 CREATE INDEX idx_lands_city ON lands(city);
 CREATE INDEX idx_lands_type ON lands(type);
 CREATE INDEX idx_lands_price ON lands(price);
-CREATE INDEX idx_lands_agent ON lands(agent_id);
+CREATE INDEX idx_lands_agent_id ON lands(agent_id);
 
--- Favoritos
-CREATE INDEX idx_favorites_user ON favorites(user_id);
-
--- Mensagens
-CREATE INDEX idx_messages_receiver ON messages(receiver_id);
-CREATE INDEX idx_messages_sender ON messages(sender_id);
-
--- Agendamentos
-CREATE INDEX idx_bookings_user ON bookings(user_id);
-CREATE INDEX idx_bookings_property ON bookings(property_id);
+-- Favoritos / Mensagens / Agendamentos
+CREATE INDEX idx_favorites_user_id ON favorites(user_id);
+CREATE INDEX idx_messages_receiver_id ON messages(receiver_id);
+CREATE INDEX idx_messages_sender_id ON messages(sender_id);
+CREATE INDEX idx_bookings_user_id ON bookings(user_id);
+CREATE INDEX idx_bookings_property_id ON bookings(property_id);
 ```

@@ -4,7 +4,7 @@ Documento com as práticas de segurança, políticas e recomendações para a pl
 
 ---
 
-## Visão Gonal
+## Visão Geral
 
 A segurança da plataforma é garantida por uma combinação de:
 
@@ -65,7 +65,7 @@ RLS é a primeira linha de defesa na base de dados. Deve ser ativado em todas as
 
 ### Políticas Implementadas
 
-> Conforme `supabase/migrations/002_rls_role_based_policies.sql`, refinadas em `006_enforce_admin_rls.sql` e `007_security_fixes.sql`. O `id` da tabela `users` coincide com `auth.uid()`. O role é obtido pela função helper `public.get_user_role()`.
+> Conforme `supabase/migrations/002_rls_role_based_policies.sql`, refinadas ao longo das migrações até à `026` (destacam-se a 018 — base de segurança/confiança — e a 021 — correções app↔BD). O `id` da tabela `users` coincide com `auth.uid()`. O role é obtido pela função helper `public.get_user_role()`.
 
 #### Tabela `users`
 
@@ -168,6 +168,28 @@ CREATE POLICY "Notifications: admin insert" ON notifications FOR INSERT WITH CHE
 CREATE POLICY "Notifications: update own" ON notifications FOR UPDATE USING (auth.uid() = user_id);
 ```
 
+#### Tabelas `reviews`, `saved_searches`, `device_tokens`, `reports`, `moderation_log`
+
+A migrations 018–022 introduziram moderação, avaliações, pesquisas guardadas e tokens de dispositivo. Resumo:
+
+| Tabela | Leitura | Escrita | Notas |
+|---|---|---|---|
+| `reviews` | Público | Próprio autor | 1 por (imóvel, utilizador) |
+| `saved_searches` | Próprio | Próprio | Só os filtros do próprio |
+| `device_tokens` | Próprio + Admin | Próprio | Token único por dispositivo |
+| `reports` | Próprio + Admin | Próprio (INSERT) | Admin atualiza/apaga |
+| `moderation_log` | Admin | Admin | Registo de ações de moderação |
+
+### Reforços de segurança (migration 018)
+
+- **Bookings**: removida a leitura anónima de marcações de convidados (PII); convidados criam marcações via RPC `create_guest_booking`.
+- **Partners**: removida a leitura pública de `nif`/`license`; expostos apenas via view `partners_public`.
+- **Storage**: upload/update restritos a `agent`/`admin`; delete só pelo `owner_id`.
+- **send_notification**: rate limit por destinatário (20/10 min), validação de autorização e limites de tamanho.
+- **register_guest_client**: valida posse da marcação (telefone coincide) antes de criar o perfil de visitante.
+- **users**: campos de verificação (`verified`, `verified_at`, …) só editáveis por admins (trigger `prevent_self_verification`, reforçado na 021).
+- **delete_user** (migration 024): apagar utilizador passa por RPC `SECURITY DEFINER` que exige role admin.
+
 ---
 
 ## Armazenamento de Ficheiros (Supabase Storage)
@@ -178,13 +200,12 @@ CREATE POLICY "Notifications: update own" ON notifications FOR UPDATE USING (aut
 |---|---|---|
 | `property-images` | Público | Autenticado (agente/admin) |
 | `avatars` | Público | Autenticado (próprio utilizador) |
-| `documents` | Privado | Autenticado (próprio utilizador) |
-| `products` | Público | Autenticado (agente/admin) |
+| `property-videos` | Público | Autenticado (agente/admin) |
 
 ### Limites
 
-- Tamanho máximo por ficheiro: 10 MB
-- Formatos permitidos: JPEG, PNG, WebP, PDF
+- Ficheiros de imagem: até 10 MB (avatar: 5 MB); vídeos: até 50 MB
+- Formatos permitidos: JPEG, PNG, WebP, GIF (imagens); MP4, MOV, WebM, MKV, 3GPP, AVI (vídeos)
 - Máximo de imagens por propriedade: 10
 
 ---

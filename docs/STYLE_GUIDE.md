@@ -29,7 +29,6 @@ flutter analyze
 |---|---|---|
 | Screens | `lib/screens/{modulo}/{nome}_screen.dart` | `home_screen.dart` |
 | Widgets | `lib/widgets/{nome}_widget.dart` | `property_card.dart` |
-| Components | `lib/components/{nome}.dart` | `bottom_nav.dart` |
 | Providers | `lib/core/providers/{nome}_provider.dart` | `auth_provider.dart` |
 | Repositories | `lib/core/repositories/{nome}_repository.dart` | `property_repository.dart` |
 | Models | `lib/core/models/{nome}_model.dart` | `user_model.dart` |

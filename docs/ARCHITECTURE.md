@@ -42,7 +42,7 @@ A aplicação Flutter utiliza o Supabase como plataforma backend (BaaS), elimina
 
 #### 1. UI (Screens + Widgets + Components)
 
-- **Screens**: Ecraãs completas da aplicação, cada uma mapeada para uma rota
+- **Screens**: Ecrãs completos da aplicação, cada um mapeado para uma rota
 - **Widgets**: Componentes reutilizáveis de UI (PropertyCard, PriceTag, SearchWidget, etc.)
 - **Components**: Elementos estruturais de layout (Header, BottomNav, EmptyState)
 
@@ -63,13 +63,19 @@ Providers baseados em `ChangeNotifier` que expõem o estado reativo à UI:
   - `FavoriteRepository` — Gestão de favoritos
   - `BookingRepository` — Gestão de agendamentos
   - `MessageRepository` — Gestão de mensagens
-  - `AdminRepository` — Painel administrativo (estatísticas, utilizadores)
+  - `AdminRepository` — Painel administrativo (estatísticas, utilizadores, analytics)
+  - `ReviewRepository` — Avaliações de imóveis
+  - `ReportRepository` — Denúncias/moderação
+  - `PartnerRepository` — Parceiros imobiliários
+  - `SavedSearchRepository` — Pesquisas guardadas
+  - `LocationRepository` — Localizações geográficas
 
 - **Services**: Integrações com serviços externos
   - `SupabaseService` — Inicialização e instância do cliente Supabase
   - `AuthService` — Autenticação via Supabase Auth
   - `StorageService` — Upload/download de ficheiros via Supabase Storage
-  - `NotificationService` — Notificações push via Firebase
+  - `NotificationService` — Notificações push via Firebase (com preferências por categoria)
+  - `ConnectivityService` — Estado da ligação de rede
 
 #### 4. External APIs
 
@@ -126,14 +132,18 @@ class ModelName {
 
 | Modelo | Descrição |
 |---|---|
-| `UserModel` | Utilizador (id, nome, email, telefone, avatar, role) |
-| `PropertyModel` | Propriedade (título, tipo, preço, área, localização, imagens, agente) |
-| `LandModel` | Terreno (título, tipo, preço, área, localização, imagens, agente) |
-| `CategoryModel` | Categoria de propriedade |
+| `UserModel` | Utilizador (id, nome, email, telefone, avatar, role, verificação) |
+| `PropertyModel` | Propriedade (título, tipo, preço, área, localização, imagens/vídeos, agente) |
+| `LandModel` | Terreno (título, tipo, preço, área, localização, imagens/vídeos, agente) |
 | `FavoriteModel` | Registo de favorito |
-| `BookingModel` | Agendamento de visita |
+| `BookingModel` | Agendamento de visita (imóvel ou terreno) |
 | `MessageModel` | Mensagem entre utilizadores |
-| `LocationModel` | Coordenadas geográficas |
+| `PartnerModel` | Parceiro imobiliário |
+| `ReviewModel` | Avaliação de imóvel |
+| `ReportModel` | Denúncia de anúncio/utilizador |
+| `SavedSearchModel` | Pesquisa guardada (snapshot de filtros) |
+
+> Coordenadas geográficas (`latitude`/`longitude`) e localizações são tratadas nos próprios modelos de `Property`/`Land`.
 
 ---
 
@@ -176,10 +186,11 @@ class ModelName {
 
 | Bucket | Conteúdo |
 |---|---|
-| `property-images` | Imagens de propriedades |
+| `property-images` | Imagens de propriedades e terrenos |
+| `property-videos` | Vídeos de propriedades e terrenos |
 | `avatars` | Avatares de utilizadores |
-| `documents` | Documentos |
-| `products` | Imagens de produtos |
+
+> Os buckets `documents` e `products` referidos em documentação antiga **não** são criados pelas migrações atuais.
 
 ---
 
@@ -195,42 +206,22 @@ luar_company/lib/
 │   │   ├── app_colors.dart
 │   │   ├── app_constants.dart
 │   │   └── app_text_styles.dart
-│   ├── models/
-│   │   ├── property_model.dart
-│   │   ├── land_model.dart
-│   │   ├── user_model.dart
-│   │   ├── category_model.dart
-│   │   ├── favorite_model.dart
-│   │   ├── booking_model.dart
-│   │   ├── message_model.dart
-│   │   └── location_model.dart
-│   ├── providers/
-│   │   ├── auth_provider.dart
-│   │   ├── property_provider.dart
-│   │   ├── land_provider.dart
-│   │   ├── search_provider.dart
-│   │   ├── favorite_provider.dart
-│   │   ├── booking_provider.dart
-│   │   ├── message_provider.dart
-│   │   └── admin_provider.dart
-│   ├── repositories/
-│   │   ├── auth_repository.dart
-│   │   ├── property_repository.dart
-│   │   ├── land_repository.dart
-│   │   ├── favorite_repository.dart
-│   │   ├── booking_repository.dart
-│   │   ├── message_repository.dart
-│   │   └── admin_repository.dart
-│   ├── services/
-│   │   ├── supabase_service.dart
-│   │   ├── auth_service.dart
-│   │   ├── storage_service.dart
-│   │   └── notification_service.dart
+│   ├── models/            (10 modelos: property, land, user, favorite,
+│   │                       booking, message, partner, review, report,
+│   │                       saved_search)
+│   ├── providers/         (18 providers: auth, property, land, search,
+│   │                       favorite, booking, message, admin, discover,
+│   │                       comparison, review, report, partner, saved_search,
+│   │                       notification_settings, locale, theme, playback)
+│   ├── repositories/      (12 repositórios)
+│   ├── services/          (supabase, auth, storage, notification,
+│   │                       notification_preferences, connectivity)
 │   └── utils/
 │       ├── routes.dart
 │       ├── formatters.dart
-│       └── validators.dart
-├── screens/     (11 módulos)
-├── widgets/     (10 componentes)
-└── components/  (3 componentes)
+│       ├── validators.dart
+│       └── navigation.dart
+├── screens/     (16 módulos)
+├── widgets/     (17 componentes)
+└── l10n/        (PT/EN)
 ```

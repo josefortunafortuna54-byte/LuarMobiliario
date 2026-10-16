@@ -216,7 +216,7 @@ PropertyDetailScreen
             → Supabase: INSERT na tabela bookings
               → user_id: utilizador atual
               → property_id: propriedade selecionada
-              → scheduled_date: data/hora escolhida
+              → date / time: data e hora escolhidas
               → status: 'pending'
           → Sucesso → SnackBar + navegação para BookingsScreen
 ```

@@ -773,6 +773,50 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tentarNovamente => 'Try again';
 
   @override
+  String get ordenar => 'Sort';
+
+  @override
+  String get aplicar => 'Apply';
+
+  @override
+  String get eliminar => 'Delete';
+
+  @override
+  String get mapa => 'Map';
+
+  @override
+  String get preVisualizar => 'Preview';
+
+  @override
+  String get guardarPesquisa => 'Save search';
+
+  @override
+  String get pesquisasGuardadas => 'Saved searches';
+
+  @override
+  String get pesquisaGuardadaComSucesso => 'Search saved';
+
+  @override
+  String get nomePesquisa => 'Search name';
+
+  @override
+  String get recomendados => 'Recommended for you';
+
+  @override
+  String get semPesquisasGuardadas => 'You have no saved searches yet';
+
+  @override
+  String get semMapaDisponivel => 'No location available for the map';
+
+  @override
+  String get erroAoCarregarMapa => 'Error loading the map';
+
+  @override
+  String enviarImagemDe(Object atual, Object total) {
+    return 'Uploading image $atual of $total';
+  }
+
+  @override
   String get algoCorreuMal => 'Something went wrong';
 
   @override

@@ -49,7 +49,7 @@ class _OfflineBanner extends StatelessWidget {
 
     return Stack(
       children: [
-        if (child != null) child!,
+        ?child,
         if (!connectivity.isOnline)
           Positioned(
             top: 0,

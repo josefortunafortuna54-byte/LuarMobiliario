@@ -224,7 +224,7 @@ class _LandFormScreenState extends State<LandFormScreen> {
         agentName: user?.name ?? '',
         agentPhone: user?.phone ?? '',
         isFeatured: _existingLand?.isFeatured ?? false,
-        isAvailable: true,
+        isAvailable: _existingLand?.isAvailable ?? true,
         createdAt: _existingLand?.createdAt ?? DateTime.now(),
         updatedAt: DateTime.now(),
       );

@@ -248,7 +248,7 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
         agentName: user?.name ?? '',
         agentPhone: user?.phone ?? '',
         isFeatured: _existingProperty?.isFeatured ?? false,
-        isAvailable: true,
+        isAvailable: _existingProperty?.isAvailable ?? true,
         createdAt: _existingProperty?.createdAt ?? DateTime.now(),
         updatedAt: DateTime.now(),
       );

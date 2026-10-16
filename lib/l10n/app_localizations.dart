@@ -1538,6 +1538,90 @@ abstract class AppLocalizations {
   /// **'Tentar novamente'**
   String get tentarNovamente;
 
+  /// No description provided for @ordenar.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ordenar'**
+  String get ordenar;
+
+  /// No description provided for @aplicar.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aplicar'**
+  String get aplicar;
+
+  /// No description provided for @eliminar.
+  ///
+  /// In pt, this message translates to:
+  /// **'Eliminar'**
+  String get eliminar;
+
+  /// No description provided for @mapa.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mapa'**
+  String get mapa;
+
+  /// No description provided for @preVisualizar.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pré-visualizar'**
+  String get preVisualizar;
+
+  /// No description provided for @guardarPesquisa.
+  ///
+  /// In pt, this message translates to:
+  /// **'Guardar pesquisa'**
+  String get guardarPesquisa;
+
+  /// No description provided for @pesquisasGuardadas.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pesquisas guardadas'**
+  String get pesquisasGuardadas;
+
+  /// No description provided for @pesquisaGuardadaComSucesso.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pesquisa guardada com sucesso'**
+  String get pesquisaGuardadaComSucesso;
+
+  /// No description provided for @nomePesquisa.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nome da pesquisa'**
+  String get nomePesquisa;
+
+  /// No description provided for @recomendados.
+  ///
+  /// In pt, this message translates to:
+  /// **'Recomendados para si'**
+  String get recomendados;
+
+  /// No description provided for @semPesquisasGuardadas.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ainda não tem pesquisas guardadas'**
+  String get semPesquisasGuardadas;
+
+  /// No description provided for @semMapaDisponivel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem localização disponível para o mapa'**
+  String get semMapaDisponivel;
+
+  /// No description provided for @erroAoCarregarMapa.
+  ///
+  /// In pt, this message translates to:
+  /// **'Erro ao carregar o mapa'**
+  String get erroAoCarregarMapa;
+
+  /// No description provided for @enviarImagemDe.
+  ///
+  /// In pt, this message translates to:
+  /// **'A enviar imagem {atual} de {total}'**
+  String enviarImagemDe(Object atual, Object total);
+
   /// No description provided for @algoCorreuMal.
   ///
   /// In pt, this message translates to:

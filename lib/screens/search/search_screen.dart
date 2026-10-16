@@ -118,6 +118,8 @@ class _SearchScreenState extends State<SearchScreen> {
                   children: [
                     if (provider.activeFilterCount > 0)
                       _buildActiveFilters(provider),
+                    if (!provider.isLoading && provider.results.isNotEmpty)
+                      _buildSortBar(provider),
                     Expanded(child: _buildResults(provider)),
                   ],
                 );
@@ -334,11 +336,127 @@ class _SearchScreenState extends State<SearchScreen> {
       return _buildShimmerGrid();
     }
 
+    if (provider.error != null && provider.results.isEmpty) {
+      return _buildErrorState(provider);
+    }
+
     if (provider.results.isEmpty) {
       return _buildEmptyState();
     }
 
     return _buildResultsGrid(provider);
+  }
+
+  Widget _buildSortBar(SearchProvider provider) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 4, 8, 0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          PopupMenuButton<String>(
+            initialValue: provider.sortOption,
+            onSelected: provider.setSort,
+            itemBuilder: (_) => [
+              _sortMenuItem('recent', l10n.maisRecentes, Icons.schedule),
+              _sortMenuItem(
+                'priceAsc',
+                l10n.menorPreco,
+                Icons.arrow_upward_rounded,
+              ),
+              _sortMenuItem(
+                'priceDesc',
+                l10n.maiorPreco,
+                Icons.arrow_downward_rounded,
+              ),
+              _sortMenuItem('areaDesc', l10n.maiorArea, Icons.crop_square),
+            ],
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.sort_rounded, size: 18, color: palette.textSecondary),
+                  const SizedBox(width: 4),
+                  Text(
+                    l10n.ordenar,
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: palette.textSecondary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  PopupMenuItem<String> _sortMenuItem(String value, String label, IconData icon) {
+    return PopupMenuItem(
+      value: value,
+      child: Row(
+        children: [
+          Icon(icon, size: 18),
+          const SizedBox(width: 8),
+          Text(label, style: AppTextStyles.bodySmall),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState(SearchProvider provider) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                color: AppColors.navy.withValues(alpha: 0.06),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.wifi_off_rounded,
+                size: 48,
+                color: palette.textMuted,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              l10n.algoCorreuMal,
+              style: AppTextStyles.h5.copyWith(color: palette.textTitle),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              l10n.erroAoCarregar,
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: palette.textSecondary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: provider.search,
+              icon: const Icon(Icons.refresh_rounded),
+              label: Text(l10n.tentarNovamente),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.gold,
+                foregroundColor: AppColors.navy,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildShimmerGrid() {

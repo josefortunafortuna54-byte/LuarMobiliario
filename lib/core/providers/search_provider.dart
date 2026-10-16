@@ -31,6 +31,7 @@ class SearchProvider extends ChangeNotifier {
   List<dynamic> _results = [];
   bool _isLoading = false;
   String? _error;
+  String _sortOption = 'recent';
 
   int _page = 0;
   bool _hasMore = false;
@@ -58,6 +59,18 @@ class SearchProvider extends ChangeNotifier {
   bool get isLoadingMore => _isLoadingMore;
   bool get hasMore => _hasMore;
   String? get error => _error;
+
+  /// Opção de ordenação aplicada aos resultados na UI
+  /// (`recent`, `priceAsc`, `priceDesc`, `areaDesc`).
+  String get sortOption => _sortOption;
+
+  /// Altera a ordenação dos resultados (client-side, sobre o que já foi
+  /// carregado). Não refaz a pesquisa no backend.
+  void setSort(String option) {
+    if (_sortOption == option) return;
+    _sortOption = option;
+    notifyListeners();
+  }
 
   /// `true` quando há filtros aplicados mas nenhum resultado — usado para
   /// distinguir o estado vazio inicial do estado vazio "sem correspondências".
@@ -329,10 +342,43 @@ class SearchProvider extends ChangeNotifier {
     return [...properties, ...lands];
   }
 
-  List<PropertyModel> get propertyResults =>
-      _results.whereType<PropertyModel>().toList();
+  List<PropertyModel> get propertyResults {
+    final list = _results.whereType<PropertyModel>().toList();
+    switch (_sortOption) {
+      case 'priceAsc':
+        list.sort((a, b) => a.price.compareTo(b.price));
+        break;
+      case 'priceDesc':
+        list.sort((a, b) => b.price.compareTo(a.price));
+        break;
+      case 'areaDesc':
+        list.sort((a, b) => b.area.compareTo(a.area));
+        break;
+      case 'recent':
+      default:
+        list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    }
+    return list;
+  }
 
-  List<LandModel> get landResults => _results.whereType<LandModel>().toList();
+  List<LandModel> get landResults {
+    final list = _results.whereType<LandModel>().toList();
+    switch (_sortOption) {
+      case 'priceAsc':
+        list.sort((a, b) => a.price.compareTo(b.price));
+        break;
+      case 'priceDesc':
+        list.sort((a, b) => b.price.compareTo(a.price));
+        break;
+      case 'areaDesc':
+        list.sort((a, b) => b.area.compareTo(a.area));
+        break;
+      case 'recent':
+      default:
+        list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    }
+    return list;
+  }
 
   void clearError() {
     _error = null;

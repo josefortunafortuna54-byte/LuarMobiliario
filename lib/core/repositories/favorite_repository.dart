@@ -50,21 +50,40 @@ class FavoriteRepository {
     if (ids.isEmpty) return [];
     final response = await _client
         .from('properties')
-        .select()
+        .select('*, property_images(image_url)')
         .inFilter('id', ids);
 
-    return (response as List<dynamic>)
-        .map((json) => PropertyModel.fromJson(json as Map<String, dynamic>))
-        .toList();
+    return (response as List<dynamic>).map((e) {
+      final json = Map<String, dynamic>.from(e as Map);
+      final imagesData = json.remove('property_images');
+      final images = imagesData is List
+          ? imagesData
+              .map((row) => (row as Map)['image_url'] as String? ?? '')
+              .where((url) => url.isNotEmpty)
+              .toList()
+          : <String>[];
+      return PropertyModel.fromJson(json).copyWith(images: images);
+    }).toList();
   }
 
   Future<List<LandModel>> fetchFavoriteLands(List<String> ids) async {
     if (ids.isEmpty) return [];
-    final response = await _client.from('lands').select().inFilter('id', ids);
+    final response = await _client
+        .from('lands')
+        .select('*, land_images(image_url)')
+        .inFilter('id', ids);
 
-    return (response as List<dynamic>)
-        .map((json) => LandModel.fromJson(json as Map<String, dynamic>))
-        .toList();
+    return (response as List<dynamic>).map((e) {
+      final json = Map<String, dynamic>.from(e as Map);
+      final imagesData = json.remove('land_images');
+      final images = imagesData is List
+          ? imagesData
+              .map((row) => (row as Map)['image_url'] as String? ?? '')
+              .where((url) => url.isNotEmpty)
+              .toList()
+          : <String>[];
+      return LandModel.fromJson(json).copyWith(images: images);
+    }).toList();
   }
 
   /// Contagem de favoritos por imóvel (alimenta o contador de "gostos" do

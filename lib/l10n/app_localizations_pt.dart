@@ -779,6 +779,50 @@ class AppLocalizationsPt extends AppLocalizations {
   String get tentarNovamente => 'Tentar novamente';
 
   @override
+  String get ordenar => 'Ordenar';
+
+  @override
+  String get aplicar => 'Aplicar';
+
+  @override
+  String get eliminar => 'Eliminar';
+
+  @override
+  String get mapa => 'Mapa';
+
+  @override
+  String get preVisualizar => 'Pré-visualizar';
+
+  @override
+  String get guardarPesquisa => 'Guardar pesquisa';
+
+  @override
+  String get pesquisasGuardadas => 'Pesquisas guardadas';
+
+  @override
+  String get pesquisaGuardadaComSucesso => 'Pesquisa guardada com sucesso';
+
+  @override
+  String get nomePesquisa => 'Nome da pesquisa';
+
+  @override
+  String get recomendados => 'Recomendados para si';
+
+  @override
+  String get semPesquisasGuardadas => 'Ainda não tem pesquisas guardadas';
+
+  @override
+  String get semMapaDisponivel => 'Sem localização disponível para o mapa';
+
+  @override
+  String get erroAoCarregarMapa => 'Erro ao carregar o mapa';
+
+  @override
+  String enviarImagemDe(Object atual, Object total) {
+    return 'A enviar imagem $atual de $total';
+  }
+
+  @override
   String get algoCorreuMal => 'Algo correu mal';
 
   @override

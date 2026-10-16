@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../models/user_model.dart';
 import '../repositories/admin_repository.dart';
+import '../services/notification_preferences.dart';
 import '../services/notification_service.dart';
 
 class AdminProvider extends ChangeNotifier {
@@ -12,6 +13,7 @@ class AdminProvider extends ChangeNotifier {
   int _totalUsers = 0;
   int _totalUnreadMessages = 0;
   List<UserModel> _allUsers = [];
+  AdminAnalytics? _analytics;
   bool _isLoading = false;
   String? _error;
 
@@ -20,6 +22,7 @@ class AdminProvider extends ChangeNotifier {
   int get totalUsers => _totalUsers;
   int get totalUnreadMessages => _totalUnreadMessages;
   List<UserModel> get allUsers => _allUsers;
+  AdminAnalytics? get analytics => _analytics;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
@@ -38,6 +41,18 @@ class AdminProvider extends ChangeNotifier {
       _error = e.toString();
     } finally {
       _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Carrega as métricas agregadas para o painel de análise. Não bloqueia a
+  /// UI de estatísticas (falhas ficam apenas registadas no erro).
+  Future<void> loadAnalytics() async {
+    try {
+      _analytics = await _repository.fetchAnalytics();
+      notifyListeners();
+    } catch (e) {
+      _error = e.toString();
       notifyListeners();
     }
   }
@@ -96,6 +111,7 @@ class AdminProvider extends ChangeNotifier {
                 ? 'O seu perfil de anunciante já está verificado.'
                 : 'A verificação do seu perfil foi removida.',
         route: '/profile',
+        category: NotificationCategory.system,
       );
 
       final index = _allUsers.indexWhere((u) => u.id == userId);

@@ -8,6 +8,7 @@ import 'core/providers/booking_provider.dart';
 import 'core/providers/comparison_provider.dart';
 import 'core/providers/locale_provider.dart';
 import 'core/providers/message_provider.dart';
+import 'core/providers/notification_settings_provider.dart';
 import 'core/providers/admin_provider.dart';
 import 'core/providers/discover_provider.dart';
 import 'core/providers/favorite_provider.dart';
@@ -68,6 +69,7 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => ReportProvider()),
         ChangeNotifierProvider(create: (_) => PartnerProvider()),
         ChangeNotifierProvider(create: (_) => ReviewProvider()),
+        ChangeNotifierProvider(create: (_) => NotificationSettingsProvider()..load()),
         ChangeNotifierProvider.value(value: themeProvider),
         ChangeNotifierProvider.value(value: localeProvider),
         ChangeNotifierProvider.value(value: playbackProvider),

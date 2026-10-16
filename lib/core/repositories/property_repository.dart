@@ -127,6 +127,19 @@ class PropertyRepository {
     return _mapResponse(response as List);
   }
 
+  /// Registo de visualização (analytics), melhor esforço. Incrementa o
+  /// contador `views` do anúncio; falhas são ignoradas para não afetar a UI.
+  Future<void> registerView(String id) async {
+    try {
+      await _client.rpc(
+        'register_listing_view',
+        params: {'p_kind': 'property', 'p_id': id},
+      );
+    } catch (_) {
+      // Telemetria não crítica.
+    }
+  }
+
   Future<PropertyModel> fetchById(String id) async {
     final response = await _client
         .from('properties')

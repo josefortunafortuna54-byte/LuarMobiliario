@@ -20,6 +20,39 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get notificacoes => 'Notifications';
+
+  @override
+  String get notifMensagens => 'Messages';
+
+  @override
+  String get notifMensagensDesc => 'New chat messages';
+
+  @override
+  String get notifAgendamentos => 'Bookings';
+
+  @override
+  String get notifAgendamentosDesc => 'Booking and visit updates';
+
+  @override
+  String get notifAnuncios => 'Listings';
+
+  @override
+  String get notifAnunciosDesc => 'New listings and highlights';
+
+  @override
+  String get notifPromocoes => 'Promotions';
+
+  @override
+  String get notifPromocoesDesc => 'News and promotions';
+
+  @override
+  String get notifSistema => 'System';
+
+  @override
+  String get notifSistemaDesc => 'General app notifications';
+
+  @override
   String get explorarImoveis => 'Explore Properties';
 
   @override
@@ -1833,4 +1866,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get enviarAvaliacao => 'Submit review';
+
+  @override
+  String get analise => 'Analytics';
+
+  @override
+  String get carregandoAnalise => 'Loading analytics...';
+
+  @override
+  String get novosUtilizadores30d => 'New users (30 days)';
+
+  @override
+  String get agendamentosPendentes => 'Pending bookings';
+
+  @override
+  String get precoMedioVenda => 'Average price (sale)';
+
+  @override
+  String get maisVistos => 'Most viewed listings';
+
+  @override
+  String get visualizacoes => 'views';
+
+  @override
+  String get semVisualizacoes => 'No views yet.';
+
+  @override
+  String get porTipo => 'Listings by type';
 }

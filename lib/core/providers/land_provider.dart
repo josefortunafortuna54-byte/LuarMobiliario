@@ -93,6 +93,7 @@ class LandProvider extends ChangeNotifier {
 
     try {
       _selectedLand = await _repository.fetchById(id);
+      _repository.registerView(id);
     } catch (e) {
       _error = e.toString();
     } finally {

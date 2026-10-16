@@ -20,6 +20,39 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get notificacoes => 'Notificações';
+
+  @override
+  String get notifMensagens => 'Mensagens';
+
+  @override
+  String get notifMensagensDesc => 'Novas mensagens de conversa';
+
+  @override
+  String get notifAgendamentos => 'Agendamentos';
+
+  @override
+  String get notifAgendamentosDesc => 'Atualizações de agendamentos e visitas';
+
+  @override
+  String get notifAnuncios => 'Anúncios';
+
+  @override
+  String get notifAnunciosDesc => 'Novos anúncios e destaques';
+
+  @override
+  String get notifPromocoes => 'Promoções';
+
+  @override
+  String get notifPromocoesDesc => 'Novidades e promoções';
+
+  @override
+  String get notifSistema => 'Sistema';
+
+  @override
+  String get notifSistemaDesc => 'Notificações gerais da aplicação';
+
+  @override
   String get explorarImoveis => 'Explorar Imóveis';
 
   @override
@@ -1841,4 +1874,31 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get enviarAvaliacao => 'Enviar avaliação';
+
+  @override
+  String get analise => 'Análise';
+
+  @override
+  String get carregandoAnalise => 'A carregar análise...';
+
+  @override
+  String get novosUtilizadores30d => 'Novos utilizadores (30 dias)';
+
+  @override
+  String get agendamentosPendentes => 'Agendamentos pendentes';
+
+  @override
+  String get precoMedioVenda => 'Preço médio (venda)';
+
+  @override
+  String get maisVistos => 'Anúncios mais vistos';
+
+  @override
+  String get visualizacoes => 'visualizações';
+
+  @override
+  String get semVisualizacoes => 'Ainda sem visualizações.';
+
+  @override
+  String get porTipo => 'Anúncios por tipo';
 }

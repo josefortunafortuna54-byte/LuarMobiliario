@@ -10,6 +10,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../config/env_config.dart';
 import '../utils/navigation.dart';
 import '../utils/routes.dart';
+import 'notification_preferences.dart';
 import 'supabase_service.dart';
 
 /// Handler de mensagens em segundo plano (tem de ser top-level).
@@ -43,6 +44,8 @@ class NotificationService {
   ({String name, Object? arguments})? _pendingRoute;
 
   Future<void> initialize() async {
+    await NotificationPreferences.instance.load();
+
     try {
       if (EnvConfig.fcmSenderId.isNotEmpty &&
           EnvConfig.fcmProjectId.isNotEmpty &&
@@ -195,6 +198,7 @@ class NotificationService {
     required String body,
     required String userId,
     String? route,
+    NotificationCategory? category,
   }) async {
     try {
       await _client.rpc(
@@ -211,6 +215,7 @@ class NotificationService {
           'title': title,
           'body': body,
           'route': ?route,
+          'category': ?category?.name,
         },
       );
     } catch (e) {
@@ -222,23 +227,74 @@ class NotificationService {
     final notification = message.notification;
     if (notification == null) return;
 
+    final category = NotificationPreferences.fromPayload(
+      message.data['category']?.toString(),
+    );
+
+    // Respeita a preferência do utilizador por categoria.
+    if (!NotificationPreferences.instance.isEnabled(category)) return;
+
     _localNotifications.show(
       notification.hashCode,
       notification.title,
       notification.body,
       NotificationDetails(
-        android: const AndroidNotificationDetails(
-          'luar_company_channel',
-          'Luar Company Notificações',
-          channelDescription: 'Notificações da aplicação Luar Company',
-          importance: Importance.high,
-          priority: Priority.high,
-          visibility: NotificationVisibility.private,
-        ),
+        android: _androidDetails(category),
         iOS: const DarwinNotificationDetails(),
       ),
       payload: message.data['route']?.toString(),
     );
+  }
+
+  /// Canal Android por categoria — permite ao utilizador gerir cada tipo
+  /// separadamente nas definições do sistema, além do interruptor in-app.
+  AndroidNotificationDetails _androidDetails(NotificationCategory category) {
+    const importance = Importance.high;
+    const priority = Priority.high;
+    const visibility = NotificationVisibility.private;
+
+    return switch (category) {
+      NotificationCategory.messages => const AndroidNotificationDetails(
+        'luar_messages',
+        'Mensagens',
+        channelDescription: 'Novas mensagens de conversa',
+        importance: importance,
+        priority: priority,
+        visibility: visibility,
+      ),
+      NotificationCategory.bookings => const AndroidNotificationDetails(
+        'luar_bookings',
+        'Agendamentos',
+        channelDescription: 'Atualizações de agendamentos e visitas',
+        importance: importance,
+        priority: priority,
+        visibility: visibility,
+      ),
+      NotificationCategory.listings => const AndroidNotificationDetails(
+        'luar_listings',
+        'Anúncios',
+        channelDescription: 'Novos anúncios e destaques',
+        importance: importance,
+        priority: priority,
+        visibility: visibility,
+      ),
+      NotificationCategory.promotions => const AndroidNotificationDetails(
+        'luar_promotions',
+        'Promoções',
+        channelDescription: 'Novidades e promoções',
+        importance: importance,
+        priority: priority,
+        visibility: visibility,
+      ),
+      NotificationCategory.system => const AndroidNotificationDetails(
+        'luar_company_channel',
+        'Luar Company Notificações',
+        channelDescription: 'Notificações gerais da aplicação',
+        importance: importance,
+        priority: priority,
+        visibility: visibility,
+      ),
+    };
   }
 
   void _handleNotificationTap(RemoteMessage message) {

@@ -96,6 +96,7 @@ class PropertyProvider extends ChangeNotifier {
 
     try {
       _selectedProperty = await _repository.fetchById(id);
+      _repository.registerView(id);
     } catch (e) {
       _error = e.toString();
     } finally {

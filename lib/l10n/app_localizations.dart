@@ -116,6 +116,72 @@ abstract class AppLocalizations {
   /// **'Versão {v}'**
   String versao(Object v);
 
+  /// No description provided for @notificacoes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Notificações'**
+  String get notificacoes;
+
+  /// No description provided for @notifMensagens.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mensagens'**
+  String get notifMensagens;
+
+  /// No description provided for @notifMensagensDesc.
+  ///
+  /// In pt, this message translates to:
+  /// **'Novas mensagens de conversa'**
+  String get notifMensagensDesc;
+
+  /// No description provided for @notifAgendamentos.
+  ///
+  /// In pt, this message translates to:
+  /// **'Agendamentos'**
+  String get notifAgendamentos;
+
+  /// No description provided for @notifAgendamentosDesc.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atualizações de agendamentos e visitas'**
+  String get notifAgendamentosDesc;
+
+  /// No description provided for @notifAnuncios.
+  ///
+  /// In pt, this message translates to:
+  /// **'Anúncios'**
+  String get notifAnuncios;
+
+  /// No description provided for @notifAnunciosDesc.
+  ///
+  /// In pt, this message translates to:
+  /// **'Novos anúncios e destaques'**
+  String get notifAnunciosDesc;
+
+  /// No description provided for @notifPromocoes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Promoções'**
+  String get notifPromocoes;
+
+  /// No description provided for @notifPromocoesDesc.
+  ///
+  /// In pt, this message translates to:
+  /// **'Novidades e promoções'**
+  String get notifPromocoesDesc;
+
+  /// No description provided for @notifSistema.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sistema'**
+  String get notifSistema;
+
+  /// No description provided for @notifSistemaDesc.
+  ///
+  /// In pt, this message translates to:
+  /// **'Notificações gerais da aplicação'**
+  String get notifSistemaDesc;
+
   /// No description provided for @explorarImoveis.
   ///
   /// In pt, this message translates to:
@@ -3529,6 +3595,60 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Enviar avaliação'**
   String get enviarAvaliacao;
+
+  /// No description provided for @analise.
+  ///
+  /// In pt, this message translates to:
+  /// **'Análise'**
+  String get analise;
+
+  /// No description provided for @carregandoAnalise.
+  ///
+  /// In pt, this message translates to:
+  /// **'A carregar análise...'**
+  String get carregandoAnalise;
+
+  /// No description provided for @novosUtilizadores30d.
+  ///
+  /// In pt, this message translates to:
+  /// **'Novos utilizadores (30 dias)'**
+  String get novosUtilizadores30d;
+
+  /// No description provided for @agendamentosPendentes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Agendamentos pendentes'**
+  String get agendamentosPendentes;
+
+  /// No description provided for @precoMedioVenda.
+  ///
+  /// In pt, this message translates to:
+  /// **'Preço médio (venda)'**
+  String get precoMedioVenda;
+
+  /// No description provided for @maisVistos.
+  ///
+  /// In pt, this message translates to:
+  /// **'Anúncios mais vistos'**
+  String get maisVistos;
+
+  /// No description provided for @visualizacoes.
+  ///
+  /// In pt, this message translates to:
+  /// **'visualizações'**
+  String get visualizacoes;
+
+  /// No description provided for @semVisualizacoes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ainda sem visualizações.'**
+  String get semVisualizacoes;
+
+  /// No description provided for @porTipo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Anúncios por tipo'**
+  String get porTipo;
 }
 
 class _AppLocalizationsDelegate

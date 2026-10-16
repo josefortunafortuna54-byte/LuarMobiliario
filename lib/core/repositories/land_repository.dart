@@ -115,6 +115,18 @@ class LandRepository {
     return _mapResponse(response as List);
   }
 
+  /// Registo de visualização (analytics), melhor esforço.
+  Future<void> registerView(String id) async {
+    try {
+      await _client.rpc(
+        'register_listing_view',
+        params: {'p_kind': 'land', 'p_id': id},
+      );
+    } catch (_) {
+      // Telemetria não crítica.
+    }
+  }
+
   Future<LandModel> fetchById(String id) async {
     final response = await _client
         .from('lands')

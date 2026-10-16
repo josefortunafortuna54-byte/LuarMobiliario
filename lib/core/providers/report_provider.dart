@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../models/report_model.dart';
 import '../repositories/report_repository.dart';
+import '../services/notification_preferences.dart';
 import '../services/notification_service.dart';
 
 class ReportProvider extends ChangeNotifier {
@@ -131,6 +132,7 @@ class ReportProvider extends ChangeNotifier {
                 targetType == ReportTarget.land
                     ? '/lands/$targetId'
                     : '/properties/$targetId',
+            category: NotificationCategory.listings,
           );
         }
       } catch (_) {

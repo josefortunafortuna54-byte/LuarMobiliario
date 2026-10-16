@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../models/booking_model.dart';
 import '../repositories/booking_repository.dart';
+import '../services/notification_preferences.dart';
 import '../services/notification_service.dart';
 
 class BookingProvider extends ChangeNotifier {
@@ -105,6 +106,7 @@ class BookingProvider extends ChangeNotifier {
               previous.isLand
                   ? '/lands/${previous.landId}'
                   : '/properties/${previous.propertyId}',
+          category: NotificationCategory.bookings,
         );
       }
       return true;

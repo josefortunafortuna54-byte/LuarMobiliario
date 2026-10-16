@@ -65,7 +65,7 @@ Deno.serve(async (req) => {
     }
     const callerId = userData.user.id;
 
-    const { user_id, title, body, route } = await req.json();
+    const { user_id, title, body, route, category } = await req.json();
     if (!user_id || !title) {
       return json({ error: "user_id e title sao obrigatorios" }, 400);
     }
@@ -111,7 +111,12 @@ Deno.serve(async (req) => {
           body: JSON.stringify({
             to: token,
             notification: { title, body },
-            data: { title, body, ...(route ? { route } : {}) },
+            data: {
+              title,
+              body,
+              ...(route ? { route } : {}),
+              ...(category ? { category } : {}),
+            },
           }),
         })
       ),

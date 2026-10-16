@@ -7,6 +7,7 @@ import '../../screens/home/main_shell.dart';
 import '../../screens/discover/discover_screen.dart';
 import '../../screens/comparison/comparison_screen.dart';
 import '../../screens/search/filters_screen.dart';
+import '../../screens/search/saved_searches_screen.dart';
 import '../../screens/search/search_screen.dart';
 import '../../screens/properties/properties_screen.dart';
 import '../../screens/properties/property_detail_screen.dart';
@@ -39,6 +40,7 @@ abstract final class AppRoutes {
   static const String comparison = '/comparison';
   static const String search = '/search';
   static const String filters = '/filters';
+  static const String savedSearches = '/saved-searches';
   static const String properties = '/properties';
   static const String propertyDetail = '/properties/:id';
   static const String lands = '/lands';
@@ -62,9 +64,10 @@ abstract final class AppRoutes {
   static const String partnerForm = '/partner-form';
 
   /// Rotas estáticas que uma notificação pode abrir (allowlist fechada).
-  /// Exclui splash/welcome/adminLogin: reencaminhar o utilizador para o
-  /// arranque ou para o login de admin a partir de um payload não confiável
-  /// não faz sentido.
+  /// Exclui splash/welcome/adminLogin e formulários: um payload não
+  /// confiável não pode empurrar o utilizador para ecrãs de escrita nem
+  /// para o arranque. As rotas de admin ficam porque os ecrãs de gestão
+  /// já aplicam as suas próprias guardas de função.
   static const Set<String> _notificationRoutes = {
     home,
     discover,
@@ -76,18 +79,14 @@ abstract final class AppRoutes {
     messages,
     profile,
     bookings,
-    adminDashboard,
     adminProperties,
     adminLands,
     adminUsers,
     adminBookings,
     adminReports,
     chat,
-    propertyForm,
-    landForm,
     editProfile,
     partners,
-    partnerForm,
   };
 
   /// Valida um payload de rota vindo de uma notificação (FCM ou notificação
@@ -164,6 +163,9 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
 
     case AppRoutes.filters:
       return _buildRoute(const FiltersScreen(), settings);
+
+    case AppRoutes.savedSearches:
+      return _buildRoute(const SavedSearchesScreen(), settings);
 
     case AppRoutes.properties:
       return _buildRoute(const PropertiesScreen(), settings);

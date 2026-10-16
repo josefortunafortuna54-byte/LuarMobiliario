@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../models/user_model.dart';
 import '../repositories/admin_repository.dart';
+import '../services/notification_service.dart';
 
 class AdminProvider extends ChangeNotifier {
   final AdminRepository _repository = AdminRepository();
@@ -83,6 +84,18 @@ class AdminProvider extends ChangeNotifier {
         userId: userId,
         verified: verified,
         adminId: actorId,
+      );
+
+      // Informa o anunciante do resultado da verificação (ação de admin,
+      // autorizada pelo RPC/Edge Function).
+      NotificationService().sendNotification(
+        userId: userId,
+        title: verified ? 'Conta verificada' : 'Verificação removida',
+        body:
+            verified
+                ? 'O seu perfil de anunciante já está verificado.'
+                : 'A verificação do seu perfil foi removida.',
+        route: '/profile',
       );
 
       final index = _allUsers.indexWhere((u) => u.id == userId);

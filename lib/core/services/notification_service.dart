@@ -87,6 +87,15 @@ class NotificationService {
         FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
         FirebaseMessaging.onMessageOpenedApp.listen(_handleNotificationTap);
 
+        // O token FCM pode ser rotacionado pelo Google; regrista o novo
+        // sempre que isso acontece para a entrega push não ficar obsoleta.
+        FirebaseMessaging.instance.onTokenRefresh.listen((
+          String token,
+        ) {
+          final userId = _client.auth.currentUser?.id;
+          if (userId != null) saveTokenToDatabase(userId);
+        });
+
         // App aberto a partir de uma notificação (cold start). Guarda a rota
         // até o splash terminar e chamar [consumePendingNavigation].
         final initial = await FirebaseMessaging.instance.getInitialMessage();
@@ -159,6 +168,16 @@ class NotificationService {
         'platform': _platform,
         'updated_at': DateTime.now().toIso8601String(),
       }, onConflict: 'token');
+
+      // Limpa tokens antigos deste mesmo utilizador/plataforma (a chave
+      // única é o token — sem isto, a rotação acumulava linhas mortas que
+      // a Edge Function tentaria entregar).
+      await _client
+          .from('device_tokens')
+          .delete()
+          .eq('user_id', userId)
+          .eq('platform', _platform)
+          .neq('token', token);
     } catch (e) {
       debugPrint('[Luar] Failed to save token: $e');
     }

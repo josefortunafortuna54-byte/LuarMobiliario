@@ -254,6 +254,57 @@ class SearchProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Snapshot dos filtros atuais (com a ordenação) para pesquisas guardadas.
+  /// Só inclui chaves com valor — o JSON fica mínimo e autodescritivo.
+  Map<String, dynamic> snapshotFilters() {
+    return {
+      if (_query.isNotEmpty) 'query': _query,
+      if (_propertyType != null) 'propertyType': _propertyType,
+      if (_landType != null) 'landType': _landType,
+      if (_purpose != null) 'purpose': _purpose,
+      if (_transactionType != null) 'transactionType': _transactionType,
+      if (_province != null) 'province': _province,
+      if (_city != null) 'city': _city,
+      if (_municipality != null) 'municipality': _municipality,
+      if (_neighborhood != null) 'neighborhood': _neighborhood,
+      if (_minPrice != null) 'minPrice': _minPrice,
+      if (_maxPrice != null) 'maxPrice': _maxPrice,
+      if (_minArea != null) 'minArea': _minArea,
+      if (_maxArea != null) 'maxArea': _maxArea,
+      if (_bedrooms != null) 'bedrooms': _bedrooms,
+      if (_bathrooms != null) 'bathrooms': _bathrooms,
+      if (_garage != null) 'garage': _garage,
+      'sortOption': _sortOption,
+    };
+  }
+
+  /// Repõe um snapshot guardado por [snapshotFilters], limpar os resultados
+  /// atuais para a pesquisa seguinte partir do estado limpo.
+  void restoreFilters(Map<String, dynamic> filters) {
+    _query = filters['query'] as String? ?? '';
+    _propertyType = filters['propertyType'] as String?;
+    _landType = filters['landType'] as String?;
+    _purpose = filters['purpose'] as String?;
+    _transactionType = filters['transactionType'] as String?;
+    _province = filters['province'] as String?;
+    _city = filters['city'] as String?;
+    _municipality = filters['municipality'] as String?;
+    _neighborhood = filters['neighborhood'] as String?;
+    _minPrice = (filters['minPrice'] as num?)?.toDouble();
+    _maxPrice = (filters['maxPrice'] as num?)?.toDouble();
+    _minArea = (filters['minArea'] as num?)?.toDouble();
+    _maxArea = (filters['maxArea'] as num?)?.toDouble();
+    _bedrooms = filters['bedrooms'] as int?;
+    _bathrooms = filters['bathrooms'] as int?;
+    _garage = filters['garage'] as int?;
+    _sortOption = filters['sortOption'] as String? ?? _sortOption;
+    _results = [];
+    _page = 0;
+    _hasMore = false;
+    _error = null;
+    notifyListeners();
+  }
+
   Future<void> search() async {
     _isLoading = true;
     _error = null;

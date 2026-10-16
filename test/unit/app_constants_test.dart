@@ -57,16 +57,12 @@ void main() {
       expect(AppConstants.propertyImagesBucket, 'property-images');
     });
 
+    test('propertyVideosBucket', () {
+      expect(AppConstants.propertyVideosBucket, 'property-videos');
+    });
+
     test('avatarBucket', () {
       expect(AppConstants.avatarBucket, 'avatars');
-    });
-
-    test('documentBucket', () {
-      expect(AppConstants.documentBucket, 'documents');
-    });
-
-    test('productsBucket', () {
-      expect(AppConstants.productsBucket, 'products');
     });
   });
 

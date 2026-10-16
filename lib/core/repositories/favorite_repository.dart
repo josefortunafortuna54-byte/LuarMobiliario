@@ -88,19 +88,25 @@ class FavoriteRepository {
 
   /// Contagem de favoritos por imóvel (alimenta o contador de "gostos" do
   /// feed Discover). Devolve uma entrada por id pedido, mesmo que zero.
+  ///
+  /// Usa a RPC `favorite_counts` (migration 021): a policy "read own" da
+  /// tabela `favorites` não deixa ler contagens de terceiros — para
+  /// utilizadores anónimos a query direta devolvia sempre 0.
   Future<Map<String, int>> countLikes(List<String> propertyIds) async {
     final counts = <String, int>{for (final id in propertyIds) id: 0};
     if (counts.isEmpty) return counts;
 
-    final response = await _client
-        .from('favorites')
-        .select('property_id')
-        .inFilter('property_id', propertyIds);
+    final response = await _client.rpc(
+      'favorite_counts',
+      params: {'p_property_ids': propertyIds},
+    );
 
     for (final row in response as List<dynamic>) {
-      final id = (row as Map<String, dynamic>)['property_id'] as String?;
+      final map = row as Map<String, dynamic>;
+      final id = map['property_id'] as String?;
+      final likes = (map['likes'] as num?)?.toInt() ?? 0;
       if (id != null && counts.containsKey(id)) {
-        counts[id] = counts[id]! + 1;
+        counts[id] = likes;
       }
     }
     return counts;

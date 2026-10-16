@@ -104,6 +104,13 @@ void main() {
       expect(AppRoutes.parse(AppRoutes.adminLogin), isNull);
     });
 
+    test('rejects forms and admin dashboard (write/entry screens)', () {
+      expect(AppRoutes.parse(AppRoutes.propertyForm), isNull);
+      expect(AppRoutes.parse(AppRoutes.landForm), isNull);
+      expect(AppRoutes.parse(AppRoutes.partnerForm), isNull);
+      expect(AppRoutes.parse(AppRoutes.adminDashboard), isNull);
+    });
+
     test('rejects path traversal and malformed ids', () {
       expect(AppRoutes.parse('/properties/../admin'), isNull);
       expect(AppRoutes.parse('/properties/a/b'), isNull);

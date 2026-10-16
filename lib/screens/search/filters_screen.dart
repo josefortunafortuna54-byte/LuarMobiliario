@@ -6,10 +6,13 @@ import '../../core/constants/app_categories.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/constants/app_text_styles.dart';
+import '../../core/providers/auth_provider.dart';
+import '../../core/providers/saved_search_provider.dart';
 import '../../core/providers/search_provider.dart';
 import '../../core/repositories/location_repository.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/utils/formatters.dart';
+import '../../core/utils/routes.dart';
 import '../../l10n/app_localizations.dart';
 
 /// Ecrã "Filtros" alinhado com o design de referência: transação, localização,
@@ -139,6 +142,87 @@ class _FiltersScreenState extends State<FiltersScreen> {
     });
   }
 
+  /// Snapshot dos filtros ainda em edição nesta folha (mais a pesquisa por
+  /// texto e a ordenação do provider) para guardar como pesquisa.
+  Map<String, dynamic> _stagedFilters() {
+    final provider = context.read<SearchProvider>();
+    return {
+      if (provider.query.isNotEmpty) 'query': provider.query,
+      if (_transactionType != null) 'transactionType': _transactionType,
+      if (_propertyType != null) 'propertyType': _propertyType,
+      if (_landType != null) 'landType': _landType,
+      if (_purpose != null) 'purpose': _purpose,
+      if (_province != null) 'province': _province,
+      if (_municipality != null) 'municipality': _municipality,
+      if (_parsePrice(_minPriceController.text) != null)
+        'minPrice': _parsePrice(_minPriceController.text),
+      if (_parsePrice(_maxPriceController.text) != null)
+        'maxPrice': _parsePrice(_maxPriceController.text),
+      if (_minArea > 0) 'minArea': _minArea,
+      if (_maxArea < _areaCap) 'maxArea': _maxArea,
+      if (_bedrooms != null) 'bedrooms': _bedrooms,
+      if (_bathrooms != null) 'bathrooms': _bathrooms,
+      if (_garage != null) 'garage': _garage,
+      'sortOption': provider.sortOption,
+    };
+  }
+
+  /// Pede o nome e guarda o snapshot atual dos filtros em
+  /// `saved_searches` (apenas com sessão iniciada).
+  Future<void> _saveSearch() async {
+    final l10n = AppLocalizations.of(context);
+    final userId = context.read<AuthProvider>().user?.id;
+    if (userId == null) return;
+
+    final controller = TextEditingController();
+    final name = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: context.palette.surface,
+        title: Text(l10n.guardarPesquisa, style: AppTextStyles.h6),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          maxLength: 60,
+          textCapitalization: TextCapitalization.sentences,
+          decoration: InputDecoration(
+            labelText: l10n.nomePesquisa,
+            counterText: '',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(l10n.cancelar),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(dialogContext, controller.text),
+            child: Text(l10n.guardar),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (name == null || name.trim().isEmpty || !mounted) return;
+
+    final provider = context.read<SavedSearchProvider>();
+    final saved = await provider.save(
+      userId: userId,
+      name: name,
+      filters: _stagedFilters(),
+    );
+    if (!mounted) return;
+
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          saved != null ? l10n.pesquisaGuardadaComSucesso : l10n.erroAoGuardar,
+        ),
+      ),
+    );
+  }
+
   void _clearAll() {
     setState(() {
       _transactionType = null;
@@ -197,6 +281,18 @@ class _FiltersScreenState extends State<FiltersScreen> {
           style: AppTextStyles.h5.copyWith(color: AppColors.white),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.bookmark_border, color: AppColors.gold),
+            tooltip: l10n.pesquisasGuardadas,
+            onPressed: () =>
+                Navigator.pushNamed(context, AppRoutes.savedSearches),
+          ),
+          if (context.watch<AuthProvider>().user != null)
+            IconButton(
+              icon: const Icon(Icons.save_alt, color: AppColors.gold),
+              tooltip: l10n.guardarPesquisa,
+              onPressed: _saveSearch,
+            ),
           TextButton(
             onPressed: _clearAll,
             child: Text(

@@ -29,8 +29,10 @@ class MessageRepository {
     }
 
     if (partnerIds.isNotEmpty) {
+      // View pública sem PII (migration 021) — a policy da tabela `users`
+      // só permite ler o próprio/admin e os parceiros não são visíveis.
       final usersRes = await _client
-          .from('users')
+          .from('users_public')
           .select('id, name, avatar_url')
           .inFilter('id', partnerIds.toList());
 

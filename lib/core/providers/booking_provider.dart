@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../models/booking_model.dart';
 import '../repositories/booking_repository.dart';
+import '../services/notification_service.dart';
 
 class BookingProvider extends ChangeNotifier {
   final BookingRepository _repository = BookingRepository();
@@ -72,18 +73,40 @@ class BookingProvider extends ChangeNotifier {
     String bookingId,
     BookingStatus status,
   ) async {
+    final allIndex = _allBookings.indexWhere((b) => b.id == bookingId);
+    final index = _bookings.indexWhere((b) => b.id == bookingId);
+    final previous =
+        allIndex != -1
+            ? _allBookings[allIndex]
+            : (index != -1 ? _bookings[index] : null);
+
     try {
       await _repository.updateStatus(bookingId, status);
 
-      final allIndex = _allBookings.indexWhere((b) => b.id == bookingId);
       if (allIndex != -1) {
         _allBookings[allIndex] = _allBookings[allIndex].copyWith(status: status);
       }
-      final index = _bookings.indexWhere((b) => b.id == bookingId);
       if (index != -1) {
         _bookings[index] = _bookings[index].copyWith(status: status);
       }
       notifyListeners();
+
+      // Push para o cliente quando a visita é confirmada (o RPC/Edge
+      // Function só permitem agent/admin notificar terceiros).
+      if (status == BookingStatus.confirmed &&
+          previous != null &&
+          previous.userId != null) {
+        NotificationService().sendNotification(
+          userId: previous.userId!,
+          title: 'Reserva confirmada',
+          body:
+              'A sua visita a "${previous.propertyTitle}" foi confirmada.',
+          route:
+              previous.isLand
+                  ? '/lands/${previous.landId}'
+                  : '/properties/${previous.propertyId}',
+        );
+      }
       return true;
     } catch (e) {
       _error = e.toString();

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../models/report_model.dart';
 import '../repositories/report_repository.dart';
+import '../services/notification_service.dart';
 
 class ReportProvider extends ChangeNotifier {
   ReportProvider({ReportRepository? repository})
@@ -112,6 +113,29 @@ class ReportProvider extends ChangeNotifier {
         targetId: targetId,
         metadata: {'report_id': reportId},
       );
+
+      // Informa o agente dono do anúncio. Ação best-effort: uma falha ao
+      // notificar nunca deve invalidar a moderação já efetuada.
+      try {
+        final agentId = await _repository.fetchListingAgentId(
+          targetType: targetType,
+          targetId: targetId,
+        );
+        if (agentId != null) {
+          await NotificationService().sendNotification(
+            userId: agentId,
+            title: 'Anúncio ocultado',
+            body:
+                'O seu anúncio foi ocultado dos resultados após revisão da moderação.',
+            route:
+                targetType == ReportTarget.land
+                    ? '/lands/$targetId'
+                    : '/properties/$targetId',
+          );
+        }
+      } catch (_) {
+        // Notificação é best-effort — ignora erros.
+      }
       return true;
     } catch (e) {
       _error = e.toString();

@@ -64,6 +64,21 @@ class ReportRepository {
     await _client.from(table).update({'is_available': false}).eq('id', targetId);
   }
 
+  /// Devolve o agente dono de um anúncio (para notificar na moderação).
+  /// Só admins chegam aqui — leitura de `properties`/`lands` é pública.
+  Future<String?> fetchListingAgentId({
+    required ReportTarget targetType,
+    required String targetId,
+  }) async {
+    final table = targetType == ReportTarget.land ? 'lands' : 'properties';
+    final response = await _client
+        .from(table)
+        .select('agent_id')
+        .eq('id', targetId)
+        .maybeSingle();
+    return response?['agent_id'] as String?;
+  }
+
   Future<void> logModeration({
     required String actorId,
     required String action,

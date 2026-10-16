@@ -11,6 +11,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+defaults:
+  run:
+    working-directory: luar_company
+
 jobs:
   quality:
     name: Analyze & Test
@@ -105,7 +109,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: luar-mobiliario-apk-${{ github.run_number }}
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: luar_company/build/app/outputs/flutter-apk/app-release.apk
           if-no-files-found: error
 
   build-aab:
@@ -178,7 +182,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: luar-mobiliario-aab-${{ github.run_number }}
-          path: build/app/outputs/bundle/release/app-release.aab
+          path: luar_company/build/app/outputs/bundle/release/app-release.aab
           if-no-files-found: error
 
   build-web:
@@ -224,7 +228,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: build/web
+          path: luar_company/build/web
 
       - name: Deploy to GitHub Pages
         id: deployment

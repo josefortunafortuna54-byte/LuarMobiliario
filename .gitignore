@@ -1,64 +1,61 @@
-# Miscellaneous
-*.class
-*.log
-*.pyc
-*.swp
-.DS_Store
-.atom/
-.build/
-.buildlog/
-.history
-.svn/
-.swiftpm/
-migrate_working_dir/
+# ─────────────────────────────────────────────
+# Luar Company Imobiliária — ignore rules (raiz)
+# ─────────────────────────────────────────────
 
-# IntelliJ related
-*.iml
-*.ipr
-*.iws
-.idea/
-
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
-
-# Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
-.dart_tool/
-.flutter-plugins-dependencies
-.pub-cache/
-.pub/
-/build/
-/coverage/
-
-# Symbolication related
-app.*.symbols
-
-# Obfuscation related
-app.*.map.json
-
-# Android Studio will place build artifacts here
-/android/app/debug
-/android/app/profile
-/android/app/release
-
-# Environment variables
+# Segredos e credenciais — NUNCA versionar
 .env
 .env.local
 .env.*.local
-
-# Android signing
+!.env.example
 *.jks
 *.keystore
 key.properties
 
-# Kotlin compile cache
-android/.kotlin/
+# Binários de build de grande dimensão (usar GitHub Releases)
+*.apk
+*.aab
+*.ipa
 
-# Supabase CLI artifacts
+# Flutter / Dart
+.dart_tool/
+.pub-cache/
+.pub/
+.build/
+build/
+/flutter_build/
+*.lock
+!pubspec.lock
+
+# Supabase
+luar_company/supabase/.temp/
 supabase/.temp/
+luar_company/supabase/.branches/
+luar_company/supabase/.git/
 
-# Credenciais admin locais (nunca versionar)
-supabase/set_admin_passcode.sql
+# Android
+/local.properties
+.idea/
+*.iml
+.android/
+captures/
+
+# iOS
+**/ios/Flutter/ephemeral/
+**/ios/Pods/
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/flutter_export_environment.sh
+
+# Testes / coverage
+/coverage/
+*.gcda
+*.gcno
+.dart_tool/
+
+# Logs e temporários
+*.log
+*.tmp
+*.swp
+.DS_Store
+
+# Diretórios genéricos do SO
+Thumbs.db

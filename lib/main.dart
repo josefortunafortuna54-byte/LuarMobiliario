@@ -16,6 +16,7 @@ import 'core/providers/property_provider.dart';
 import 'core/providers/report_provider.dart';
 import 'core/providers/partner_provider.dart';
 import 'core/providers/playback_provider.dart';
+import 'core/providers/review_provider.dart';
 import 'core/providers/saved_search_provider.dart';
 import 'core/providers/search_provider.dart';
 import 'core/providers/theme_provider.dart';
@@ -66,6 +67,7 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => AdminProvider()),
         ChangeNotifierProvider(create: (_) => ReportProvider()),
         ChangeNotifierProvider(create: (_) => PartnerProvider()),
+        ChangeNotifierProvider(create: (_) => ReviewProvider()),
         ChangeNotifierProvider.value(value: themeProvider),
         ChangeNotifierProvider.value(value: localeProvider),
         ChangeNotifierProvider.value(value: playbackProvider),

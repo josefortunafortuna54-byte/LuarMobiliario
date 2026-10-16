@@ -3457,6 +3457,78 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Reproduzir vídeos do feed sem toque'**
   String get reproducaoAutomaticaDesc;
+
+  /// No description provided for @avaliacoes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Avaliações'**
+  String get avaliacoes;
+
+  /// No description provided for @avaliar.
+  ///
+  /// In pt, this message translates to:
+  /// **'Avaliar'**
+  String get avaliar;
+
+  /// No description provided for @avaliarImovel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Avaliar imóvel'**
+  String get avaliarImovel;
+
+  /// No description provided for @atualizarAvaliacao.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atualizar avaliação'**
+  String get atualizarAvaliacao;
+
+  /// No description provided for @semAvaliacoes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ainda sem avaliações'**
+  String get semAvaliacoes;
+
+  /// No description provided for @avaliacoesCount.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count} avaliações'**
+  String avaliacoesCount(int count);
+
+  /// No description provided for @avaliacaoRequerLogin.
+  ///
+  /// In pt, this message translates to:
+  /// **'Inicie sessão para avaliar'**
+  String get avaliacaoRequerLogin;
+
+  /// No description provided for @avaliacaoInvalida.
+  ///
+  /// In pt, this message translates to:
+  /// **'Selecione uma classificação de 1 a 5'**
+  String get avaliacaoInvalida;
+
+  /// No description provided for @avaliacaoEnviada.
+  ///
+  /// In pt, this message translates to:
+  /// **'Avaliação enviada'**
+  String get avaliacaoEnviada;
+
+  /// No description provided for @erroAvaliacao.
+  ///
+  /// In pt, this message translates to:
+  /// **'Erro ao enviar avaliação'**
+  String get erroAvaliacao;
+
+  /// No description provided for @escrevaComentario.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escreva o seu comentário (opcional)'**
+  String get escrevaComentario;
+
+  /// No description provided for @enviarAvaliacao.
+  ///
+  /// In pt, this message translates to:
+  /// **'Enviar avaliação'**
+  String get enviarAvaliacao;
 }
 
 class _AppLocalizationsDelegate

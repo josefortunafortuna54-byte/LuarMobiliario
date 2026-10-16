@@ -1803,4 +1803,42 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get reproducaoAutomaticaDesc => 'Reproduzir vídeos do feed sem toque';
+
+  @override
+  String get avaliacoes => 'Avaliações';
+
+  @override
+  String get avaliar => 'Avaliar';
+
+  @override
+  String get avaliarImovel => 'Avaliar imóvel';
+
+  @override
+  String get atualizarAvaliacao => 'Atualizar avaliação';
+
+  @override
+  String get semAvaliacoes => 'Ainda sem avaliações';
+
+  @override
+  String avaliacoesCount(int count) {
+    return '$count avaliações';
+  }
+
+  @override
+  String get avaliacaoRequerLogin => 'Inicie sessão para avaliar';
+
+  @override
+  String get avaliacaoInvalida => 'Selecione uma classificação de 1 a 5';
+
+  @override
+  String get avaliacaoEnviada => 'Avaliação enviada';
+
+  @override
+  String get erroAvaliacao => 'Erro ao enviar avaliação';
+
+  @override
+  String get escrevaComentario => 'Escreva o seu comentário (opcional)';
+
+  @override
+  String get enviarAvaliacao => 'Enviar avaliação';
 }

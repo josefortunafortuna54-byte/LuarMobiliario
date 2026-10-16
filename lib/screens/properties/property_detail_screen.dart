@@ -24,6 +24,7 @@ import '../../widgets/loading_widget.dart';
 import '../../widgets/avatar_widget.dart';
 import '../../widgets/feature_chip.dart';
 import '../../widgets/report_dialog.dart';
+import '../../widgets/reviews_section.dart';
 import '../../widgets/verified_badge.dart';
 
 class PropertyDetailScreen extends StatefulWidget {
@@ -142,6 +143,11 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                 _buildVideoSection(property.videos),
                 _buildDescriptionSection(property),
                 _buildLocationSection(property, location),
+                ReviewsSection(
+                  propertyId: property.id,
+                  agentId: property.agentId,
+                ),
+                const SizedBox(height: 24),
                 _buildAgentSection(property),
                 const SizedBox(height: 24),
               ],

@@ -543,5 +543,24 @@
   "reportarRequerLogin": "Sign in to report listings",
   "semLigacao": "No internet connection",
   "reproducaoAutomatica": "Autoplay",
-  "reproducaoAutomaticaDesc": "Play feed videos automatically"
+  "reproducaoAutomaticaDesc": "Play feed videos automatically",
+  "avaliacoes": "Reviews",
+  "avaliar": "Rate",
+  "avaliarImovel": "Rate this property",
+  "atualizarAvaliacao": "Update review",
+  "semAvaliacoes": "No reviews yet",
+  "avaliacoesCount": "{count} reviews",
+  "@avaliacoesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "avaliacaoRequerLogin": "Sign in to rate",
+  "avaliacaoInvalida": "Select a rating from 1 to 5",
+  "avaliacaoEnviada": "Review submitted",
+  "erroAvaliacao": "Error submitting review",
+  "escrevaComentario": "Write your comment (optional)",
+  "enviarAvaliacao": "Submit review"
 }

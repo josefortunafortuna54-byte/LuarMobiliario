@@ -543,5 +543,24 @@
   "reportarRequerLogin": "Inicie sessão para reportar anúncios",
   "semLigacao": "Sem ligação à internet",
   "reproducaoAutomatica": "Reprodução automática",
-  "reproducaoAutomaticaDesc": "Reproduzir vídeos do feed sem toque"
+  "reproducaoAutomaticaDesc": "Reproduzir vídeos do feed sem toque",
+  "avaliacoes": "Avaliações",
+  "avaliar": "Avaliar",
+  "avaliarImovel": "Avaliar imóvel",
+  "atualizarAvaliacao": "Atualizar avaliação",
+  "semAvaliacoes": "Ainda sem avaliações",
+  "avaliacoesCount": "{count} avaliações",
+  "@avaliacoesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "avaliacaoRequerLogin": "Inicie sessão para avaliar",
+  "avaliacaoInvalida": "Selecione uma classificação de 1 a 5",
+  "avaliacaoEnviada": "Avaliação enviada",
+  "erroAvaliacao": "Erro ao enviar avaliação",
+  "escrevaComentario": "Escreva o seu comentário (opcional)",
+  "enviarAvaliacao": "Enviar avaliação"
 }

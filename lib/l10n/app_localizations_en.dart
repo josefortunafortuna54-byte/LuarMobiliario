@@ -1795,4 +1795,42 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reproducaoAutomaticaDesc => 'Play feed videos automatically';
+
+  @override
+  String get avaliacoes => 'Reviews';
+
+  @override
+  String get avaliar => 'Rate';
+
+  @override
+  String get avaliarImovel => 'Rate this property';
+
+  @override
+  String get atualizarAvaliacao => 'Update review';
+
+  @override
+  String get semAvaliacoes => 'No reviews yet';
+
+  @override
+  String avaliacoesCount(int count) {
+    return '$count reviews';
+  }
+
+  @override
+  String get avaliacaoRequerLogin => 'Sign in to rate';
+
+  @override
+  String get avaliacaoInvalida => 'Select a rating from 1 to 5';
+
+  @override
+  String get avaliacaoEnviada => 'Review submitted';
+
+  @override
+  String get erroAvaliacao => 'Error submitting review';
+
+  @override
+  String get escrevaComentario => 'Write your comment (optional)';
+
+  @override
+  String get enviarAvaliacao => 'Submit review';
 }

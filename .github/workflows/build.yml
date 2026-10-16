@@ -26,15 +26,6 @@ jobs:
           channel: stable
           cache: true
 
-      - name: Create .env from secrets
-        run: |
-          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" > .env
-          echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> .env
-          echo "FCM_SENDER_ID=${{ secrets.FCM_SENDER_ID }}" >> .env
-          echo "FCM_PROJECT_ID=${{ secrets.FCM_PROJECT_ID }}" >> .env
-          echo "FCM_API_KEY=${{ secrets.FCM_API_KEY }}" >> .env
-          echo "FCM_APP_ID=${{ secrets.FCM_APP_ID }}" >> .env
-
       - name: Install dependencies
         run: flutter pub get
 
@@ -74,15 +65,6 @@ jobs:
           key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: gradle-${{ runner.os }}-
 
-      - name: Create .env from secrets
-        run: |
-          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" > .env
-          echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> .env
-          echo "FCM_SENDER_ID=${{ secrets.FCM_SENDER_ID }}" >> .env
-          echo "FCM_PROJECT_ID=${{ secrets.FCM_PROJECT_ID }}" >> .env
-          echo "FCM_API_KEY=${{ secrets.FCM_API_KEY }}" >> .env
-          echo "FCM_APP_ID=${{ secrets.FCM_APP_ID }}" >> .env
-
       - name: Configure release signing
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
@@ -110,7 +92,14 @@ jobs:
         timeout-minutes: 30
         env:
           GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs=-Xmx4g -Dorg.gradle.workers.max=2"
-        run: flutter build apk --release --no-tree-shake-icons
+        run: |
+          flutter build apk --release --no-tree-shake-icons \
+            --dart-define=SUPABASE_URL="${{ secrets.SUPABASE_URL }}" \
+            --dart-define=SUPABASE_ANON_KEY="${{ secrets.SUPABASE_ANON_KEY }}" \
+            --dart-define=FCM_SENDER_ID="${{ secrets.FCM_SENDER_ID }}" \
+            --dart-define=FCM_PROJECT_ID="${{ secrets.FCM_PROJECT_ID }}" \
+            --dart-define=FCM_API_KEY="${{ secrets.FCM_API_KEY }}" \
+            --dart-define=FCM_APP_ID="${{ secrets.FCM_APP_ID }}"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
@@ -149,15 +138,6 @@ jobs:
           key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: gradle-${{ runner.os }}-
 
-      - name: Create .env from secrets
-        run: |
-          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" > .env
-          echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> .env
-          echo "FCM_SENDER_ID=${{ secrets.FCM_SENDER_ID }}" >> .env
-          echo "FCM_PROJECT_ID=${{ secrets.FCM_PROJECT_ID }}" >> .env
-          echo "FCM_API_KEY=${{ secrets.FCM_API_KEY }}" >> .env
-          echo "FCM_APP_ID=${{ secrets.FCM_APP_ID }}" >> .env
-
       - name: Configure release signing
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
@@ -185,7 +165,14 @@ jobs:
         timeout-minutes: 30
         env:
           GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs=-Xmx4g -Dorg.gradle.workers.max=2"
-        run: flutter build appbundle --release --no-tree-shake-icons
+        run: |
+          flutter build appbundle --release --no-tree-shake-icons \
+            --dart-define=SUPABASE_URL="${{ secrets.SUPABASE_URL }}" \
+            --dart-define=SUPABASE_ANON_KEY="${{ secrets.SUPABASE_ANON_KEY }}" \
+            --dart-define=FCM_SENDER_ID="${{ secrets.FCM_SENDER_ID }}" \
+            --dart-define=FCM_PROJECT_ID="${{ secrets.FCM_PROJECT_ID }}" \
+            --dart-define=FCM_API_KEY="${{ secrets.FCM_API_KEY }}" \
+            --dart-define=FCM_APP_ID="${{ secrets.FCM_APP_ID }}"
 
       - name: Upload AAB
         uses: actions/upload-artifact@v4
@@ -218,20 +205,18 @@ jobs:
           channel: stable
           cache: true
 
-      - name: Create .env from secrets
-        run: |
-          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" > .env
-          echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> .env
-          echo "FCM_SENDER_ID=${{ secrets.FCM_SENDER_ID }}" >> .env
-          echo "FCM_PROJECT_ID=${{ secrets.FCM_PROJECT_ID }}" >> .env
-          echo "FCM_API_KEY=${{ secrets.FCM_API_KEY }}" >> .env
-          echo "FCM_APP_ID=${{ secrets.FCM_APP_ID }}" >> .env
-
       - name: Install dependencies
         run: flutter pub get
 
       - name: Build Web
-        run: flutter build web --release --base-href "/LuarMobiliario/"
+        run: |
+          flutter build web --release --base-href "/LuarMobiliario/" \
+            --dart-define=SUPABASE_URL="${{ secrets.SUPABASE_URL }}" \
+            --dart-define=SUPABASE_ANON_KEY="${{ secrets.SUPABASE_ANON_KEY }}" \
+            --dart-define=FCM_SENDER_ID="${{ secrets.FCM_SENDER_ID }}" \
+            --dart-define=FCM_PROJECT_ID="${{ secrets.FCM_PROJECT_ID }}" \
+            --dart-define=FCM_API_KEY="${{ secrets.FCM_API_KEY }}" \
+            --dart-define=FCM_APP_ID="${{ secrets.FCM_APP_ID }}"
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

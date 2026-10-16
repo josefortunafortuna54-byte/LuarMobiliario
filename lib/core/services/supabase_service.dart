@@ -18,7 +18,10 @@ class SupabaseService {
 
   static Future<void> initialize() async {
     if (!EnvConfig.isConfigured) {
-      throw StateError('Supabase configuration missing. Check your .env file.');
+      throw StateError(
+        'Supabase configuration missing. Pass SUPABASE_URL and '
+        'SUPABASE_ANON_KEY via --dart-define (see .env.example).',
+      );
     }
 
     await Supabase.initialize(

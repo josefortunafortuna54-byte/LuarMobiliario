@@ -10,7 +10,7 @@ Documento com as instruções para compilar e publicar a aplicação Luar Compan
 - Conta Google Play Console (para Android)
 - Conta Apple Developer (para iOS)
 - Conta Supabase com o projeto configurado
-- Ficheiro `.env` configurado em `luar_company/.env`
+- Ficheiro `.env` configurado em `luar_company/.env` (usado apenas em build via `--dart-define`; **não** é empacotado no app)
 
 ---
 
@@ -20,7 +20,7 @@ Documento com as instruções para compilar e publicar a aplicação Luar Compan
 
 ```bash
 cd luar_company
-flutter build apk --release
+flutter build apk --release --dart-define-from-file=.env
 ```
 
 O APK será gerado em: `build/app/outputs/flutter-apk/app-release.apk`
@@ -28,7 +28,7 @@ O APK será gerado em: `build/app/outputs/flutter-apk/app-release.apk`
 ### Build AAB (Google Play)
 
 ```bash
-flutter build appbundle --release
+flutter build appbundle --release --dart-define-from-file=.env
 ```
 
 O AAB será gerado em: `build/app/outputs/bundle/release/app-release.aab`

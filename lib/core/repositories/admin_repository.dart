@@ -56,7 +56,10 @@ class AdminRepository {
     });
   }
 
+  /// Apaga um utilizador através do RPC `delete_user` (SECURITY DEFINER), que
+  /// valida o papel de admin no servidor. `auth.admin.deleteUser` exigiria a
+  /// service_role key, indisponível no cliente.
   Future<void> deleteUser(String userId) async {
-    await _client.auth.admin.deleteUser(userId);
+    await _client.rpc('delete_user', params: {'p_user_id': userId});
   }
 }

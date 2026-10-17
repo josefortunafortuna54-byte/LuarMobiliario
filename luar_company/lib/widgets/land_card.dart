@@ -6,6 +6,7 @@ import '../core/constants/app_text_styles.dart';
 import '../core/theme/app_palette.dart';
 import '../core/utils/formatters.dart';
 import '../l10n/app_localizations.dart';
+import 'property_card.dart' show PropertyCardVariant;
 import 'verified_badge.dart';
 
 class LandCard extends StatelessWidget {
@@ -21,6 +22,11 @@ class LandCard extends StatelessWidget {
     this.onTap,
     this.onDetailsTap,
     this.agentVerified = false,
+    this.variant = PropertyCardVariant.vertical,
+    this.onFavoriteTap,
+    this.isFavorite = false,
+    this.statusLabel,
+    this.statusColor,
   });
 
   final String imageUrl;
@@ -33,9 +39,17 @@ class LandCard extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onDetailsTap;
   final bool agentVerified;
+  final PropertyCardVariant variant;
+  final VoidCallback? onFavoriteTap;
+  final bool isFavorite;
+  final String? statusLabel;
+  final Color? statusColor;
 
   @override
   Widget build(BuildContext context) {
+    if (variant == PropertyCardVariant.horizontal) {
+      return _buildHorizontal(context);
+    }
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -65,12 +79,171 @@ class LandCard extends StatelessWidget {
     );
   }
 
-  Widget _buildImage(BuildContext context) {
+  /// Variante horizontal: miniatura à esquerda, conteúdo à direita.
+  Widget _buildHorizontal(BuildContext context) {
+    final palette = context.palette;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 132,
+        decoration: BoxDecoration(
+          color: palette.surface,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.navy.withValues(alpha: 0.08),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Row(
+          children: [
+            SizedBox(width: 132, child: _buildImage(context, height: 132)),
+            Expanded(child: _buildHorizontalContent(context)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHorizontalContent(BuildContext context) {
+    final palette = context.palette;
+    return Padding(
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            formatPriceCurrency(price),
+            style: AppTextStyles.priceSmall,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            title,
+            style: AppTextStyles.h6.copyWith(fontSize: 15),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 2),
+          Row(
+            children: [
+              const Icon(
+                Icons.location_on_outlined,
+                size: 13,
+                color: AppColors.gold,
+              ),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  location,
+                  style: AppTextStyles.bodyTiny.copyWith(
+                    color: palette.textSecondary,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              if (agentVerified) ...[
+                const SizedBox(width: 4),
+                const VerifiedBadge(compact: true),
+              ],
+            ],
+          ),
+          const SizedBox(height: 6),
+          Row(
+            children: [
+              Expanded(
+                child: FittedBox(
+                  alignment: Alignment.centerLeft,
+                  fit: BoxFit.scaleDown,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.square_foot_outlined,
+                        size: 14,
+                        color: AppColors.gold,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${area.toStringAsFixed(0)} m²',
+                        style: AppTextStyles.bodyTiny.copyWith(
+                          color: palette.textBody,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              if (onFavoriteTap != null)
+                _buildHeart(context)
+              else
+                _buildDetailsButton(context),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Botão "Detalhes" — à direita do conteúdo (variante horizontal).
+  Widget _buildDetailsButton(BuildContext context) {
+    return GestureDetector(
+      onTap: onDetailsTap ?? onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: AppColors.navy,
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Text(
+          AppLocalizations.of(context).detalhes,
+          style: AppTextStyles.buttonSmall.copyWith(
+            fontSize: 10,
+            color: AppColors.white,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeart(BuildContext context) {
+    final palette = context.palette;
+    return Semantics(
+      button: true,
+      label: isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos',
+      child: GestureDetector(
+        onTap: onFavoriteTap,
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: palette.surfaceAlt,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: palette.borderStrong),
+          ),
+          child: Icon(
+            isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+            size: 18,
+            color: isFavorite ? AppColors.error : palette.textMuted,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImage(BuildContext context, {double? height}) {
     final palette = context.palette;
     return Stack(
       children: [
         SizedBox(
-          height: 220,
+          height: height ?? 220,
           width: double.infinity,
           child: CachedNetworkImage(
             imageUrl: imageUrl,
@@ -87,7 +260,8 @@ class LandCard extends StatelessWidget {
           ),
         ),
         Container(
-          height: 220,
+          height: height ?? 220,
+          width: double.infinity,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
@@ -105,11 +279,11 @@ class LandCard extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: AppColors.gold,
+              color: statusColor ?? AppColors.gold,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              badgeLabel,
+              statusLabel ?? badgeLabel,
               style: AppTextStyles.labelMedium.copyWith(color: AppColors.white),
             ),
           ),

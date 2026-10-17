@@ -77,10 +77,11 @@ void main() {
   });
 
   group('TransactionType', () {
-    test('has two values: sale and rent', () {
-      expect(TransactionType.values.length, 2);
+    test('has three values: sale, rent and renew', () {
+      expect(TransactionType.values.length, 3);
       expect(TransactionType.values, contains(TransactionType.sale));
       expect(TransactionType.values, contains(TransactionType.rent));
+      expect(TransactionType.values, contains(TransactionType.renew));
     });
   });
 

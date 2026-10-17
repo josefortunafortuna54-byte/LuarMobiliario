@@ -9,7 +9,7 @@ LandType _landTypeFromString(String value) {
 
 String _landTypeToString(LandType type) => type.name;
 
-enum LandTransactionType { sale, rent }
+enum LandTransactionType { sale, rent, renew }
 
 LandTransactionType _transactionTypeFromString(String value) {
   return LandTransactionType.values.firstWhere(

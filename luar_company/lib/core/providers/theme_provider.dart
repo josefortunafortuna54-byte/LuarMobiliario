@@ -10,7 +10,7 @@ class ThemeProvider extends ChangeNotifier {
 
   final SharedPreferences _prefs;
 
-  ThemePreference _preference = ThemePreference.light;
+  ThemePreference _preference = ThemePreference.dark;
 
   ThemePreference get preference => _preference;
 
@@ -47,7 +47,7 @@ class ThemeProvider extends ChangeNotifier {
       case 'system':
         _preference = ThemePreference.system;
       default:
-        _preference = ThemePreference.light;
+        _preference = ThemePreference.dark;
     }
   }
 

@@ -120,7 +120,6 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
     return Scaffold(
       backgroundColor: palette.surface,
       appBar: AppBar(
-        backgroundColor: AppColors.navy,
         elevation: 0,
         centerTitle: true,
         title: Text(

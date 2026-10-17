@@ -40,6 +40,7 @@ class _SavedSearchesScreenState extends State<SavedSearchesScreen> {
         f['query'] as String,
       if (f['transactionType'] == 'sale') l10n.comprar,
       if (f['transactionType'] == 'rent') l10n.arrendar,
+      if (f['transactionType'] == 'renew') l10n.renovar,
       if (f['propertyType'] != null) f['propertyType'] as String,
       if (f['landType'] != null) f['landType'] as String,
       if (f['province'] != null) f['province'] as String,
@@ -67,7 +68,6 @@ class _SavedSearchesScreenState extends State<SavedSearchesScreen> {
     return Scaffold(
       backgroundColor: palette.background,
       appBar: AppBar(
-        backgroundColor: AppColors.navy,
         foregroundColor: AppColors.white,
         elevation: 0,
         centerTitle: true,

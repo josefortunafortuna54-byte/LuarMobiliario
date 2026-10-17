@@ -60,7 +60,7 @@ abstract final class AppTheme {
         labelSmall: AppTextStyles.labelSmall,
       ),
       appBarTheme: AppBarTheme(
-        backgroundColor: isDark ? AppColors.darkSurface : AppColors.navy,
+        backgroundColor: isDark ? AppColors.darkBackground : AppColors.navy,
         foregroundColor: AppColors.white,
         elevation: 0,
         centerTitle: true,
@@ -152,7 +152,7 @@ abstract final class AppTheme {
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        backgroundColor: isDark ? AppColors.darkSurface : AppColors.navy,
+        backgroundColor: isDark ? AppColors.darkCard : AppColors.navy,
         contentTextStyle: GoogleFonts.dmSans(
           fontSize: 14,
           color: AppColors.white,

@@ -3649,6 +3649,78 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Anúncios por tipo'**
   String get porTipo;
+
+  /// No description provided for @semFotos.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem fotos disponíveis'**
+  String get semFotos;
+
+  /// No description provided for @semVideos.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem vídeos disponíveis'**
+  String get semVideos;
+
+  /// No description provided for @seguidores.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seguidores'**
+  String get seguidores;
+
+  /// No description provided for @aprovacao.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aprovação'**
+  String get aprovacao;
+
+  /// No description provided for @renovar.
+  ///
+  /// In pt, this message translates to:
+  /// **'Renovar'**
+  String get renovar;
+
+  /// No description provided for @recentrar.
+  ///
+  /// In pt, this message translates to:
+  /// **'Recentrar mapa'**
+  String get recentrar;
+
+  /// No description provided for @semImoveisNoMapa.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem imóveis para mostrar no mapa'**
+  String get semImoveisNoMapa;
+
+  /// No description provided for @verNoMapa.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ver no mapa'**
+  String get verNoMapa;
+
+  /// No description provided for @vendido.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vendido'**
+  String get vendido;
+
+  /// No description provided for @arrendado.
+  ///
+  /// In pt, this message translates to:
+  /// **'Arrendado'**
+  String get arrendado;
+
+  /// No description provided for @historicoDesc.
+  ///
+  /// In pt, this message translates to:
+  /// **'Os imóveis que consultar ficam guardados aqui.'**
+  String get historicoDesc;
+
+  /// No description provided for @renovado.
+  ///
+  /// In pt, this message translates to:
+  /// **'Renovado'**
+  String get renovado;
 }
 
 class _AppLocalizationsDelegate

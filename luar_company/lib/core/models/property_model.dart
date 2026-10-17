@@ -9,7 +9,7 @@ PropertyType _propertyTypeFromString(String value) {
 
 String _propertyTypeToString(PropertyType type) => type.name;
 
-enum TransactionType { sale, rent }
+enum TransactionType { sale, rent, renew }
 
 TransactionType _transactionTypeFromString(String value) {
   return TransactionType.values.firstWhere(

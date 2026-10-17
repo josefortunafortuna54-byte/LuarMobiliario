@@ -272,7 +272,6 @@ class _FiltersScreenState extends State<FiltersScreen> {
     return Scaffold(
       backgroundColor: palette.background,
       appBar: AppBar(
-        backgroundColor: AppColors.navy,
         foregroundColor: AppColors.white,
         elevation: 0,
         centerTitle: true,
@@ -327,9 +326,9 @@ class _FiltersScreenState extends State<FiltersScreen> {
                   onTap: () => _toggleTransaction('rent'),
                 ),
                 _GoldChip(
-                  label: l10n.todos,
-                  selected: _transactionType == null,
-                  onTap: () => setState(() => _transactionType = null),
+                  label: l10n.renovar,
+                  selected: _transactionType == 'renew',
+                  onTap: () => _toggleTransaction('renew'),
                 ),
               ],
             ),

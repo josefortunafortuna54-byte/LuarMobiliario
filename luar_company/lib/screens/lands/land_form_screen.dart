@@ -268,7 +268,6 @@ class _LandFormScreenState extends State<LandFormScreen> {
     return Scaffold(
       backgroundColor: palette.surface,
       appBar: AppBar(
-        backgroundColor: AppColors.navy,
         elevation: 0,
         centerTitle: true,
         title: Text(
@@ -696,6 +695,7 @@ class _LandFormScreenState extends State<LandFormScreen> {
       items: [
         DropdownMenuItem(value: 'sale', child: Text(l10n.venda)),
         DropdownMenuItem(value: 'rent', child: Text(l10n.arrendamento)),
+        DropdownMenuItem(value: 'renew', child: Text(l10n.renovar)),
       ],
       onChanged: (v) => setState(() => _selectedTransaction = v ?? 'sale'),
     );

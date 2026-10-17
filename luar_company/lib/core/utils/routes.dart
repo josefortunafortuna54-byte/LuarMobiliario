@@ -6,6 +6,7 @@ import '../../screens/auth/admin_login_screen.dart';
 import '../../screens/home/main_shell.dart';
 import '../../screens/discover/discover_screen.dart';
 import '../../screens/comparison/comparison_screen.dart';
+import '../../screens/map/map_screen.dart';
 import '../../screens/search/filters_screen.dart';
 import '../../screens/search/saved_searches_screen.dart';
 import '../../screens/search/search_screen.dart';
@@ -41,6 +42,7 @@ abstract final class AppRoutes {
   static const String search = '/search';
   static const String filters = '/filters';
   static const String savedSearches = '/saved-searches';
+  static const String map = '/map';
   static const String properties = '/properties';
   static const String propertyDetail = '/properties/:id';
   static const String lands = '/lands';
@@ -166,6 +168,9 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
 
     case AppRoutes.savedSearches:
       return _buildRoute(const SavedSearchesScreen(), settings);
+
+    case AppRoutes.map:
+      return _buildRoute(const MapScreen(), settings);
 
     case AppRoutes.properties:
       return _buildRoute(const PropertiesScreen(), settings);

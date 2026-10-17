@@ -16,6 +16,7 @@ import '../../core/theme/app_palette.dart';
 import '../../core/utils/deep_links.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/utils/routes.dart';
+import '../../core/services/view_history_service.dart';
 import '../../l10n/app_localizations.dart';
 import '../../screens/bookings/booking_bottom_sheet.dart';
 import '../../screens/videos/video_viewer_screen.dart';
@@ -44,6 +45,7 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
       final landId = ModalRoute.of(context)?.settings.arguments as String?;
       if (landId != null) {
         context.read<LandProvider>().selectLand(landId);
+        ViewHistory.recordLand(landId);
       }
     });
   }
@@ -68,7 +70,6 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
           return Scaffold(
             backgroundColor: palette.surface,
             appBar: AppBar(
-              backgroundColor: AppColors.navy,
               foregroundColor: AppColors.white,
               title: Text(
                 l10n.erro,
@@ -121,7 +122,7 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
   }
 
   Widget _buildDetailContent(LandModel land) {
-    final isRent = land.transactionType == LandTransactionType.rent;
+    final isRent = land.transactionType != LandTransactionType.sale;
     final location = '${land.neighborhood}, ${land.city}, ${land.municipality}';
 
     return Scaffold(
@@ -163,7 +164,6 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
     return SliverAppBar(
       expandedHeight: 0,
       floating: true,
-      backgroundColor: AppColors.navy,
       foregroundColor: AppColors.white,
       elevation: 0,
       title: Text(
@@ -415,11 +415,17 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: isRent ? AppColors.navyLight : AppColors.gold,
+                  color: land.transactionType == LandTransactionType.sale
+                      ? AppColors.gold
+                      : AppColors.navyLight,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  (isRent ? l10n.arrendamento : l10n.venda).toUpperCase(),
+                  (switch (land.transactionType) {
+                        LandTransactionType.sale => l10n.venda,
+                        LandTransactionType.rent => l10n.arrendamento,
+                        LandTransactionType.renew => l10n.renovar,
+                      }).toUpperCase(),
                   style: AppTextStyles.labelMedium.copyWith(
                     color: AppColors.white,
                   ),

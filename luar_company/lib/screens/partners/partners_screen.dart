@@ -70,7 +70,6 @@ class _PartnersScreenState extends State<PartnersScreen> {
     return Scaffold(
       backgroundColor: palette.surface,
       appBar: AppBar(
-        backgroundColor: AppColors.navy,
         elevation: 0,
         centerTitle: true,
         title: Text(

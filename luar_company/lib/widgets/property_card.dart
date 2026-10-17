@@ -3,12 +3,22 @@ import 'package:flutter/material.dart';
 import 'package:luar_company/l10n/app_localizations.dart';
 
 import '../core/constants/app_colors.dart';
+import '../core/models/property_model.dart';
 import '../core/constants/app_text_styles.dart';
 import '../core/theme/app_palette.dart';
 import '../core/utils/formatters.dart';
 import 'verified_badge.dart';
 
-enum PropertyListingType { venda, arrendamento }
+enum PropertyListingType { venda, arrendamento, renovacao }
+
+/// Conversão de `TransactionType` para o tipo de badge do cartão.
+extension TransactionTypeListing on TransactionType {
+  PropertyListingType get listingType => switch (this) {
+    TransactionType.sale => PropertyListingType.venda,
+    TransactionType.rent => PropertyListingType.arrendamento,
+    TransactionType.renew => PropertyListingType.renovacao,
+  };
+}
 
 enum PropertyCardVariant { horizontal, vertical }
 
@@ -29,6 +39,10 @@ class PropertyCard extends StatelessWidget {
     this.onCompareTap,
     this.isCompared = false,
     this.agentVerified = false,
+    this.onFavoriteTap,
+    this.isFavorite = false,
+    this.statusLabel,
+    this.statusColor,
   });
 
   final String imageUrl;
@@ -46,8 +60,19 @@ class PropertyCard extends StatelessWidget {
   final bool isCompared;
   final bool agentVerified;
 
-  String _badgeLabel(AppLocalizations l10n) =>
-      listingType == PropertyListingType.venda ? l10n.venda : l10n.arrendamento;
+  /// Ação de remover dos favoritos (mostra o coração no cartão).
+  final VoidCallback? onFavoriteTap;
+  final bool isFavorite;
+
+  /// Badge de estado (`Vendido`/`Arrendado`) que substitui o de tipo.
+  final String? statusLabel;
+  final Color? statusColor;
+
+  String _badgeLabel(AppLocalizations l10n) => switch (listingType) {
+    PropertyListingType.venda => l10n.venda,
+    PropertyListingType.arrendamento => l10n.arrendamento,
+    PropertyListingType.renovacao => l10n.renovar,
+  };
 
   Color get _badgeColor => listingType == PropertyListingType.venda
       ? AppColors.gold
@@ -169,7 +194,7 @@ class PropertyCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              _badgeLabel(AppLocalizations.of(context)),
+              statusLabel ?? _badgeLabel(AppLocalizations.of(context)),
               style: AppTextStyles.labelMedium.copyWith(color: AppColors.white),
             ),
           ),
@@ -228,6 +253,10 @@ class PropertyCard extends StatelessWidget {
                   style: AppTextStyles.priceMedium,
                 ),
               ),
+              if (onFavoriteTap != null) ...[
+                _buildHeart(context),
+                const SizedBox(width: 8),
+              ],
               if (onCompareTap != null) ...[
                 GestureDetector(
                   onTap: onCompareTap,
@@ -271,28 +300,36 @@ class PropertyCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
               ],
-              GestureDetector(
-                onTap: onDetailsTap,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.navy,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    l10n.detalhes,
-                    style: AppTextStyles.buttonSmall.copyWith(
-                      color: AppColors.white,
-                    ),
-                  ),
-                ),
-              ),
+              _buildDetailsButton(l10n, compact: false),
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  /// Botão de favorito (coração) do cartão horizontal/vertical.
+  Widget _buildHeart(BuildContext context) {
+    final palette = context.palette;
+    return Semantics(
+      button: true,
+      label: isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos',
+      child: GestureDetector(
+        onTap: onFavoriteTap,
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: palette.surfaceAlt,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: palette.borderStrong),
+          ),
+          child: Icon(
+            isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+            size: 18,
+            color: isFavorite ? AppColors.error : palette.textMuted,
+          ),
+        ),
       ),
     );
   }
@@ -307,17 +344,24 @@ class PropertyCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            title,
-            style: AppTextStyles.h6.copyWith(fontSize: 16),
+            formatPriceCurrency(price),
+            style: AppTextStyles.priceSmall,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 4),
+          Text(
+            title,
+            style: AppTextStyles.h6.copyWith(fontSize: 15),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 2),
           Row(
             children: [
               const Icon(
                 Icons.location_on_outlined,
-                size: 14,
+                size: 13,
                 color: AppColors.gold,
               ),
               const SizedBox(width: 4),
@@ -337,67 +381,47 @@ class PropertyCard extends StatelessWidget {
               ],
             ],
           ),
-          const SizedBox(height: 8),
-          _buildFeaturesRow(compact: true, context: context),
-          const SizedBox(height: 12),
+          const SizedBox(height: 6),
           Row(
             children: [
               Expanded(
-                child: Text(
-                  formatPriceCurrency(price),
-                  style: AppTextStyles.priceSmall,
+                child: FittedBox(
+                  alignment: Alignment.centerLeft,
+                  fit: BoxFit.scaleDown,
+                  child: _buildFeaturesRow(compact: true, context: context),
                 ),
               ),
-              if (onCompareTap != null) ...[
-                GestureDetector(
-                  onTap: onCompareTap,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: isCompared
-                          ? AppColors.gold.withValues(alpha: 0.15)
-                          : palette.border,
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(
-                        color: isCompared
-                            ? AppColors.gold
-                            : palette.borderStrong,
-                      ),
-                    ),
-                    child: Icon(
-                      isCompared
-                          ? Icons.check_circle_rounded
-                          : Icons.add_circle_outline_rounded,
-                      size: 14,
-                      color: isCompared ? AppColors.gold : palette.textMuted,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 6),
-              ],
-              GestureDetector(
-                onTap: onDetailsTap,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.navy,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    l10n.detalhes,
-                    style: AppTextStyles.buttonSmall.copyWith(
-                      fontSize: 10,
-                      color: AppColors.white,
-                    ),
-                  ),
-                ),
-              ),
+              if (onFavoriteTap != null)
+                _buildHeart(context)
+              else
+                _buildDetailsButton(l10n, compact: true),
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  /// Botão "Detalhes" — fica à direita do conteúdo (variante horizontal).
+  Widget _buildDetailsButton(AppLocalizations l10n, {required bool compact}) {
+    return GestureDetector(
+      onTap: onDetailsTap ?? onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: compact
+            ? const EdgeInsets.symmetric(horizontal: 12, vertical: 6)
+            : const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: AppColors.navy,
+          borderRadius: BorderRadius.circular(compact ? 6 : 8),
+        ),
+        child: Text(
+          l10n.detalhes,
+          style: AppTextStyles.buttonSmall.copyWith(
+            fontSize: compact ? 10 : null,
+            color: AppColors.white,
+          ),
+        ),
       ),
     );
   }

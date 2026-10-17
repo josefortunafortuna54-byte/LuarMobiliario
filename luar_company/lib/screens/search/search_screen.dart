@@ -59,11 +59,15 @@ class _SearchScreenState extends State<SearchScreen> {
           l10n.pesquisar,
           style: AppTextStyles.h5.copyWith(color: AppColors.white),
         ),
-        backgroundColor: AppColors.navy,
         foregroundColor: AppColors.white,
         elevation: 0,
         centerTitle: true,
         actions: [
+          IconButton(
+            tooltip: l10n.mapa,
+            onPressed: () => Navigator.of(context).pushNamed(AppRoutes.map),
+            icon: const Icon(Icons.map_outlined, color: AppColors.gold),
+          ),
           Consumer<SearchProvider>(
             builder: (_, provider, _) {
               if (provider.activeFilterCount == 0) {
@@ -148,7 +152,11 @@ class _SearchScreenState extends State<SearchScreen> {
     if (provider.transactionType != null) {
       chips.add(
         _FilterChipData(
-          provider.transactionType == 'sale' ? l10n.venda : l10n.arrendamento,
+          provider.transactionType == 'sale'
+              ? l10n.venda
+              : provider.transactionType == 'rent'
+                  ? l10n.arrendamento
+                  : l10n.renovar,
           () => _removeFilter(provider, 'transactionType'),
         ),
       );
@@ -296,7 +304,6 @@ class _SearchScreenState extends State<SearchScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(l10n.limiteComparacao),
-          backgroundColor: AppColors.navy,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
@@ -549,9 +556,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         title: p.title,
                         location: '${p.neighborhood}, ${p.city}',
                         price: p.price,
-                        listingType: p.transactionType == TransactionType.sale
-                            ? PropertyListingType.venda
-                            : PropertyListingType.arrendamento,
+                        listingType: p.transactionType.listingType,
                         bedrooms: p.bedrooms,
                         bathrooms: p.bathrooms,
                         area: p.area,

@@ -1893,4 +1893,40 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get porTipo => 'Listings by type';
+
+  @override
+  String get semFotos => 'No photos available';
+
+  @override
+  String get semVideos => 'No videos available';
+
+  @override
+  String get seguidores => 'Followers';
+
+  @override
+  String get aprovacao => 'Approval';
+
+  @override
+  String get renovar => 'Renew';
+
+  @override
+  String get recentrar => 'Recenter map';
+
+  @override
+  String get semImoveisNoMapa => 'No properties to show on the map';
+
+  @override
+  String get verNoMapa => 'View on map';
+
+  @override
+  String get vendido => 'Sold';
+
+  @override
+  String get arrendado => 'Rented';
+
+  @override
+  String get historicoDesc => 'Properties you view are saved here.';
+
+  @override
+  String get renovado => 'Renewed';
 }

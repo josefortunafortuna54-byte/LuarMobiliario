@@ -6,9 +6,8 @@ import '../../core/constants/app_constants.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/models/user_model.dart';
 import '../../core/providers/auth_provider.dart';
-import '../../core/providers/favorite_provider.dart';
+import '../../core/repositories/favorite_repository.dart';
 import '../../core/repositories/land_repository.dart';
-import '../../core/repositories/message_repository.dart';
 import '../../core/repositories/property_repository.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/utils/responsive.dart';
@@ -75,7 +74,6 @@ class ProfileScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: palette.surface,
       appBar: AppBar(
-        backgroundColor: AppColors.navy,
         elevation: 0,
         centerTitle: true,
         title: Text(
@@ -217,7 +215,7 @@ class ProfileScreen extends StatelessWidget {
           Expanded(
             child: CustomButton(
               text: l10n.editarPerfil,
-              variant: CustomButtonVariant.outline,
+              variant: CustomButtonVariant.primary,
               icon: Icons.edit_outlined,
               onPressed: () =>
                   Navigator.of(context).pushNamed(AppRoutes.editProfile),
@@ -273,6 +271,11 @@ class ProfileScreen extends StatelessWidget {
         icon: Icons.chat_bubble_outline_rounded,
         title: l10n.mensagens,
         route: AppRoutes.messages,
+      ),
+      _MenuItem(
+        icon: Icons.notifications_outlined,
+        title: l10n.notificacoes,
+        onTap: (ctx) => showSettingsSheet(ctx),
       ),
       _MenuItem(
         icon: Icons.calendar_today_outlined,
@@ -440,8 +443,9 @@ class ProfileScreen extends StatelessWidget {
   }
 }
 
-/// Estatísticas do perfil — apenas com dados reais da base de dados:
-/// anúncios publicados, favoritos guardados e conversas de mensagens.
+/// Estatísticas do perfil (painel 6 do design): anúncios publicados,
+/// seguidores (utilizadores que guardaram os meus anúncios) e aprovação
+/// (% de anúncios ativos).
 class _ProfileStats extends StatefulWidget {
   const _ProfileStats({required this.userId});
 
@@ -453,42 +457,48 @@ class _ProfileStats extends StatefulWidget {
 
 class _ProfileStatsState extends State<_ProfileStats> {
   int? _listings;
-  int? _messages;
+  int? _followers;
+  String? _approval;
 
   @override
   void initState() {
     super.initState();
     _load();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      context.read<FavoriteProvider>().loadFavorites(widget.userId);
-    });
   }
 
   Future<void> _load() async {
     int listings = 0;
-    int messages = 0;
+    int available = 0;
+    int? followers;
 
     try {
-      final properties = await PropertyRepository().countByAgent(widget.userId);
-      final lands = await LandRepository().countByAgent(widget.userId);
-      listings = properties + lands;
+      final propertiesRepo = PropertyRepository();
+      final landsRepo = LandRepository();
+      final results = await Future.wait([
+        propertiesRepo.countByAgent(widget.userId),
+        landsRepo.countByAgent(widget.userId),
+        propertiesRepo.countAvailableByAgent(widget.userId),
+        landsRepo.countAvailableByAgent(widget.userId),
+      ]);
+      listings = results[0] + results[1];
+      available = results[2] + results[3];
     } catch (_) {
       listings = 0;
     }
 
     try {
-      final conversations = await MessageRepository()
-          .fetchConversations(widget.userId);
-      messages = conversations.length;
+      followers = await FavoriteRepository().countAudience(widget.userId);
     } catch (_) {
-      messages = 0;
+      followers = null;
     }
 
     if (!mounted) return;
     setState(() {
       _listings = listings;
-      _messages = messages;
+      _followers = followers;
+      _approval = listings == 0
+          ? '—'
+          : '${((available * 100) / listings).round()}%';
     });
   }
 
@@ -496,7 +506,6 @@ class _ProfileStatsState extends State<_ProfileStats> {
   Widget build(BuildContext context) {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
-    final favorites = context.watch<FavoriteProvider>().favorites.length;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -518,35 +527,39 @@ class _ProfileStatsState extends State<_ProfileStats> {
           children: [
             Expanded(
               child: _StatItem(
-                value: _listings,
+                value: _listings == null ? null : '$_listings',
                 label: l10n.anuncios,
               ),
             ),
             Container(width: 1, height: 44, color: palette.border),
             Expanded(
               child: _StatItem(
-                value: favorites,
-                label: l10n.favoritos,
+                value: _followers == null ? null : _formatFollowers(_followers!),
+                label: l10n.seguidores,
               ),
             ),
             Container(width: 1, height: 44, color: palette.border),
             Expanded(
-              child: _StatItem(
-                value: _messages,
-                label: l10n.mensagens,
-              ),
+              child: _StatItem(value: _approval, label: l10n.aprovacao),
             ),
           ],
         ),
       ),
     );
   }
+
+  /// 1200 → "1.2k" (como no design de referência).
+  static String _formatFollowers(int value) {
+    if (value < 1000) return '$value';
+    final thousands = (value / 1000).toStringAsFixed(1);
+    return '${thousands.endsWith('.0') ? thousands.substring(0, thousands.length - 2) : thousands}k';
+  }
 }
 
 class _StatItem extends StatelessWidget {
   const _StatItem({required this.value, required this.label});
 
-  final int? value;
+  final String? value;
   final String label;
 
   @override
@@ -556,7 +569,7 @@ class _StatItem extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          value == null ? '—' : '$value',
+          value ?? '—',
           style: AppTextStyles.h5.copyWith(color: palette.textBody),
         ),
         const SizedBox(height: 4),

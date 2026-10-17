@@ -11,6 +11,7 @@ import '../constants/app_colors.dart';
 class AppPalette extends ThemeExtension<AppPalette> {
   const AppPalette({
     required this.background,
+    required this.appBar,
     required this.surface,
     required this.surfaceAlt,
     required this.inputFill,
@@ -25,6 +26,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
   });
 
   final Color background;
+  final Color appBar;
   final Color surface;
   final Color surfaceAlt;
   final Color inputFill;
@@ -39,6 +41,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
 
   static const AppPalette light = AppPalette(
     background: AppColors.offWhite,
+    appBar: AppColors.navy,
     surface: AppColors.white,
     surfaceAlt: AppColors.gray100,
     inputFill: AppColors.white,
@@ -54,6 +57,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
 
   static const AppPalette dark = AppPalette(
     background: AppColors.darkBackground,
+    appBar: AppColors.darkBackground,
     surface: AppColors.darkSurface,
     surfaceAlt: AppColors.darkCard,
     inputFill: AppColors.darkSurface,
@@ -70,6 +74,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
   @override
   AppPalette copyWith({
     Color? background,
+    Color? appBar,
     Color? surface,
     Color? surfaceAlt,
     Color? inputFill,
@@ -84,6 +89,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
   }) {
     return AppPalette(
       background: background ?? this.background,
+      appBar: appBar ?? this.appBar,
       surface: surface ?? this.surface,
       surfaceAlt: surfaceAlt ?? this.surfaceAlt,
       inputFill: inputFill ?? this.inputFill,
@@ -103,6 +109,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
     if (other is! AppPalette) return this;
     return AppPalette(
       background: Color.lerp(background, other.background, t)!,
+      appBar: Color.lerp(appBar, other.appBar, t)!,
       surface: Color.lerp(surface, other.surface, t)!,
       surfaceAlt: Color.lerp(surfaceAlt, other.surfaceAlt, t)!,
       inputFill: Color.lerp(inputFill, other.inputFill, t)!,

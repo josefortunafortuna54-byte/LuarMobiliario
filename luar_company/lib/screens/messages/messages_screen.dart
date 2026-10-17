@@ -53,7 +53,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
     return Scaffold(
       backgroundColor: palette.surface,
       appBar: AppBar(
-        backgroundColor: AppColors.navy,
         elevation: 0,
         centerTitle: true,
         title: Text(

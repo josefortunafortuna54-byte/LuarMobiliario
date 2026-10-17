@@ -1901,4 +1901,40 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get porTipo => 'Anúncios por tipo';
+
+  @override
+  String get semFotos => 'Sem fotos disponíveis';
+
+  @override
+  String get semVideos => 'Sem vídeos disponíveis';
+
+  @override
+  String get seguidores => 'Seguidores';
+
+  @override
+  String get aprovacao => 'Aprovação';
+
+  @override
+  String get renovar => 'Renovar';
+
+  @override
+  String get recentrar => 'Recentrar mapa';
+
+  @override
+  String get semImoveisNoMapa => 'Sem imóveis para mostrar no mapa';
+
+  @override
+  String get verNoMapa => 'Ver no mapa';
+
+  @override
+  String get vendido => 'Vendido';
+
+  @override
+  String get arrendado => 'Arrendado';
+
+  @override
+  String get historicoDesc => 'Os imóveis que consultar ficam guardados aqui.';
+
+  @override
+  String get renovado => 'Renovado';
 }

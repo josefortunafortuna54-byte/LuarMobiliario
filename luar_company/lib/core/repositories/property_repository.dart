@@ -356,6 +356,16 @@ class PropertyRepository {
     return (response as List).length;
   }
 
+  /// Nº de anúncios ativos do agente (para a aprovação do perfil).
+  Future<int> countAvailableByAgent(String agentId) async {
+    final response = await _client
+        .from('properties')
+        .select('id')
+        .eq('agent_id', agentId)
+        .eq('is_available', true);
+    return (response as List).length;
+  }
+
   /// Ativa ou desativa a publicação de um anúncio do próprio agente.
   Future<void> setAvailable(String id, bool available) async {
     await _client

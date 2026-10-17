@@ -132,7 +132,6 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
           l10n.imoveis,
           style: AppTextStyles.h5.copyWith(color: AppColors.white),
         ),
-        backgroundColor: AppColors.navy,
         foregroundColor: AppColors.white,
         elevation: 0,
         centerTitle: true,
@@ -465,9 +464,7 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
                   title: property.title,
                   location: '${property.neighborhood}, ${property.city}',
                   price: property.price,
-                  listingType: property.transactionType == TransactionType.sale
-                      ? PropertyListingType.venda
-                      : PropertyListingType.arrendamento,
+                  listingType: property.transactionType.listingType,
                   bedrooms: property.bedrooms,
                   bathrooms: property.bathrooms,
                   area: property.area,

@@ -11,6 +11,7 @@ import '../../core/providers/comparison_provider.dart';
 import '../../core/providers/discover_provider.dart';
 import '../../core/providers/favorite_provider.dart';
 import '../../core/providers/playback_provider.dart';
+import '../../core/providers/review_provider.dart';
 import '../../core/providers/search_provider.dart';
 import '../../core/services/connectivity_service.dart';
 import '../../core/theme/app_palette.dart';
@@ -18,7 +19,6 @@ import '../../core/utils/deep_links.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/utils/navigation.dart';
 import '../../core/utils/routes.dart';
-import '../../core/utils/whatsapp_util.dart';
 import '../../l10n/app_localizations.dart';
 import '../../widgets/empty_state.dart';
 import '../../widgets/video_player_widget.dart';
@@ -113,6 +113,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> with RouteAware {
     final ids = items.skip(index).take(3).map((p) => p.id).toList();
     if (ids.isEmpty) return;
     context.read<FavoriteProvider>().loadLikeCounts(ids);
+    context.read<ReviewProvider>().loadCounts(ids);
   }
 
   @override
@@ -137,13 +138,13 @@ class _DiscoverScreenState extends State<DiscoverScreen> with RouteAware {
   /// Navega para outro separador do shell (ou para a rota equivalente quando
   /// o Discover foi empurrado como rota independente).
   void _goToTab(int index) {
-    if (index == 1) return;
+    if (index == 0) return;
     final onSelect = widget.onSelectTab;
     if (onSelect != null) {
       onSelect(index);
       return;
     }
-    final route = index == 2 ? AppRoutes.search : AppRoutes.favorites;
+    final route = index == 1 ? AppRoutes.search : AppRoutes.favorites;
     Navigator.of(context).pushNamed(route);
   }
 
@@ -294,11 +295,11 @@ class _DiscoverScreenState extends State<DiscoverScreen> with RouteAware {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _TopTab(label: l10n.descobrir, selected: true, onTap: () => _goToTab(1)),
+                _TopTab(label: l10n.descobrir, selected: true, onTap: () => _goToTab(0)),
                 const SizedBox(width: 20),
-                _TopTab(label: l10n.pesquisar, selected: false, onTap: () => _goToTab(2)),
+                _TopTab(label: l10n.pesquisar, selected: false, onTap: () => _goToTab(1)),
                 const SizedBox(width: 20),
-                _TopTab(label: l10n.favoritos, selected: false, onTap: () => _goToTab(3)),
+                _TopTab(label: l10n.favoritos, selected: false, onTap: () => _goToTab(2)),
               ],
             ),
           ),
@@ -411,13 +412,12 @@ class _DiscoverPage extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final auth = context.watch<AuthProvider>();
     final favorites = context.watch<FavoriteProvider>();
-    final comparison = context.watch<ComparisonProvider>();
     final userId = auth.user?.id ?? '';
     final isFavorite =
         userId.isNotEmpty &&
         favorites.isFavorite(userId, propertyId: property.id);
-    final isCompared = comparison.isSelected(property.id);
     final likeCount = favorites.likeCount(property.id);
+    final commentCount = context.watch<ReviewProvider>().countFor(property.id);
 
     final isRent = property.transactionType == TransactionType.rent;
     final location = [
@@ -467,8 +467,6 @@ class _DiscoverPage extends StatelessWidget {
                         l10n,
                         isRent: isRent,
                         location: location,
-                        isCompared: isCompared,
-                        comparison: comparison,
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -476,6 +474,7 @@ class _DiscoverPage extends StatelessWidget {
                       context,
                       l10n,
                       isFavorite: isFavorite,
+                      commentCount: commentCount,
                       userId: userId,
                       likeCount: likeCount,
                     ),
@@ -545,8 +544,6 @@ class _DiscoverPage extends StatelessWidget {
     AppLocalizations l10n, {
     required bool isRent,
     required String location,
-    required bool isCompared,
-    required ComparisonProvider comparison,
   }) {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
@@ -566,24 +563,6 @@ class _DiscoverPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isRent ? AppColors.navyLight : AppColors.gold,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        isRent ? l10n.arrendamento : l10n.venda,
-                        style: AppTextStyles.bodyTiny.copyWith(
-                          color: AppColors.white,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.baseline,
                       textBaseline: TextBaseline.alphabetic,
@@ -611,11 +590,6 @@ class _DiscoverPage extends StatelessWidget {
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(width: 8),
-              _CardCompareButton(
-                isSelected: isCompared,
-                onTap: () => _toggleComparison(context, comparison),
               ),
             ],
           ),
@@ -706,6 +680,7 @@ class _DiscoverPage extends StatelessWidget {
     required bool isFavorite,
     required String userId,
     required int likeCount,
+    required int commentCount,
   }) {
     final favorites = context.read<FavoriteProvider>();
     return Column(
@@ -717,13 +692,23 @@ class _DiscoverPage extends StatelessWidget {
               : Icons.favorite_border_rounded,
           label: _compactCount(likeCount),
           semanticsLabel: l10n.favoritos,
-          color: isFavorite ? AppColors.gold : AppColors.white,
+          color: isFavorite ? AppColors.error : AppColors.white,
           onTap: userId.isEmpty
               ? null
               : () => favorites.toggleFavorite(
                   userId,
                   propertyId: property.id,
                 ),
+        ),
+        const SizedBox(height: 16),
+        _ActionButton(
+          icon: Icons.chat_bubble_outline_rounded,
+          label: _compactCount(commentCount),
+          semanticsLabel: l10n.avaliacoes,
+          onTap: () => Navigator.of(context).pushNamed(
+            AppRoutes.propertyDetail,
+            arguments: property.id,
+          ),
         ),
         const SizedBox(height: 16),
         _ActionButton(
@@ -737,74 +722,11 @@ class _DiscoverPage extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 16),
-        _ActionButton(
-          icon: Icons.chat_rounded,
-          label: l10n.contactar,
-          onTap: () => WhatsAppUtil.open(
-            phone: property.agentPhone.isNotEmpty ? property.agentPhone : null,
-            message: l10n.mensagemInteresseImovel(property.title),
-          ),
-        ),
-        const SizedBox(height: 16),
-        _ActionButton(
-          icon: Icons.info_outline_rounded,
-          label: l10n.detalhes,
-          onTap: () => Navigator.of(context).pushNamed(
-            AppRoutes.propertyDetail,
-            arguments: property.id,
-          ),
-        ),
       ],
     );
   }
-
-  void _toggleComparison(
-    BuildContext context,
-    ComparisonProvider comparison,
-  ) {
-    final l10n = AppLocalizations.of(context);
-    final wasSelected = comparison.isSelected(property.id);
-
-    if (!wasSelected && comparison.isFull) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.limiteComparacao),
-          backgroundColor: AppColors.navy,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-      );
-      return;
-    }
-
-    comparison.toggle(property);
-
-    if (!wasSelected && comparison.canCompare) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            l10n.imovelAdicionadoComparacao(comparison.count),
-          ),
-          backgroundColor: AppColors.gold,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          action: SnackBarAction(
-            label: l10n.comparar,
-            textColor: AppColors.white,
-            onPressed: () {
-              Navigator.of(context).pushNamed(AppRoutes.comparison);
-            },
-          ),
-        ),
-      );
-    }
-  }
 }
+
 
 /// Especificação inline (ícone + valor) do cartão do Discover.
 class _SpecItem extends StatelessWidget {
@@ -835,39 +757,6 @@ class _SpecItem extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-/// Botão circular dourado de comparação dentro do cartão.
-class _CardCompareButton extends StatelessWidget {
-  const _CardCompareButton({required this.isSelected, required this.onTap});
-
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return Semantics(
-      button: true,
-      label: isSelected ? l10n.comparando : l10n.comparar,
-      child: Material(
-        color: AppColors.gold,
-        shape: const CircleBorder(),
-        child: InkWell(
-          customBorder: const CircleBorder(),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.all(9),
-            child: Icon(
-              isSelected ? Icons.check_rounded : Icons.compare_arrows_rounded,
-              size: 20,
-              color: AppColors.white,
-            ),
-          ),
-        ),
       ),
     );
   }

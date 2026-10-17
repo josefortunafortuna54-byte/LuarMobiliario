@@ -195,7 +195,7 @@ class _HomeScreenState extends State<HomeScreen> {
           OutlinedButton.icon(
             onPressed: () {
               if (widget.onSelectTab != null) {
-                widget.onSelectTab!(1);
+                widget.onSelectTab!(0);
               } else {
                 Navigator.of(context).pushNamed(AppRoutes.discover);
               }
@@ -478,9 +478,7 @@ class _HomeScreenState extends State<HomeScreen> {
       property.city,
     ].where((p) => p.isNotEmpty).join(', ');
 
-    final listingType = property.transactionType == TransactionType.sale
-        ? PropertyListingType.venda
-        : PropertyListingType.arrendamento;
+    final listingType = property.transactionType.listingType;
 
     return PropertyCard(
       imageUrl: imageUrl,

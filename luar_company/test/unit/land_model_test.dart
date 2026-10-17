@@ -71,10 +71,11 @@ void main() {
   });
 
   group('LandTransactionType', () {
-    test('has two values: sale and rent', () {
-      expect(LandTransactionType.values.length, 2);
+    test('has three values: sale, rent and renew', () {
+      expect(LandTransactionType.values.length, 3);
       expect(LandTransactionType.values, contains(LandTransactionType.sale));
       expect(LandTransactionType.values, contains(LandTransactionType.rent));
+      expect(LandTransactionType.values, contains(LandTransactionType.renew));
     });
   });
 

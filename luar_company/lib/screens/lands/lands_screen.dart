@@ -157,7 +157,6 @@ class _LandsScreenState extends State<LandsScreen> {
           l10n.terrenos,
           style: AppTextStyles.h5.copyWith(color: AppColors.white),
         ),
-        backgroundColor: AppColors.navy,
         foregroundColor: AppColors.white,
         elevation: 0,
         centerTitle: true,

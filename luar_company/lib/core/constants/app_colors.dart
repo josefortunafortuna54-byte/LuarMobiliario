@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 abstract final class AppColors {
-  static const Color navy = Color(0xFF0F1B2D);
-  static const Color navyLight = Color(0xFF1A2D47);
-  static const Color navyDark = Color(0xFF091220);
+  static const Color navy = Color(0xFF0E3A4B);
+  static const Color navyLight = Color(0xFF17576B);
+  static const Color navyDark = Color(0xFF081F27);
 
   static const Color gold = Color(0xFFC9A84C);
   static const Color goldLight = Color(0xFFD4BA6A);
@@ -23,12 +23,12 @@ abstract final class AppColors {
   static const Color gray800 = Color(0xFF1F2937);
   static const Color gray900 = Color(0xFF111827);
 
-  // ── Dark theme neutrals ─────────────────────────────────────────────
-  static const Color darkBackground = Color(0xFF0B1220);
-  static const Color darkSurface = Color(0xFF121A2B);
-  static const Color darkCard = Color(0xFF1A2438);
-  static const Color darkBorder = Color(0xFF232F47);
-  static const Color darkBorderStrong = Color(0xFF2C3A55);
+  // ── Dark theme neutrals (preto puro, conforme design de referência) ─
+  static const Color darkBackground = Color(0xFF000000);
+  static const Color darkSurface = Color(0xFF0D0D0D);
+  static const Color darkCard = Color(0xFF151515);
+  static const Color darkBorder = Color(0xFF242424);
+  static const Color darkBorderStrong = Color(0xFF303030);
   static const Color darkTextMuted = Color(0xFF6B7280);
   static const Color darkTextSecondary = Color(0xFF9CA3AF);
   static const Color darkTextBody = Color(0xFFE5E7EB);
@@ -61,7 +61,7 @@ abstract final class AppColors {
   static const LinearGradient heroGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [navy, navyLight, Color(0xFF1E3A5F)],
+    colors: [navy, navyLight, Color(0xFF1E6D80)],
   );
 
   static const LinearGradient goldShimmer = LinearGradient(

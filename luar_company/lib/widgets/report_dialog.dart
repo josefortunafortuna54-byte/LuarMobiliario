@@ -23,7 +23,6 @@ Future<void> showReportDialog(
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(l10n.reportarRequerLogin),
-        backgroundColor: AppColors.navy,
       ),
     );
     return Future.value();

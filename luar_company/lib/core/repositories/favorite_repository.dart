@@ -111,4 +111,14 @@ class FavoriteRepository {
     }
     return counts;
   }
+
+  /// Nº distinto de utilizadores que guardaram anúncios de um agente
+  /// ("seguidores" do perfil). Usa a RPC `agent_audience` (migration 027).
+  Future<int> countAudience(String agentId) async {
+    final response = await _client.rpc(
+      'agent_audience',
+      params: {'p_agent_id': agentId},
+    );
+    return (response as num?)?.toInt() ?? 0;
+  }
 }

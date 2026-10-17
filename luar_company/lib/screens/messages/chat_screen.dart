@@ -70,7 +70,6 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       backgroundColor: palette.background,
       appBar: AppBar(
-        backgroundColor: AppColors.navy,
         elevation: 0,
         centerTitle: true,
         title: Row(

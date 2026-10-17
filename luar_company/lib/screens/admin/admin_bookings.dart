@@ -84,7 +84,6 @@ class _AdminBookingsScreenState extends State<AdminBookingsScreen> {
     return Scaffold(
       backgroundColor: palette.background,
       appBar: AppBar(
-        backgroundColor: AppColors.navy,
         elevation: 0,
         centerTitle: true,
         title: Text(

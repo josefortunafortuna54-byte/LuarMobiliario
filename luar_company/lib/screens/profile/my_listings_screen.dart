@@ -197,7 +197,6 @@ class _MyListingsScreenState extends State<MyListingsScreen>
     return Scaffold(
       backgroundColor: palette.surface,
       appBar: AppBar(
-        backgroundColor: AppColors.navy,
         elevation: 0,
         centerTitle: true,
         title: Text(
@@ -258,7 +257,7 @@ class _MyListingsScreenState extends State<MyListingsScreen>
                 ? property.address
                 : property.city,
             price: property.price,
-            isRent: property.transactionType.name == 'rent',
+            isRent: property.transactionType.name != 'sale',
             isAvailable: property.isAvailable,
             imageUrl: property.images.isNotEmpty ? property.images.first : null,
             accentIcon: Icons.home_outlined,
@@ -291,7 +290,7 @@ class _MyListingsScreenState extends State<MyListingsScreen>
             title: land.title,
             location: land.address.isNotEmpty ? land.address : land.city,
             price: land.price,
-            isRent: land.transactionType.name == 'rent',
+            isRent: land.transactionType.name != 'sale',
             isAvailable: land.isAvailable,
             imageUrl: land.images.isNotEmpty ? land.images.first : null,
             accentIcon: Icons.landscape_outlined,

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
-import '../../core/providers/auth_provider.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/utils/responsive.dart';
 import '../../l10n/app_localizations.dart';
@@ -11,7 +9,6 @@ import '../discover/discover_screen.dart';
 import '../favorites/favorites_screen.dart';
 import '../profile/profile_screen.dart';
 import '../search/search_screen.dart';
-import 'home_screen.dart';
 
 /// Estrutura principal da app autenticada.
 ///
@@ -28,7 +25,7 @@ class MainShell extends StatefulWidget {
 }
 
 class _MainShellState extends State<MainShell> {
-  static const int _tabCount = 5;
+  static const int _tabCount = 4;
   late int _index;
   late final Set<int> _visited;
 
@@ -50,17 +47,15 @@ class _MainShellState extends State<MainShell> {
   Widget _screenFor(int index) {
     switch (index) {
       case 0:
-        return HomeScreen(embedded: true, onSelectTab: _select);
-      case 1:
         return DiscoverScreen(
-          isActive: _index == 1,
+          isActive: _index == 0,
           onSelectTab: _select,
         );
-      case 2:
+      case 1:
         return const SearchScreen();
-      case 3:
+      case 2:
         return const FavoritesScreen();
-      case 4:
+      case 3:
       default:
         return const ProfileScreen();
     }
@@ -68,7 +63,6 @@ class _MainShellState extends State<MainShell> {
 
   @override
   Widget build(BuildContext context) {
-    final isGuest = context.watch<AuthProvider>().user == null;
     final isDesktop = Responsive.isDesktop(context);
 
     return Scaffold(
@@ -80,15 +74,15 @@ class _MainShellState extends State<MainShell> {
           (i) => _visited.contains(i) ? _screenFor(i) : const SizedBox.shrink(),
         ),
       ),
-      bottomNavigationBar: isDesktop ? null : _buildBottomNav(isGuest: isGuest),
+      bottomNavigationBar: isDesktop ? null : _buildBottomNav(),
     );
   }
 
-  Widget _buildBottomNav({required bool isGuest}) {
+  Widget _buildBottomNav() {
     final l10n = AppLocalizations.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.navy,
+        color: context.palette.appBar,
         boxShadow: [
           BoxShadow(
             color: AppColors.black.withValues(alpha: 0.15),
@@ -104,37 +98,29 @@ class _MainShellState extends State<MainShell> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _buildNavItem(
-                icon: Icons.home_outlined,
-                activeIcon: Icons.home_rounded,
-                label: l10n.inicio,
-                index: 0,
-              ),
-              _buildNavItem(
-                icon: Icons.play_circle_outline_rounded,
-                activeIcon: Icons.play_circle_rounded,
+                icon: Icons.explore_outlined,
+                activeIcon: Icons.explore_rounded,
                 label: l10n.descobrir,
-                index: 1,
+                index: 0,
               ),
               _buildNavItem(
                 icon: Icons.search_outlined,
                 activeIcon: Icons.search_rounded,
                 label: l10n.pesquisar,
+                index: 1,
+              ),
+              _buildNavItem(
+                icon: Icons.favorite_outline,
+                activeIcon: Icons.favorite_rounded,
+                label: l10n.favoritos,
                 index: 2,
               ),
-              if (!isGuest) ...[
-                _buildNavItem(
-                  icon: Icons.favorite_outline,
-                  activeIcon: Icons.favorite_rounded,
-                  label: l10n.favoritos,
-                  index: 3,
-                ),
-                _buildNavItem(
-                  icon: Icons.person_outline,
-                  activeIcon: Icons.person_rounded,
-                  label: l10n.perfil,
-                  index: 4,
-                ),
-              ],
+              _buildNavItem(
+                icon: Icons.person_outline,
+                activeIcon: Icons.person_rounded,
+                label: l10n.perfil,
+                index: 3,
+              ),
             ],
           ),
         ),

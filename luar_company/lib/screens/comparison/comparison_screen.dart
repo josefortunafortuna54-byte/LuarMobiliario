@@ -32,7 +32,6 @@ class ComparisonScreen extends StatelessWidget {
             );
           },
         ),
-        backgroundColor: AppColors.navy,
         foregroundColor: AppColors.white,
         elevation: 0,
         centerTitle: true,
@@ -226,10 +225,13 @@ class ComparisonScreen extends StatelessWidget {
             context,
             label: l10n.transacao,
             values: items
-                .map((p) =>
-                    p.transactionType == TransactionType.sale
-                        ? l10n.venda
-                        : l10n.arrendamento)
+                .map(
+                  (p) => switch (p.transactionType) {
+                    TransactionType.sale => l10n.venda,
+                    TransactionType.rent => l10n.arrendamento,
+                    TransactionType.renew => l10n.renovar,
+                  },
+                )
                 .toList(),
           ),
           _buildTableRow(

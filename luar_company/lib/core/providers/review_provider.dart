@@ -10,6 +10,7 @@ class ReviewProvider extends ChangeNotifier {
   final ReviewRepository _repository;
 
   List<ReviewModel> _reviews = [];
+  final Map<String, int> _counts = {};
   bool _isLoading = false;
   String? _error;
 
@@ -19,6 +20,24 @@ class ReviewProvider extends ChangeNotifier {
   bool get isEmpty => !_isLoading && _reviews.isEmpty;
 
   int get count => _reviews.length;
+
+  /// Número de avaliações/comentários de um imóvel (feed).
+  int countFor(String propertyId) => _counts[propertyId] ?? 0;
+
+  /// Pré-carrega as contagens dos imóveis do feed (só as que faltam).
+  Future<void> loadCounts(List<String> propertyIds) async {
+    final missing =
+        propertyIds.where((id) => id.isNotEmpty && !_counts.containsKey(id))
+            .toList();
+    if (missing.isEmpty) return;
+
+    try {
+      _counts.addAll(await _repository.countByProperties(missing));
+      notifyListeners();
+    } catch (_) {
+      // Contagens são decorativas: falha silenciosa.
+    }
+  }
 
   /// Média das avaliações (0 quando não há avaliações).
   double get averageRating {

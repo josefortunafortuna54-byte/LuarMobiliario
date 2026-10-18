@@ -52,7 +52,15 @@ class _MapPin {
 /// pesquisa no topo, pins (com clusters) no mapa, cartão do anúncio no fundo
 /// e botão para recentrar a vista.
 class MapScreen extends StatefulWidget {
-  const MapScreen({super.key});
+  const MapScreen({
+    super.key,
+    this.propertyRepository,
+    this.landRepository,
+  });
+
+  /// Repositórios opcionais para injeção em testes.
+  final PropertyRepository? propertyRepository;
+  final LandRepository? landRepository;
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -65,6 +73,11 @@ class _MapScreenState extends State<MapScreen> {
 
   final MapController _mapController = MapController();
   final TextEditingController _searchController = TextEditingController();
+
+  late final PropertyRepository _propertyRepository =
+      widget.propertyRepository ?? PropertyRepository();
+  late final LandRepository _landRepository =
+      widget.landRepository ?? LandRepository();
 
   List<_MapPin> _pins = [];
   bool _isLoading = true;
@@ -126,7 +139,7 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   Future<void> _fetchProperties(List<_MapPin> out) async {
-    final repository = PropertyRepository();
+    final repository = _propertyRepository;
     var page = 0;
     while (page < _maxPages) {
       final batch = await repository.fetchProperties(
@@ -141,7 +154,7 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   Future<void> _fetchLands(List<_MapPin> out) async {
-    final repository = LandRepository();
+    final repository = _landRepository;
     var page = 0;
     while (page < _maxPages) {
       final batch = await repository.fetchLands(

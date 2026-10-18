@@ -4,13 +4,24 @@ import '../models/favorite_model.dart';
 import '../models/property_model.dart';
 import '../models/land_model.dart';
 import '../repositories/favorite_repository.dart';
+import '../services/guest_favorites_service.dart';
 
 class FavoriteProvider extends ChangeNotifier {
-  final FavoriteRepository _repository = FavoriteRepository();
+  FavoriteProvider({FavoriteRepository? repository})
+    : _repository = repository ?? FavoriteRepository();
+
+  final FavoriteRepository _repository;
+
+  /// Identificador usado quando o utilizador navega sem conta (convidado).
+  /// Nesse modo os favoritos são guardados localmente no dispositivo.
+  static const String guestUserId = '__guest__';
 
   List<FavoriteModel> _favorites = [];
   final Map<String, int> _likeCounts = {};
   bool _isLoading = false;
+  String? _loadedFor;
+
+  bool get isGuest => _loadedFor == guestUserId;
 
   List<FavoriteModel> get favorites => _favorites;
   bool get isLoading => _isLoading;
@@ -52,7 +63,12 @@ class FavoriteProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _favorites = await _repository.fetchFavorites(userId);
+      if (userId == guestUserId) {
+        _favorites = await _loadGuestFavorites();
+      } else {
+        _favorites = await _repository.fetchFavorites(userId);
+      }
+      _loadedFor = userId;
     } catch (e) {
       _favorites = [];
     } finally {
@@ -61,11 +77,43 @@ class FavoriteProvider extends ChangeNotifier {
     }
   }
 
+  /// Carrega os favoritos de [userId] apenas se ainda não estiverem em memória.
+  ///
+  /// Evita repetir a query em cada ecrã visitado durante a mesma sessão.
+  Future<void> ensureLoaded(String userId) async {
+    if (_loadedFor == userId) return;
+    await loadFavorites(userId);
+  }
+
+  Future<List<FavoriteModel>> _loadGuestFavorites() async {
+    final propertyIds = await GuestFavorites.propertyIds();
+    final landIds = await GuestFavorites.landIds();
+    return [
+      for (final id in propertyIds)
+        FavoriteModel(
+          id: 'guest_p_$id',
+          userId: guestUserId,
+          propertyId: id,
+          createdAt: DateTime.now(),
+        ),
+      for (final id in landIds)
+        FavoriteModel(
+          id: 'guest_l_$id',
+          userId: guestUserId,
+          landId: id,
+          createdAt: DateTime.now(),
+        ),
+    ];
+  }
+
   Future<bool> toggleFavorite(
     String userId, {
     String? propertyId,
     String? landId,
   }) async {
+    if (userId == guestUserId) {
+      return _toggleGuestFavorite(propertyId: propertyId, landId: landId);
+    }
     try {
       final existingIndex = _favorites.indexWhere(
         (f) =>
@@ -95,6 +143,50 @@ class FavoriteProvider extends ChangeNotifier {
         notifyListeners();
         return true;
       }
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Alterna um favorito local (modo convidado), persistindo no dispositivo.
+  Future<bool> _toggleGuestFavorite({
+    String? propertyId,
+    String? landId,
+  }) async {
+    try {
+      final bool added;
+      if (propertyId != null && propertyId.isNotEmpty) {
+        added = await GuestFavorites.toggleProperty(propertyId);
+      } else if (landId != null && landId.isNotEmpty) {
+        added = await GuestFavorites.toggleLand(landId);
+      } else {
+        return false;
+      }
+
+      final existingIndex = _favorites.indexWhere(
+        (f) =>
+            f.userId == guestUserId &&
+            ((propertyId != null && f.propertyId == propertyId) ||
+                (landId != null && f.landId == landId)),
+      );
+
+      if (added && existingIndex == -1) {
+        _favorites.insert(
+          0,
+          FavoriteModel(
+            id: 'guest_${propertyId ?? landId}',
+            userId: guestUserId,
+            propertyId: propertyId,
+            landId: landId,
+            createdAt: DateTime.now(),
+          ),
+        );
+      } else if (!added && existingIndex != -1) {
+        _favorites.removeAt(existingIndex);
+      }
+
+      notifyListeners();
+      return added;
     } catch (e) {
       return false;
     }
@@ -137,6 +229,7 @@ class FavoriteProvider extends ChangeNotifier {
 
   void clearFavorites() {
     _favorites = [];
+    _loadedFor = null;
     notifyListeners();
   }
 }

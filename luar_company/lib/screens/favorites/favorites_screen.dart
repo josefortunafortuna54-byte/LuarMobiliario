@@ -58,8 +58,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
   Future<void> _loadFavorites() async {
     final auth = context.read<AuthProvider>();
     final favorites = context.read<FavoriteProvider>();
-    final userId = auth.user?.id;
-    if (userId == null) return;
+    final userId = auth.user?.id ?? FavoriteProvider.guestUserId;
 
     await favorites.loadFavorites(userId);
 
@@ -94,9 +93,7 @@ class _FavoritesScreenState extends State<FavoritesScreen>
     final properties = propertyIds.isEmpty
         ? <PropertyModel>[]
         : await _safeProperties(propertyIds);
-    final lands = landIds.isEmpty
-        ? <LandModel>[]
-        : await _safeLands(landIds);
+    final lands = landIds.isEmpty ? <LandModel>[] : await _safeLands(landIds);
 
     final propertyById = {for (final p in properties) p.id: p};
     final landById = {for (final l in lands) l.id: l};
@@ -138,12 +135,14 @@ class _FavoritesScreenState extends State<FavoritesScreen>
   }
 
   Future<void> _removeFavorite(PropertyModel? property, LandModel? land) async {
-    final userId = context.read<AuthProvider>().user?.id;
-    if (userId == null) return;
+    final userId =
+        context.read<AuthProvider>().user?.id ?? FavoriteProvider.guestUserId;
     final favorites = context.read<FavoriteProvider>();
 
     if (property != null) {
-      setState(() => _favoriteProperties.removeWhere((p) => p.id == property.id));
+      setState(
+        () => _favoriteProperties.removeWhere((p) => p.id == property.id),
+      );
       await favorites.toggleFavorite(userId, propertyId: property.id);
     } else if (land != null) {
       setState(() => _favoriteLands.removeWhere((l) => l.id == land.id));
@@ -153,8 +152,8 @@ class _FavoritesScreenState extends State<FavoritesScreen>
   }
 
   bool _isFavorite(PropertyModel? property, LandModel? land) {
-    final userId = context.watch<AuthProvider>().user?.id;
-    if (userId == null) return false;
+    final userId =
+        context.watch<AuthProvider>().user?.id ?? FavoriteProvider.guestUserId;
     final favorites = context.watch<FavoriteProvider>();
     if (property != null) {
       return favorites.isFavorite(userId, propertyId: property.id);
@@ -171,7 +170,6 @@ class _FavoritesScreenState extends State<FavoritesScreen>
 
   @override
   Widget build(BuildContext context) {
-    final isGuest = context.watch<AuthProvider>().user == null;
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
 
@@ -185,73 +183,23 @@ class _FavoritesScreenState extends State<FavoritesScreen>
           style: AppTextStyles.h6.copyWith(color: AppColors.white),
         ),
         iconTheme: const IconThemeData(color: AppColors.gold),
-        bottom: isGuest
-            ? null
-            : TabBar(
-                controller: _tabController,
-                indicatorColor: AppColors.gold,
-                indicatorWeight: 3,
-                labelColor: AppColors.gold,
-                unselectedLabelColor: palette.textMuted,
-                labelStyle: AppTextStyles.labelLarge,
-                unselectedLabelStyle: AppTextStyles.labelLarge,
-                tabs: [
-                  Tab(text: l10n.favoritos),
-                  Tab(text: l10n.historico),
-                ],
-              ),
-      ),
-      body: isGuest
-          ? _buildGuestState()
-          : TabBarView(
-              controller: _tabController,
-              children: [_buildFavoritesTab(), _buildHistoryTab()],
-            ),
-    );
-  }
-
-  Widget _buildGuestState() {
-    final palette = context.palette;
-    final l10n = AppLocalizations.of(context);
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 48),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.gold.withValues(alpha: 0.08),
-                border: Border.all(
-                  color: AppColors.gold.withValues(alpha: 0.2),
-                  width: 1.5,
-                ),
-              ),
-              child: Icon(
-                Icons.favorite_border_rounded,
-                size: 48,
-                color: AppColors.gold.withValues(alpha: 0.6),
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              l10n.favoritosDisponiveisConta,
-              style: AppTextStyles.h5,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              l10n.guardeImoveisConta,
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: palette.textSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
+        bottom: TabBar(
+          controller: _tabController,
+          indicatorColor: AppColors.gold,
+          indicatorWeight: 3,
+          labelColor: AppColors.gold,
+          unselectedLabelColor: palette.textMuted,
+          labelStyle: AppTextStyles.labelLarge,
+          unselectedLabelStyle: AppTextStyles.labelLarge,
+          tabs: [
+            Tab(text: l10n.favoritos),
+            Tab(text: l10n.historico),
           ],
         ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [_buildFavoritesTab(), _buildHistoryTab()],
       ),
     );
   }
@@ -319,7 +267,10 @@ class _FavoritesScreenState extends State<FavoritesScreen>
     );
   }
 
-  Widget _buildPropertyRow(PropertyModel property, {required bool isFavoriteTab}) {
+  Widget _buildPropertyRow(
+    PropertyModel property, {
+    required bool isFavoriteTab,
+  }) {
     final l10n = AppLocalizations.of(context);
     final location = [
       property.neighborhood,
@@ -391,8 +342,9 @@ class _FavoritesScreenState extends State<FavoritesScreen>
           : AppColors.gold;
     }
 
-    void open() =>
-        Navigator.of(context).pushNamed(AppRoutes.landDetail, arguments: land.id);
+    void open() => Navigator.of(
+      context,
+    ).pushNamed(AppRoutes.landDetail, arguments: land.id);
 
     return LandCard(
       variant: PropertyCardVariant.horizontal,
@@ -416,20 +368,22 @@ class _FavoritesScreenState extends State<FavoritesScreen>
 
   /// No histórico o coração alterna o favorito sem sair do ecrã.
   Future<void> _toggleFavoriteFromHistory(PropertyModel property) async {
-    final userId = context.read<AuthProvider>().user?.id;
-    if (userId == null) return;
-    await context
-        .read<FavoriteProvider>()
-        .toggleFavorite(userId, propertyId: property.id);
+    final userId =
+        context.read<AuthProvider>().user?.id ?? FavoriteProvider.guestUserId;
+    await context.read<FavoriteProvider>().toggleFavorite(
+      userId,
+      propertyId: property.id,
+    );
     if (mounted) await _loadFavorites();
   }
 
   Future<void> _toggleLandFavoriteFromHistory(LandModel land) async {
-    final userId = context.read<AuthProvider>().user?.id;
-    if (userId == null) return;
-    await context
-        .read<FavoriteProvider>()
-        .toggleFavorite(userId, landId: land.id);
+    final userId =
+        context.read<AuthProvider>().user?.id ?? FavoriteProvider.guestUserId;
+    await context.read<FavoriteProvider>().toggleFavorite(
+      userId,
+      landId: land.id,
+    );
     if (mounted) await _loadFavorites();
   }
 

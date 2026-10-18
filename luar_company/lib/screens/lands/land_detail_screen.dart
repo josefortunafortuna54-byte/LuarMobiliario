@@ -48,6 +48,9 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
         context.read<LandProvider>().selectLand(landId);
         ViewHistory.recordLand(landId);
       }
+      final userId =
+          context.read<AuthProvider>().user?.id ?? FavoriteProvider.guestUserId;
+      context.read<FavoriteProvider>().ensureLoaded(userId);
     });
   }
 
@@ -156,11 +159,9 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
     final authProvider = context.watch<AuthProvider>();
     final favoriteProvider = context.watch<FavoriteProvider>();
     final l10n = AppLocalizations.of(context);
-    final userId = authProvider.user?.id ?? '';
+    final userId = authProvider.user?.id ?? FavoriteProvider.guestUserId;
 
-    if (userId.isNotEmpty) {
-      _isFavorite = favoriteProvider.isFavorite(userId, landId: land.id);
-    }
+    _isFavorite = favoriteProvider.isFavorite(userId, landId: land.id);
 
     return SliverAppBar(
       expandedHeight: 0,
@@ -187,14 +188,9 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
           icon: const Icon(Icons.share_outlined, color: AppColors.white),
         ),
         IconButton(
-          onPressed: userId.isNotEmpty
-              ? () async {
-                  await favoriteProvider.toggleFavorite(
-                    userId,
-                    landId: land.id,
-                  );
-                }
-              : null,
+          onPressed: () async {
+            await favoriteProvider.toggleFavorite(userId, landId: land.id);
+          },
           icon: Icon(
             _isFavorite
                 ? Icons.favorite_rounded
@@ -328,7 +324,11 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.videocam_outlined, size: 20, color: AppColors.gold),
+              const Icon(
+                Icons.videocam_outlined,
+                size: 20,
+                color: AppColors.gold,
+              ),
               const SizedBox(width: 8),
               Text(
                 l10n.videos,
@@ -424,10 +424,10 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
                 ),
                 child: Text(
                   (switch (land.transactionType) {
-                        LandTransactionType.sale => l10n.venda,
-                        LandTransactionType.rent => l10n.arrendamento,
-                        LandTransactionType.renew => l10n.renovar,
-                      }).toUpperCase(),
+                    LandTransactionType.sale => l10n.venda,
+                    LandTransactionType.rent => l10n.arrendamento,
+                    LandTransactionType.renew => l10n.renovar,
+                  }).toUpperCase(),
                   style: AppTextStyles.labelMedium.copyWith(
                     color: AppColors.white,
                   ),
@@ -474,10 +474,7 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          Text(
-            formatPrice(land.price),
-            style: AppTextStyles.priceLarge,
-          ),
+          Text(formatPrice(land.price), style: AppTextStyles.priceLarge),
           if (isRent)
             Text(
               l10n.perMes,
@@ -756,10 +753,14 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
                     ),
                   ),
                 ),
-                if (!isGuest && land.agentId != null) ...[
+                if (land.agentId != null) ...[
                   const SizedBox(width: 8),
                   IconButton(
                     onPressed: () {
+                      if (isGuest) {
+                        _showGuestChatNotice(l10n);
+                        return;
+                      }
                       Navigator.of(context).pushNamed(
                         AppRoutes.chat,
                         arguments: {
@@ -788,6 +789,20 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
         ],
       ),
     );
+  }
+
+  /// Aviso mostrado a convidados que tentam conversar com o consultor.
+  void _showGuestChatNotice(AppLocalizations l10n) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(
+            '${l10n.mensagensDisponiveisConta} ${l10n.converseCorretores}',
+          ),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
   }
 
   Widget _buildBottomActions(LandModel land) {
@@ -949,9 +964,7 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
         }
       },
       icon: Icon(
-        isCompared
-            ? Icons.check_circle_rounded
-            : Icons.compare_arrows_rounded,
+        isCompared ? Icons.check_circle_rounded : Icons.compare_arrows_rounded,
         color: isCompared ? AppColors.gold : AppColors.white,
       ),
       tooltip: l10n.comparar,

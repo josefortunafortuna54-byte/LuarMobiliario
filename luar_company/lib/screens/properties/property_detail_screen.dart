@@ -48,6 +48,9 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
         context.read<PropertyProvider>().selectProperty(propertyId);
         ViewHistory.recordProperty(propertyId);
       }
+      final userId =
+          context.read<AuthProvider>().user?.id ?? FavoriteProvider.guestUserId;
+      context.read<FavoriteProvider>().ensureLoaded(userId);
     });
   }
 
@@ -184,13 +187,8 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
     final images = property.images;
     final authProvider = context.watch<AuthProvider>();
     final favoriteProvider = context.watch<FavoriteProvider>();
-    final userId = authProvider.user?.id ?? '';
-    if (userId.isNotEmpty) {
-      _isFavorite = favoriteProvider.isFavorite(
-        userId,
-        propertyId: property.id,
-      );
-    }
+    final userId = authProvider.user?.id ?? FavoriteProvider.guestUserId;
+    _isFavorite = favoriteProvider.isFavorite(userId, propertyId: property.id);
 
     final location = _displayLocation(property);
     final topPad = MediaQuery.of(context).padding.top;
@@ -287,12 +285,10 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                       : Icons.favorite_border_rounded,
                   label: l10n.favoritos,
                   color: _isFavorite ? AppColors.error : AppColors.white,
-                  onTap: userId.isEmpty
-                      ? null
-                      : () => favoriteProvider.toggleFavorite(
-                          userId,
-                          propertyId: property.id,
-                        ),
+                  onTap: () => favoriteProvider.toggleFavorite(
+                    userId,
+                    propertyId: property.id,
+                  ),
                 ),
               ],
             ),
@@ -735,10 +731,14 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                     ),
                   ),
                 ),
-                if (!isGuest && property.agentId != null) ...[
+                if (property.agentId != null) ...[
                   const SizedBox(width: 8),
                   IconButton(
                     onPressed: () {
+                      if (isGuest) {
+                        _showGuestChatNotice(l10n);
+                        return;
+                      }
                       Navigator.of(context).pushNamed(
                         AppRoutes.chat,
                         arguments: {
@@ -767,6 +767,20 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
         ],
       ),
     );
+  }
+
+  /// Aviso mostrado a convidados que tentam conversar com o consultor.
+  void _showGuestChatNotice(AppLocalizations l10n) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(
+            '${l10n.mensagensDisponiveisConta} ${l10n.converseCorretores}',
+          ),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
   }
 
   /// Secção principal (design: "Visão Geral").
@@ -802,9 +816,7 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
             icon: const Icon(Icons.calendar_month_rounded, size: 20),
             label: Text(
               l10n.agendarVisita,
-              style: AppTextStyles.buttonLarge.copyWith(
-                color: AppColors.white,
-              ),
+              style: AppTextStyles.buttonLarge.copyWith(color: AppColors.white),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.gold,
@@ -928,10 +940,8 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
           onTap: () => Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => VideoViewerScreen(
-                videos: videos,
-                initialIndex: index,
-              ),
+              builder: (_) =>
+                  VideoViewerScreen(videos: videos, initialIndex: index),
             ),
           ),
           child: Container(

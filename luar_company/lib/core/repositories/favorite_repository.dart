@@ -6,7 +6,7 @@ import '../models/property_model.dart';
 import '../services/supabase_service.dart';
 
 class FavoriteRepository {
-  final SupabaseClient _client = SupabaseService.client;
+  SupabaseClient get _client => SupabaseService.client;
 
   Future<List<FavoriteModel>> fetchFavorites(String userId) async {
     final response = await _client
@@ -58,9 +58,9 @@ class FavoriteRepository {
       final imagesData = json.remove('property_images');
       final images = imagesData is List
           ? imagesData
-              .map((row) => (row as Map)['image_url'] as String? ?? '')
-              .where((url) => url.isNotEmpty)
-              .toList()
+                .map((row) => (row as Map)['image_url'] as String? ?? '')
+                .where((url) => url.isNotEmpty)
+                .toList()
           : <String>[];
       return PropertyModel.fromJson(json).copyWith(images: images);
     }).toList();
@@ -78,9 +78,9 @@ class FavoriteRepository {
       final imagesData = json.remove('land_images');
       final images = imagesData is List
           ? imagesData
-              .map((row) => (row as Map)['image_url'] as String? ?? '')
-              .where((url) => url.isNotEmpty)
-              .toList()
+                .map((row) => (row as Map)['image_url'] as String? ?? '')
+                .where((url) => url.isNotEmpty)
+                .toList()
           : <String>[];
       return LandModel.fromJson(json).copyWith(images: images);
     }).toList();

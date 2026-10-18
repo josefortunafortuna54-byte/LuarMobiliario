@@ -29,11 +29,7 @@ import '../../widgets/video_player_widget.dart';
 /// ou a primeira fotografia quando não existe vídeo. A paginação é feita a
 /// partir do backend.
 class DiscoverScreen extends StatefulWidget {
-  const DiscoverScreen({
-    super.key,
-    this.isActive = true,
-    this.onSelectTab,
-  });
+  const DiscoverScreen({super.key, this.isActive = true, this.onSelectTab});
 
   /// Indica se o tab Discover está selecionado no [MainShell]. O
   /// [IndexedStack] mantém o ecrã vivo mesmo fora de vista, por isso sem
@@ -87,6 +83,9 @@ class _DiscoverScreenState extends State<DiscoverScreen> with RouteAware {
       }
       _loadLikeCounts(0);
       _watchConnectivity();
+      final userId =
+          context.read<AuthProvider>().user?.id ?? FavoriteProvider.guestUserId;
+      context.read<FavoriteProvider>().ensureLoaded(userId);
     });
   }
 
@@ -243,12 +242,11 @@ class _DiscoverScreenState extends State<DiscoverScreen> with RouteAware {
                 top: 0,
                 left: 0,
                 right: 0,
-                child: SafeArea(
-                  bottom: false,
-                  child: _buildTopBar(l10n),
-                ),
+                child: SafeArea(bottom: false, child: _buildTopBar(l10n)),
               ),
-              _buildMediaCounter(items[_activeIndex.clamp(0, items.length - 1)]),
+              _buildMediaCounter(
+                items[_activeIndex.clamp(0, items.length - 1)],
+              ),
               if (provider.isLoadingMore)
                 const Positioned(
                   bottom: 24,
@@ -295,11 +293,23 @@ class _DiscoverScreenState extends State<DiscoverScreen> with RouteAware {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _TopTab(label: l10n.descobrir, selected: true, onTap: () => _goToTab(0)),
+                _TopTab(
+                  label: l10n.descobrir,
+                  selected: true,
+                  onTap: () => _goToTab(0),
+                ),
                 const SizedBox(width: 20),
-                _TopTab(label: l10n.pesquisar, selected: false, onTap: () => _goToTab(1)),
+                _TopTab(
+                  label: l10n.pesquisar,
+                  selected: false,
+                  onTap: () => _goToTab(1),
+                ),
                 const SizedBox(width: 20),
-                _TopTab(label: l10n.favoritos, selected: false, onTap: () => _goToTab(2)),
+                _TopTab(
+                  label: l10n.favoritos,
+                  selected: false,
+                  onTap: () => _goToTab(2),
+                ),
               ],
             ),
           ),
@@ -412,10 +422,8 @@ class _DiscoverPage extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final auth = context.watch<AuthProvider>();
     final favorites = context.watch<FavoriteProvider>();
-    final userId = auth.user?.id ?? '';
-    final isFavorite =
-        userId.isNotEmpty &&
-        favorites.isFavorite(userId, propertyId: property.id);
+    final userId = auth.user?.id ?? FavoriteProvider.guestUserId;
+    final isFavorite = favorites.isFavorite(userId, propertyId: property.id);
     final likeCount = favorites.likeCount(property.id);
     final commentCount = context.watch<ReviewProvider>().countFor(property.id);
 
@@ -595,9 +603,7 @@ class _DiscoverPage extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            location.isEmpty
-                ? property.title
-                : '${property.title} • $location',
+            location.isEmpty ? property.title : '${property.title} • $location',
             style: AppTextStyles.bodyMedium.copyWith(
               color: AppColors.white,
               fontWeight: FontWeight.w600,
@@ -647,10 +653,9 @@ class _DiscoverPage extends StatelessWidget {
             width: double.infinity,
             height: 46,
             child: ElevatedButton(
-              onPressed: () => Navigator.of(context).pushNamed(
-                AppRoutes.propertyDetail,
-                arguments: property.id,
-              ),
+              onPressed: () => Navigator.of(
+                context,
+              ).pushNamed(AppRoutes.propertyDetail, arguments: property.id),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.gold,
                 foregroundColor: AppColors.white,
@@ -693,22 +698,17 @@ class _DiscoverPage extends StatelessWidget {
           label: _compactCount(likeCount),
           semanticsLabel: l10n.favoritos,
           color: isFavorite ? AppColors.error : AppColors.white,
-          onTap: userId.isEmpty
-              ? null
-              : () => favorites.toggleFavorite(
-                  userId,
-                  propertyId: property.id,
-                ),
+          onTap: () =>
+              favorites.toggleFavorite(userId, propertyId: property.id),
         ),
         const SizedBox(height: 16),
         _ActionButton(
           icon: Icons.chat_bubble_outline_rounded,
           label: _compactCount(commentCount),
           semanticsLabel: l10n.avaliacoes,
-          onTap: () => Navigator.of(context).pushNamed(
-            AppRoutes.propertyDetail,
-            arguments: property.id,
-          ),
+          onTap: () => Navigator.of(
+            context,
+          ).pushNamed(AppRoutes.propertyDetail, arguments: property.id),
         ),
         const SizedBox(height: 16),
         _ActionButton(
@@ -726,7 +726,6 @@ class _DiscoverPage extends StatelessWidget {
     );
   }
 }
-
 
 /// Especificação inline (ícone + valor) do cartão do Discover.
 class _SpecItem extends StatelessWidget {
@@ -937,9 +936,7 @@ class _TopTab extends StatelessWidget {
               Container(
                 height: 2,
                 decoration: BoxDecoration(
-                  color: selected
-                      ? AppColors.gold
-                      : Colors.transparent,
+                  color: selected ? AppColors.gold : Colors.transparent,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),

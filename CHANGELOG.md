@@ -17,6 +17,13 @@ e este projeto adota o [Semantic Versioning](https://semver.org/lang/pt-BR/).
 - **Perfil (visitante)**: Texto atualizado para refletir o registo automático
   após agendar uma visita.
 
+### Corrigido
+
+- **WhatsApp**: botão de contacto nos detalhes de imóvel/terreno passa a
+  normalizar o telefone (`WhatsAppUtil.normalizePhone`), evitando links
+  `wa.me` inválidos para números no formato local (ex.: `942 203 497`);
+  código duplicado dos ecrãs de detalhe substituído por `WhatsAppUtil.open`.
+
 ---
 
 ## [1.0.1] - 2026-10-16

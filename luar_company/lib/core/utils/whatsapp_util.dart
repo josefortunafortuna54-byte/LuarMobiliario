@@ -9,11 +9,12 @@ import '../constants/app_constants.dart';
 /// exemplo, o telefone de um cliente), adicionando o código do país quando
 /// necessário.
 abstract final class WhatsAppUtil {
-  static Future<bool> open({
-    String? message,
-    String? phone,
-  }) async {
-    final number = _normalizePhone(phone ?? AppConstants.whatsappNumber);
+  static Future<bool> open({String? message, String? phone}) async {
+    final target = (phone == null || phone.isEmpty)
+        ? AppConstants.whatsappNumber
+        : phone;
+    final number = normalizePhone(target);
+    if (number.isEmpty) return false;
     final text = message ?? AppConstants.whatsappMessage;
     final url = Uri.parse(
       'https://wa.me/$number?text=${Uri.encodeComponent(text)}',
@@ -25,7 +26,9 @@ abstract final class WhatsAppUtil {
     return false;
   }
 
-  static String _normalizePhone(String raw) {
+  /// Converte um número para o formato exigido pelo `wa.me`: apenas dígitos
+  /// no formato internacional, prefixando 244 quando falta o código do país.
+  static String normalizePhone(String raw) {
     var digits = raw.replaceAll(RegExp(r'[^0-9]'), '');
     if (digits.length == 9) {
       digits = '244$digits';

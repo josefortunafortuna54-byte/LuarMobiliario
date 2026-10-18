@@ -17,6 +17,7 @@ import '../../core/theme/app_palette.dart';
 import '../../core/utils/deep_links.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/utils/routes.dart';
+import '../../core/utils/whatsapp_util.dart';
 import '../../core/services/view_history_service.dart';
 import '../../l10n/app_localizations.dart';
 import '../../screens/bookings/booking_bottom_sheet.dart';
@@ -860,18 +861,10 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
                     height: 48,
                     child: ElevatedButton.icon(
                       onPressed: () async {
-                        final message = Uri.encodeComponent(
-                          l10n.mensagemInteresseTerreno(land.title),
+                        await WhatsAppUtil.open(
+                          message: l10n.mensagemInteresseTerreno(land.title),
+                          phone: land.agentPhone,
                         );
-                        final uri = Uri.parse(
-                          'https://wa.me/${land.agentPhone}?text=$message',
-                        );
-                        if (await canLaunchUrl(uri)) {
-                          await launchUrl(
-                            uri,
-                            mode: LaunchMode.externalApplication,
-                          );
-                        }
                       },
                       icon: const Icon(Icons.chat_rounded, size: 18),
                       label: Text(

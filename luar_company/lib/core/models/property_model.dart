@@ -157,6 +157,7 @@ class PropertyModel {
       'agent_id': agentId,
       'agent_name': agentName,
       'agent_phone': agentPhone,
+      'agent_verified': agentVerified,
       'is_featured': isFeatured,
       'is_available': isAvailable,
       'created_at': createdAt.toIso8601String(),

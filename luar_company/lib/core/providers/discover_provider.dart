@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../constants/app_constants.dart';
 import '../models/property_model.dart';
 import '../repositories/property_repository.dart';
+import '../utils/pagination.dart';
 
 /// Estado do feed vertical (Luar Discover).
 ///
@@ -45,12 +46,12 @@ class DiscoverProvider extends ChangeNotifier {
         page: 0,
         pageSize: AppConstants.defaultPageSize,
       );
+      final slice = slicePage(result, AppConstants.defaultPageSize);
       _items
         ..clear()
-        ..addAll(result);
+        ..addAll(slice.items);
       _page = 1;
-      _hasMore = result.length >= AppConstants.defaultPageSize &&
-          _items.length < AppConstants.discoverMaxItems;
+      _hasMore = slice.hasMore && _items.length < AppConstants.discoverMaxItems;
     } catch (e) {
       _error = e.toString();
     } finally {
@@ -72,10 +73,10 @@ class DiscoverProvider extends ChangeNotifier {
         page: _page,
         pageSize: AppConstants.defaultPageSize,
       );
-      _items.addAll(result);
+      final slice = slicePage(result, AppConstants.defaultPageSize);
+      _items.addAll(slice.items);
       _page++;
-      _hasMore = result.length >= AppConstants.defaultPageSize &&
-          _items.length < AppConstants.discoverMaxItems;
+      _hasMore = slice.hasMore && _items.length < AppConstants.discoverMaxItems;
     } catch (e) {
       _error = e.toString();
     } finally {

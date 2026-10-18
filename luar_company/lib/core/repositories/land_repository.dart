@@ -3,39 +3,19 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../constants/app_constants.dart';
 import '../models/land_model.dart';
 import '../services/supabase_service.dart';
+import '../utils/media_urls.dart';
 
 class LandRepository {
   SupabaseClient get _client => SupabaseService.client;
 
   List<LandModel> _mapResponse(List<dynamic> response) {
-    return response.map((e) {
-      final json = Map<String, dynamic>.from(e as Map);
-      final images = _extractImageUrls(json.remove('land_images'));
-      final videos = _extractVideoUrls(json.remove('land_videos'));
-      return LandModel.fromJson(json).copyWith(images: images, videos: videos);
-    }).toList();
+    return response.map((e) => _mapRow(Map<String, dynamic>.from(e as Map))).toList();
   }
 
-  List<String> _extractImageUrls(dynamic imagesData) {
-    if (imagesData == null) return [];
-    try {
-      return (imagesData as List)
-          .map((img) => (img as Map<String, dynamic>)['image_url'] as String)
-          .toList();
-    } catch (_) {
-      return [];
-    }
-  }
-
-  List<String> _extractVideoUrls(dynamic videosData) {
-    if (videosData == null) return [];
-    try {
-      return (videosData as List)
-          .map((video) => (video as Map<String, dynamic>)['video_url'] as String)
-          .toList();
-    } catch (_) {
-      return [];
-    }
+  LandModel _mapRow(Map<String, dynamic> json) {
+    final images = extractMediaUrls(json.remove('land_images'), 'image_url');
+    final videos = extractMediaUrls(json.remove('land_videos'), 'video_url');
+    return LandModel.fromJson(json).copyWith(images: images, videos: videos);
   }
 
   PostgrestFilterBuilder<dynamic> _applyFilters(
@@ -88,7 +68,8 @@ class LandRepository {
     int pageSize = AppConstants.defaultPageSize,
   }) async {
     final from = page * pageSize;
-    final to = from + pageSize - 1;
+    // +1: o registo extra permite ao caller detetar se há mais páginas.
+    final to = from + pageSize;
 
     final response = await _applyFilters(
       _client
@@ -134,17 +115,14 @@ class LandRepository {
         .eq('id', id)
         .single();
 
-    final json = Map<String, dynamic>.from(response as Map);
-    final images = _extractImageUrls(json.remove('land_images'));
-    final videos = _extractVideoUrls(json.remove('land_videos'));
-    return LandModel.fromJson(json).copyWith(images: images, videos: videos);
+    return _mapRow(Map<String, dynamic>.from(response as Map));
   }
 
   Future<LandModel> create(LandModel land) async {
     final data = land.toJson();
     data.remove('id');
-    final imageUrls = List<String>.from(data.remove('images') ?? []);
-    final videoUrls = List<String>.from(data.remove('videos') ?? []);
+    final imageUrls = popMediaUrls(data, 'images');
+    final videoUrls = popMediaUrls(data, 'videos');
     data['created_at'] = DateTime.now().toIso8601String();
     data['updated_at'] = DateTime.now().toIso8601String();
 
@@ -171,9 +149,10 @@ class LandRepository {
 
   Future<void> update(LandModel land) async {
     final data = land.toJson();
-    final imageUrls = List<String>.from(data.remove('images') ?? []);
-    final videoUrls = List<String>.from(data.remove('videos') ?? []);
+    final imageUrls = popMediaUrls(data, 'images');
+    final videoUrls = popMediaUrls(data, 'videos');
     data['updated_at'] = DateTime.now().toIso8601String();
+    data.remove('created_at');
 
     await _client.from('lands').update(data).eq('id', land.id);
 
@@ -201,7 +180,10 @@ class LandRepository {
     await _client.from('lands').update({'is_available': false}).eq('id', id);
   }
 
-  Future<List<LandModel>> search(String searchQuery) async {
+  Future<List<LandModel>> search(
+    String searchQuery, {
+    int pageSize = AppConstants.defaultPageSize,
+  }) async {
     final response = await _client
         .from('lands')
         .select('*, land_images(image_url)')
@@ -210,7 +192,8 @@ class LandRepository {
           'title.ilike.%$searchQuery%,description.ilike.%$searchQuery%,address.ilike.%$searchQuery%,city.ilike.%$searchQuery%,municipality.ilike.%$searchQuery%,neighborhood.ilike.%$searchQuery%',
         )
         .order('created_at', ascending: false)
-        .limit(AppConstants.defaultPageSize);
+        // +1: registo extra para o caller detetar se há mais resultados.
+        .limit(pageSize + 1);
 
     return _mapResponse(response as List);
   }
@@ -284,7 +267,8 @@ class LandRepository {
     }
 
     final from = page * pageSize;
-    final to = from + pageSize - 1;
+    // +1: o registo extra permite ao caller detetar se há mais páginas.
+    final to = from + pageSize;
 
     final response = await queryBuilder
         .order(orderBy, ascending: ascending)

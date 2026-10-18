@@ -3,42 +3,22 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../constants/app_constants.dart';
 import '../models/property_model.dart';
 import '../services/supabase_service.dart';
+import '../utils/media_urls.dart';
 
 class PropertyRepository {
   SupabaseClient get _client => SupabaseService.client;
 
   List<PropertyModel> _mapResponse(List<dynamic> response) {
-    return response.map((e) {
-      final json = Map<String, dynamic>.from(e as Map);
-      final images = _extractImageUrls(json.remove('property_images'));
-      final videos = _extractVideoUrls(json.remove('property_videos'));
-      return PropertyModel.fromJson(json).copyWith(
-        images: images,
-        videos: videos,
-      );
-    }).toList();
+    return response.map((e) => _mapRow(Map<String, dynamic>.from(e as Map))).toList();
   }
 
-  List<String> _extractImageUrls(dynamic imagesData) {
-    if (imagesData == null) return [];
-    try {
-      return (imagesData as List)
-          .map((img) => (img as Map<String, dynamic>)['image_url'] as String)
-          .toList();
-    } catch (_) {
-      return [];
-    }
-  }
-
-  List<String> _extractVideoUrls(dynamic videosData) {
-    if (videosData == null) return [];
-    try {
-      return (videosData as List)
-          .map((video) => (video as Map<String, dynamic>)['video_url'] as String)
-          .toList();
-    } catch (_) {
-      return [];
-    }
+  PropertyModel _mapRow(Map<String, dynamic> json) {
+    final images = extractMediaUrls(json.remove('property_images'), 'image_url');
+    final videos = extractMediaUrls(json.remove('property_videos'), 'video_url');
+    return PropertyModel.fromJson(json).copyWith(
+      images: images,
+      videos: videos,
+    );
   }
 
   PostgrestFilterBuilder<dynamic> _applyFilters(
@@ -100,7 +80,8 @@ class PropertyRepository {
     int pageSize = AppConstants.defaultPageSize,
   }) async {
     final from = page * pageSize;
-    final to = from + pageSize - 1;
+    // +1: o registo extra permite ao caller detetar se há mais páginas.
+    final to = from + pageSize;
 
     final response = await _applyFilters(
       _client
@@ -147,20 +128,14 @@ class PropertyRepository {
         .eq('id', id)
         .single();
 
-    final json = Map<String, dynamic>.from(response as Map);
-    final images = _extractImageUrls(json.remove('property_images'));
-    final videos = _extractVideoUrls(json.remove('property_videos'));
-    return PropertyModel.fromJson(json).copyWith(
-      images: images,
-      videos: videos,
-    );
+    return _mapRow(Map<String, dynamic>.from(response as Map));
   }
 
   Future<PropertyModel> create(PropertyModel property) async {
     final data = property.toJson();
     data.remove('id');
-    final imageUrls = List<String>.from(data.remove('images') ?? []);
-    final videoUrls = List<String>.from(data.remove('videos') ?? []);
+    final imageUrls = popMediaUrls(data, 'images');
+    final videoUrls = popMediaUrls(data, 'videos');
     data['created_at'] = DateTime.now().toIso8601String();
     data['updated_at'] = DateTime.now().toIso8601String();
 
@@ -191,9 +166,10 @@ class PropertyRepository {
 
   Future<void> update(PropertyModel property) async {
     final data = property.toJson();
-    final imageUrls = List<String>.from(data.remove('images') ?? []);
-    final videoUrls = List<String>.from(data.remove('videos') ?? []);
+    final imageUrls = popMediaUrls(data, 'images');
+    final videoUrls = popMediaUrls(data, 'videos');
     data['updated_at'] = DateTime.now().toIso8601String();
+    data.remove('created_at');
 
     await _client.from('properties').update(data).eq('id', property.id);
 
@@ -224,7 +200,10 @@ class PropertyRepository {
         .eq('id', id);
   }
 
-  Future<List<PropertyModel>> search(String searchQuery) async {
+  Future<List<PropertyModel>> search(
+    String searchQuery, {
+    int pageSize = AppConstants.defaultPageSize,
+  }) async {
     final response = await _client
         .from('properties')
         .select('*, property_images(image_url)')
@@ -233,7 +212,8 @@ class PropertyRepository {
           'title.ilike.%$searchQuery%,description.ilike.%$searchQuery%,address.ilike.%$searchQuery%,city.ilike.%$searchQuery%,municipality.ilike.%$searchQuery%,neighborhood.ilike.%$searchQuery%',
         )
         .order('created_at', ascending: false)
-        .limit(AppConstants.defaultPageSize);
+        // +1: registo extra para o caller detetar se há mais resultados.
+        .limit(pageSize + 1);
 
     return _mapResponse(response as List);
   }
@@ -327,7 +307,8 @@ class PropertyRepository {
     }
 
     final from = page * pageSize;
-    final to = from + pageSize - 1;
+    // +1: o registo extra permite ao caller detetar se há mais páginas.
+    final to = from + pageSize;
 
     final response = await queryBuilder
         .order(orderBy, ascending: ascending)

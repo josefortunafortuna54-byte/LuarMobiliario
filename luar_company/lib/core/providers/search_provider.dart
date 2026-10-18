@@ -6,6 +6,7 @@ import '../models/property_model.dart';
 import '../models/land_model.dart';
 import '../repositories/land_repository.dart';
 import '../repositories/property_repository.dart';
+import '../utils/pagination.dart';
 
 class SearchProvider extends ChangeNotifier {
   final PropertyRepository _propertyRepository = PropertyRepository();
@@ -313,8 +314,9 @@ class SearchProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _results = await _fetchPage(0);
-      _hasMore = _results.length >= _pageSize;
+      final slice = await _fetchPage(0);
+      _results = slice.items;
+      _hasMore = slice.hasMore;
     } catch (e) {
       _error = e.toString();
       _results = [];
@@ -331,13 +333,13 @@ class SearchProvider extends ChangeNotifier {
 
     try {
       final next = _page + 1;
-      final page = await _fetchPage(next);
-      if (page.isEmpty) {
+      final slice = await _fetchPage(next);
+      if (slice.items.isEmpty) {
         _hasMore = false;
       } else {
         _page = next;
-        _results = [..._results, ...page];
-        _hasMore = page.length >= _pageSize;
+        _results = [..._results, ...slice.items];
+        _hasMore = slice.hasMore;
       }
     } catch (e) {
       _error = e.toString();
@@ -347,7 +349,10 @@ class SearchProvider extends ChangeNotifier {
     }
   }
 
-  Future<List<dynamic>> _fetchPage(int page) async {
+  /// Busca a página `page` de imóveis (e de terrenos, quando não há tipo de
+  /// imóvel definido) e recorta-a em `pageSize`: os repositórios devolvem um
+  /// registo extra por coleção apenas para sinalizar [PageSlice.hasMore].
+  Future<PageSlice<dynamic>> _fetchPage(int page) async {
     // A finalidade (residencial/comercial) restringe os tipos de imóvel e
     // não se aplica aos terrenos, que têm classificação própria.
     final purposeTypes = purposePropertyTypes(_purpose);
@@ -372,7 +377,8 @@ class SearchProvider extends ChangeNotifier {
       pageSize: _pageSize,
     );
 
-    if (purposeTypes != null) return properties;
+    final propertySlice = slicePage(properties, _pageSize);
+    if (purposeTypes != null) return propertySlice;
 
     final lands = await _landRepository.searchAdvanced(
       query: _query,
@@ -389,8 +395,12 @@ class SearchProvider extends ChangeNotifier {
       page: page,
       pageSize: _pageSize,
     );
+    final landSlice = slicePage(lands, _pageSize);
 
-    return [...properties, ...lands];
+    return PageSlice(
+      [...propertySlice.items, ...landSlice.items],
+      propertySlice.hasMore || landSlice.hasMore,
+    );
   }
 
   List<PropertyModel> get propertyResults {

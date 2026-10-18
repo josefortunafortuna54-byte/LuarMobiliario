@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../constants/app_constants.dart';
 import '../models/property_model.dart';
 import '../repositories/property_repository.dart';
+import '../utils/pagination.dart';
 
 class PropertyProvider extends ChangeNotifier {
   final PropertyRepository _repository = PropertyRepository();
@@ -32,14 +33,15 @@ class PropertyProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await _repository.fetchProperties(
+      final page = await _repository.fetchProperties(
         filters: filters,
         page: 0,
         pageSize: AppConstants.defaultPageSize,
       );
+      final slice = slicePage(page, AppConstants.defaultPageSize);
 
-      _properties = response;
-      _hasMore = _properties.length >= AppConstants.defaultPageSize;
+      _properties = slice.items;
+      _hasMore = slice.hasMore;
       _currentPage = 1;
     } catch (e) {
       _error = e.toString();
@@ -57,14 +59,15 @@ class PropertyProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await _repository.fetchProperties(
+      final page = await _repository.fetchProperties(
         filters: filters ?? _currentFilters,
         page: _currentPage,
         pageSize: AppConstants.defaultPageSize,
       );
+      final slice = slicePage(page, AppConstants.defaultPageSize);
 
-      _properties.addAll(response);
-      _hasMore = response.length >= AppConstants.defaultPageSize;
+      _properties.addAll(slice.items);
+      _hasMore = slice.hasMore;
       _currentPage++;
     } catch (e) {
       _error = e.toString();
@@ -185,11 +188,16 @@ class PropertyProvider extends ChangeNotifier {
     _error = null;
     _currentPage = 0;
     _hasMore = true;
+    // A pesquisa textual substitui a listagem filtrada: o loadMore seguinte
+    // tem de partir da pesquisa, não dos filtros antigos.
+    _currentFilters = null;
     notifyListeners();
 
     try {
-      _properties = await _repository.search(searchQuery);
-      _hasMore = _properties.length >= AppConstants.defaultPageSize;
+      final page = await _repository.search(searchQuery);
+      final slice = slicePage(page, AppConstants.defaultPageSize);
+      _properties = slice.items;
+      _hasMore = slice.hasMore;
       _currentPage = 1;
     } catch (e) {
       _error = e.toString();

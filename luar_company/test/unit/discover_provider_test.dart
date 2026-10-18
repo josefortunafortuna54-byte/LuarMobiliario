@@ -61,8 +61,9 @@ class _FakePropertyRepository extends PropertyRepository {
 void main() {
   group('DiscoverProvider', () {
     test('load popula itens e sinaliza hasMore com página completa', () async {
+      // O repositório devolve pageSize+1 (registo extra de paginação).
       final fullPage = List.generate(
-        AppConstants.defaultPageSize,
+        AppConstants.defaultPageSize + 1,
         (i) => _property('$i'),
       );
       final provider = DiscoverProvider(
@@ -92,6 +93,22 @@ void main() {
       expect(provider.hasMore, isFalse);
     });
 
+    test('load sinaliza hasMore falso quando a página é exatamente cheia',
+        () async {
+      final exactPage = List.generate(
+        AppConstants.defaultPageSize,
+        (i) => _property('$i'),
+      );
+      final provider = DiscoverProvider(
+        repository: _FakePropertyRepository(pages: [exactPage]),
+      );
+
+      await provider.load();
+
+      expect(provider.items.length, AppConstants.defaultPageSize);
+      expect(provider.hasMore, isFalse);
+    });
+
     test('load define error quando o repositório falha', () async {
       final provider = DiscoverProvider(
         repository: _FakePropertyRepository(throwOnFetch: true),
@@ -106,7 +123,7 @@ void main() {
 
     test('loadMore acrescenta a página seguinte', () async {
       final firstPage = List.generate(
-        AppConstants.defaultPageSize,
+        AppConstants.defaultPageSize + 1,
         (i) => _property('p$i'),
       );
       final repository = _FakePropertyRepository(

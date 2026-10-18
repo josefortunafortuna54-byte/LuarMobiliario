@@ -27,6 +27,7 @@ void main() {
     String agentId = 'a1',
     String agentName = 'Carlos',
     String agentPhone = '+244900000000',
+    bool agentVerified = false,
     bool isFeatured = true,
     bool isAvailable = true,
     DateTime? createdAt,
@@ -54,6 +55,7 @@ void main() {
       agentId: agentId,
       agentName: agentName,
       agentPhone: agentPhone,
+      agentVerified: agentVerified,
       isFeatured: isFeatured,
       isAvailable: isAvailable,
       createdAt: createdAt ?? fixedDate,
@@ -304,9 +306,14 @@ void main() {
       expect(json.containsKey('updated_at'), isTrue);
     });
 
-    test('has 27 keys', () {
+    test('has 28 keys', () {
       final json = createSubject().toJson();
-      expect(json.length, 27);
+      expect(json.length, 28);
+    });
+
+    test('serializes agent_verified', () {
+      final json = createSubject(agentVerified: true).toJson();
+      expect(json['agent_verified'], isTrue);
     });
   });
 

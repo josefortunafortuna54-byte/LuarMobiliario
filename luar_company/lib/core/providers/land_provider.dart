@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../constants/app_constants.dart';
 import '../models/land_model.dart';
 import '../repositories/land_repository.dart';
+import '../utils/pagination.dart';
 
 class LandProvider extends ChangeNotifier {
   final LandRepository _repository = LandRepository();
@@ -30,13 +31,15 @@ class LandProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _lands = await _repository.fetchLands(
+      final page = await _repository.fetchLands(
         filters: filters,
         page: 0,
         pageSize: AppConstants.defaultPageSize,
       );
+      final slice = slicePage(page, AppConstants.defaultPageSize);
 
-      _hasMore = _lands.length >= AppConstants.defaultPageSize;
+      _lands = slice.items;
+      _hasMore = slice.hasMore;
       _currentPage = 1;
     } catch (e) {
       _error = e.toString();
@@ -54,14 +57,15 @@ class LandProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final newLands = await _repository.fetchLands(
+      final page = await _repository.fetchLands(
         filters: filters,
         page: _currentPage,
         pageSize: AppConstants.defaultPageSize,
       );
+      final slice = slicePage(page, AppConstants.defaultPageSize);
 
-      _lands.addAll(newLands);
-      _hasMore = newLands.length >= AppConstants.defaultPageSize;
+      _lands.addAll(slice.items);
+      _hasMore = slice.hasMore;
       _currentPage++;
     } catch (e) {
       _error = e.toString();
@@ -183,8 +187,10 @@ class LandProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _lands = await _repository.search(searchQuery);
-      _hasMore = _lands.length >= AppConstants.defaultPageSize;
+      final page = await _repository.search(searchQuery);
+      final slice = slicePage(page, AppConstants.defaultPageSize);
+      _lands = slice.items;
+      _hasMore = slice.hasMore;
       _currentPage = 1;
     } catch (e) {
       _error = e.toString();

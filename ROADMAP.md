@@ -79,7 +79,7 @@ Visão temporal do desenvolvimento da plataforma Luar Company Imobiliária.
 
 | Funcionalidade | Descrição | Prioridade | Estado |
 |---|---|---|---|
-| Mapas avançados | Pesquisa por mapa com clusters e filtros geográficos | Alta | 🔄 (mapa interativo; falta clusters/terrenos) |
+| Mapas avançados | Pesquisa por mapa com clusters e filtros geográficos | Alta | ✅ (clusters, imóveis e terrenos) |
 | Tours em vídeo | Gravação e visualização de vídeos de propriedades | Média | ✅ (vídeos de anúncios) |
 | Notificações refinadas | Categorias, preferências e agendamento de notificações | Média | ✅ |
 | Multi-idioma | Suporte PT/EN com sistema de internacionalização | Média | ✅ |

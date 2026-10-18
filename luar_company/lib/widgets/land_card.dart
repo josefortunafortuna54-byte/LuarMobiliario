@@ -25,6 +25,8 @@ class LandCard extends StatelessWidget {
     this.variant = PropertyCardVariant.vertical,
     this.onFavoriteTap,
     this.isFavorite = false,
+    this.onCompareTap,
+    this.isCompared = false,
     this.statusLabel,
     this.statusColor,
   });
@@ -42,6 +44,8 @@ class LandCard extends StatelessWidget {
   final PropertyCardVariant variant;
   final VoidCallback? onFavoriteTap;
   final bool isFavorite;
+  final VoidCallback? onCompareTap;
+  final bool isCompared;
   final String? statusLabel;
   final Color? statusColor;
 
@@ -180,6 +184,10 @@ class LandCard extends StatelessWidget {
                   ),
                 ),
               ),
+              if (onCompareTap != null) ...[
+                _buildCompareButton(context),
+                const SizedBox(width: 6),
+              ],
               if (onFavoriteTap != null)
                 _buildHeart(context)
               else
@@ -208,6 +216,47 @@ class LandCard extends StatelessWidget {
             fontSize: 10,
             color: AppColors.white,
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCompareButton(BuildContext context) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
+    return GestureDetector(
+      onTap: onCompareTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+        decoration: BoxDecoration(
+          color: isCompared
+              ? AppColors.gold.withValues(alpha: 0.15)
+              : palette.border,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isCompared ? AppColors.gold : palette.borderStrong,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              isCompared
+                  ? Icons.check_circle_rounded
+                  : Icons.add_circle_outline_rounded,
+              size: 16,
+              color: isCompared ? AppColors.gold : palette.textMuted,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              isCompared ? l10n.comparando : l10n.comparar,
+              style: AppTextStyles.buttonSmall.copyWith(
+                fontSize: 11,
+                color: isCompared ? AppColors.gold : palette.textBody,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -391,6 +440,10 @@ class LandCard extends StatelessWidget {
                   style: AppTextStyles.priceMedium,
                 ),
               ),
+              if (onCompareTap != null) ...[
+                _buildCompareButton(context),
+                const SizedBox(width: 8),
+              ],
               GestureDetector(
                 onTap: onDetailsTap ?? onTap,
                 child: Container(

@@ -6,6 +6,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/models/land_model.dart';
 import '../../core/providers/land_provider.dart';
+import '../../core/providers/comparison_provider.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/utils/routes.dart';
 import '../../l10n/app_localizations.dart';
@@ -458,6 +459,7 @@ class _LandsScreenState extends State<LandsScreen> {
   Widget _buildLandGrid(List<LandModel> lands, LandProvider provider) {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
+    final comparison = context.watch<ComparisonProvider>();
     return RefreshIndicator(
       onRefresh: () async => _loadLands(),
       color: AppColors.gold,
@@ -484,6 +486,8 @@ class _LandsScreenState extends State<LandsScreen> {
                   badgeLabel: _landTypeLabel(l10n, land.type),
                   features: land.features,
                   agentVerified: land.agentVerified,
+                  isCompared: comparison.isSelected(land.id),
+                  onCompareTap: () => _toggleComparison(comparison, land),
                   onTap: () => Navigator.pushNamed(
                     context,
                     AppRoutes.landDetail,
@@ -526,5 +530,39 @@ class _LandsScreenState extends State<LandsScreen> {
         ],
       ),
     );
+  }
+
+  void _toggleComparison(ComparisonProvider comparison, LandModel land) {
+    final l10n = AppLocalizations.of(context);
+    final wasSelected = comparison.isSelected(land.id);
+
+    if (!wasSelected && comparison.isFull) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.limiteComparacao),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    comparison.toggleLand(land);
+
+    if (!wasSelected && comparison.canCompare) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.imovelAdicionadoComparacao(comparison.count)),
+          backgroundColor: AppColors.gold,
+          behavior: SnackBarBehavior.floating,
+          action: SnackBarAction(
+            label: l10n.comparar,
+            textColor: AppColors.white,
+            onPressed: () {
+              Navigator.of(context).pushNamed(AppRoutes.comparison);
+            },
+          ),
+        ),
+      );
+    }
   }
 }

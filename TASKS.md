@@ -66,6 +66,8 @@ Registo de tarefas concluídas, em curso e pendentes da plataforma Luar Company 
 | T-057 | Configuração de assinatura de APK (key keystore/secrets) | Android |
 | T-058 | Configuração de bundle identifier para Play Store | Android |
 | T-059 | Testes de integração no CI (emulador Android) | Testes |
+| T-042 | Pesquisa por mapa com clusters (imóveis + terrenos, todas as páginas) | Search |
+| T-055 | Comparação de terrenos (para além de imóveis) | Comparison |
 
 ---
 
@@ -75,7 +77,6 @@ Registo de tarefas concluídas, em curso e pendentes da plataforma Luar Company 
 |---|---|---|---|
 | T-033 | Aumentar cobertura de testes (unit + widget + integration no CI) | Testes | Alta |
 | T-036 | Testes de integração com Supabase | Testes | Média |
-| T-055 | Comparação de terrenos (para além de imóveis) | Comparison | Média |
 
 ---
 
@@ -85,7 +86,6 @@ Registo de tarefas concluídas, em curso e pendentes da plataforma Luar Company 
 |---|---|---|---|
 | T-040 | Testes de acessibilidade (semântica, contraste, navegação) | UX | Média |
 | T-041 | Testes em múltiplos dispositivos e versões de SO | QA | Média |
-| T-042 | Pesquisa por mapa com clusters | Search | Alta |
 | T-046 | Integração de pagamentos (Multicaixa Express) | Pagamentos | Alta |
 | T-049 | Modo offline com cache local | Offline | Baixa |
 | T-050 | Publicação na Google Play Store | Deploy | Alta |

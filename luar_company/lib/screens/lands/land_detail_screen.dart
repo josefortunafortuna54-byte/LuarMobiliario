@@ -11,6 +11,7 @@ import '../../core/models/land_model.dart';
 import '../../core/models/report_model.dart';
 import '../../core/providers/land_provider.dart';
 import '../../core/providers/favorite_provider.dart';
+import '../../core/providers/comparison_provider.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/utils/deep_links.dart';
@@ -201,6 +202,7 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
             color: _isFavorite ? AppColors.gold : AppColors.white,
           ),
         ),
+        _buildCompareAction(land),
         IconButton(
           onPressed: () => showReportDialog(
             context,
@@ -907,6 +909,52 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildCompareAction(LandModel land) {
+    final comparison = context.watch<ComparisonProvider>();
+    final isCompared = comparison.isSelected(land.id);
+    final l10n = AppLocalizations.of(context);
+
+    return IconButton(
+      onPressed: () {
+        if (!isCompared && comparison.isFull) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.limiteComparacao),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+          return;
+        }
+
+        comparison.toggleLand(land);
+
+        if (!isCompared && comparison.canCompare) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.imovelAdicionadoComparacao(comparison.count)),
+              backgroundColor: AppColors.gold,
+              behavior: SnackBarBehavior.floating,
+              action: SnackBarAction(
+                label: l10n.comparar,
+                textColor: AppColors.white,
+                onPressed: () {
+                  Navigator.of(context).pushNamed(AppRoutes.comparison);
+                },
+              ),
+            ),
+          );
+        }
+      },
+      icon: Icon(
+        isCompared
+            ? Icons.check_circle_rounded
+            : Icons.compare_arrows_rounded,
+        color: isCompared ? AppColors.gold : AppColors.white,
+      ),
+      tooltip: l10n.comparar,
     );
   }
 

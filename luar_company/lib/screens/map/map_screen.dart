@@ -1,21 +1,56 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:provider/provider.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
+import '../../core/models/land_model.dart';
 import '../../core/models/property_model.dart';
-import '../../core/providers/property_provider.dart';
+import '../../core/repositories/land_repository.dart';
+import '../../core/repositories/property_repository.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/utils/formatters.dart';
+import '../../core/utils/pagination.dart';
 import '../../core/utils/routes.dart';
 import '../../l10n/app_localizations.dart';
 
-/// Mapa interativo com os imóveis (painel 3 do design de referência):
-/// pesquisa no topo, pins no mapa, cartão do imóvel no fundo e botão
-/// para recentrar a vista.
+/// Marcador unificado do mapa (imóvel ou terreno).
+class _MapPin {
+  const _MapPin({
+    required this.id,
+    required this.title,
+    required this.price,
+    required this.area,
+    required this.latitude,
+    required this.longitude,
+    required this.image,
+    required this.isLand,
+    required this.location,
+    this.bedrooms,
+    this.bathrooms,
+  });
+
+  final String id;
+  final String title;
+  final double price;
+  final double area;
+  final double latitude;
+  final double longitude;
+  final String? image;
+  final bool isLand;
+  final String location;
+  final int? bedrooms;
+  final int? bathrooms;
+
+  String get detailRoute =>
+      isLand ? AppRoutes.landDetail : AppRoutes.propertyDetail;
+}
+
+/// Mapa interativo com imóveis e terrenos (painel 3 do design de referência):
+/// pesquisa no topo, pins (com clusters) no mapa, cartão do anúncio no fundo
+/// e botão para recentrar a vista.
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
 
@@ -25,14 +60,16 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   static const LatLng _luanda = LatLng(-8.8383, 13.2344);
+  static const int _pageSize = 50;
+  static const int _maxPages = 40;
 
   final MapController _mapController = MapController();
   final TextEditingController _searchController = TextEditingController();
 
-  List<PropertyModel> _properties = [];
+  List<_MapPin> _pins = [];
   bool _isLoading = true;
   String _query = '';
-  PropertyModel? _selected;
+  _MapPin? _selected;
   LatLng? _focusCenter;
 
   @override
@@ -60,24 +97,16 @@ class _MapScreenState extends State<MapScreen> {
       }
     }
 
-    final provider = context.read<PropertyProvider>();
-    if (provider.properties.isEmpty) {
-      try {
-        await provider.loadProperties();
-      } catch (_) {
-        // O estado de erro é tratado pela lista vazia.
-      }
-    }
+    final pins = <_MapPin>[];
+    await _fetchProperties(pins);
+    await _fetchLands(pins);
     if (!mounted) return;
 
     setState(() {
-      _properties =
-          provider.properties
-              .where((p) => p.latitude != 0 || p.longitude != 0)
-              .toList();
+      _pins = pins;
       if (focusId != null) {
-        for (final property in _properties) {
-          if (property.id == focusId) _selected = property;
+        for (final pin in _pins) {
+          if (pin.id == focusId) _selected = pin;
         }
       }
       if (_selected != null) {
@@ -96,14 +125,91 @@ class _MapScreenState extends State<MapScreen> {
     });
   }
 
-  List<PropertyModel> get _visible {
+  Future<void> _fetchProperties(List<_MapPin> out) async {
+    final repository = PropertyRepository();
+    var page = 0;
+    while (page < _maxPages) {
+      final batch = await repository.fetchProperties(
+        page: page,
+        pageSize: _pageSize,
+      );
+      final slice = slicePage(batch, _pageSize);
+      out.addAll(slice.items.where(_hasCoords).map(_pinFromProperty));
+      if (!slice.hasMore) break;
+      page++;
+    }
+  }
+
+  Future<void> _fetchLands(List<_MapPin> out) async {
+    final repository = LandRepository();
+    var page = 0;
+    while (page < _maxPages) {
+      final batch = await repository.fetchLands(
+        page: page,
+        pageSize: _pageSize,
+      );
+      final slice = slicePage(batch, _pageSize);
+      out.addAll(slice.items.where(_hasCoords).map(_pinFromLand));
+      if (!slice.hasMore) break;
+      page++;
+    }
+  }
+
+  static bool _hasCoords(dynamic listing) {
+    final lat = (listing.latitude as num).toDouble();
+    final lng = (listing.longitude as num).toDouble();
+    return lat != 0 || lng != 0;
+  }
+
+  static _MapPin _pinFromProperty(PropertyModel property) {
+    return _MapPin(
+      id: property.id,
+      title: property.title,
+      price: property.price,
+      area: property.area,
+      latitude: property.latitude,
+      longitude: property.longitude,
+      image: property.images.isNotEmpty ? property.images.first : null,
+      isLand: false,
+      location: _locationLabel(
+        property.neighborhood,
+        property.municipality,
+        property.city,
+      ),
+      bedrooms: property.bedrooms,
+      bathrooms: property.bathrooms,
+    );
+  }
+
+  static _MapPin _pinFromLand(LandModel land) {
+    return _MapPin(
+      id: land.id,
+      title: land.title,
+      price: land.price,
+      area: land.area,
+      latitude: land.latitude,
+      longitude: land.longitude,
+      image: land.images.isNotEmpty ? land.images.first : null,
+      isLand: true,
+      location: _locationLabel(land.neighborhood, land.municipality, land.city),
+    );
+  }
+
+  static String _locationLabel(String a, String b, String c) {
+    final parts = [a, b, c].where((part) => part.isNotEmpty).toList();
+    final deduped = <String>[];
+    for (final part in parts) {
+      if (!deduped.contains(part)) deduped.add(part);
+    }
+    return deduped.join(', ');
+  }
+
+  List<_MapPin> get _visible {
     final query = _query.trim().toLowerCase();
-    if (query.isEmpty) return _properties;
-    return _properties.where((p) {
-      return p.title.toLowerCase().contains(query) ||
-          p.city.toLowerCase().contains(query) ||
-          p.municipality.toLowerCase().contains(query) ||
-          p.neighborhood.toLowerCase().contains(query);
+    if (query.isEmpty) return _pins;
+    return _pins.where((pin) {
+      return pin.title.toLowerCase().contains(query) ||
+          pin.location.toLowerCase().contains(query);
     }).toList();
   }
 
@@ -119,7 +225,7 @@ class _MapScreenState extends State<MapScreen> {
       return;
     }
     final bounds = LatLngBounds.fromPoints([
-      for (final p in items) LatLng(p.latitude, p.longitude),
+      for (final pin in items) LatLng(pin.latitude, pin.longitude),
     ]);
     _mapController.fitCamera(
       CameraFit.bounds(
@@ -160,7 +266,7 @@ class _MapScreenState extends State<MapScreen> {
                 urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 userAgentPackageName: 'com.luarcompany.luar_company',
               ),
-              MarkerLayer(markers: _buildMarkers()),
+              MarkerClusterLayerWidget(options: _clusterOptions()),
               const SimpleAttributionWidget(
                 source: Text('© OpenStreetMap'),
               ),
@@ -199,12 +305,48 @@ class _MapScreenState extends State<MapScreen> {
               left: 12,
               right: 12,
               bottom: 16,
-              child: _buildPropertyCard(_selected!, l10n, palette),
+              child: _buildPinCard(_selected!, palette),
             ),
           if (_isLoading)
             const Center(child: CircularProgressIndicator(color: AppColors.gold)),
         ],
       ),
+    );
+  }
+
+  MarkerClusterLayerOptions _clusterOptions() {
+    return MarkerClusterLayerOptions(
+      maxClusterRadius: 48,
+      size: const Size(40, 40),
+      alignment: Alignment.center,
+      padding: const EdgeInsets.all(50),
+      maxZoom: 16,
+      markers: _buildMarkers(),
+      builder: (context, markers) {
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.navy,
+            shape: BoxShape.circle,
+            border: Border.all(color: AppColors.gold, width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.black.withValues(alpha: 0.3),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Center(
+            child: Text(
+              '${markers.length}',
+              style: AppTextStyles.labelMedium.copyWith(
+                color: AppColors.white,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -277,28 +419,27 @@ class _MapScreenState extends State<MapScreen> {
 
   List<Marker> _buildMarkers() {
     return [
-      for (final property in _visible)
+      for (final pin in _visible)
         Marker(
-          point: LatLng(property.latitude, property.longitude),
+          point: LatLng(pin.latitude, pin.longitude),
           width: 34,
           height: 34,
           alignment: Alignment.topCenter,
           child: GestureDetector(
-            onTap: () => setState(() => _selected = property),
+            onTap: () => setState(() => _selected = pin),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              width: _selected?.id == property.id ? 30 : 22,
-              height: _selected?.id == property.id ? 30 : 22,
+              width: _selected?.id == pin.id ? 30 : 22,
+              height: _selected?.id == pin.id ? 30 : 22,
               decoration: BoxDecoration(
-                color:
-                    _selected?.id == property.id
-                        ? AppColors.gold
-                        : property.transactionType != TransactionType.sale
-                        ? AppColors.navy
-                        : AppColors.gold,
+                color: _selected?.id == pin.id
+                    ? AppColors.gold
+                    : pin.isLand
+                    ? AppColors.navyLight
+                    : AppColors.gold,
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: _selected?.id == property.id
+                  color: _selected?.id == pin.id
                       ? AppColors.white
                       : AppColors.white.withValues(alpha: 0.9),
                   width: 2.5,
@@ -317,18 +458,11 @@ class _MapScreenState extends State<MapScreen> {
     ];
   }
 
-  Widget _buildPropertyCard(
-    PropertyModel property,
-    AppLocalizations l10n,
-    AppPalette palette,
-  ) {
-    final location = _displayLocation(property);
-    final image = property.images.isNotEmpty ? property.images.first : null;
-
+  Widget _buildPinCard(_MapPin pin, AppPalette palette) {
     return GestureDetector(
       onTap: () => Navigator.of(context).pushNamed(
-        AppRoutes.propertyDetail,
-        arguments: property.id,
+        pin.detailRoute,
+        arguments: pin.id,
       ),
       child: Container(
         padding: const EdgeInsets.all(10),
@@ -351,22 +485,26 @@ class _MapScreenState extends State<MapScreen> {
               child: SizedBox(
                 width: 88,
                 height: 88,
-                child: image == null
+                child: pin.image == null
                     ? Container(
                         color: palette.surfaceAlt,
                         child: Icon(
-                          Icons.apartment_rounded,
+                          pin.isLand
+                              ? Icons.landscape_rounded
+                              : Icons.apartment_rounded,
                           color: palette.textMuted,
                         ),
                       )
                     : CachedNetworkImage(
-                        imageUrl: image,
+                        imageUrl: pin.image!,
                         fit: BoxFit.cover,
                         memCacheWidth: 240,
                         errorWidget: (_, _, _) => Container(
                           color: palette.surfaceAlt,
                           child: Icon(
-                            Icons.apartment_rounded,
+                            pin.isLand
+                                ? Icons.landscape_rounded
+                                : Icons.apartment_rounded,
                             color: palette.textMuted,
                           ),
                         ),
@@ -379,7 +517,7 @@ class _MapScreenState extends State<MapScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    formatPrice(property.price),
+                    formatPrice(pin.price),
                     style: AppTextStyles.h6.copyWith(
                       color: palette.textTitle,
                     ),
@@ -388,9 +526,9 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    location.isEmpty
-                        ? property.title
-                        : '${property.title} • $location',
+                    pin.location.isEmpty
+                        ? pin.title
+                        : '${pin.title} • ${pin.location}',
                     style: AppTextStyles.bodySmall.copyWith(
                       color: palette.textSecondary,
                     ),
@@ -400,7 +538,7 @@ class _MapScreenState extends State<MapScreen> {
                   const SizedBox(height: 6),
                   Row(
                     children: [
-                      if (property.bedrooms > 0) ...[
+                      if (pin.bedrooms != null && pin.bedrooms! > 0) ...[
                         const Icon(
                           Icons.king_bed_outlined,
                           size: 14,
@@ -408,14 +546,14 @@ class _MapScreenState extends State<MapScreen> {
                         ),
                         const SizedBox(width: 3),
                         Text(
-                          '${property.bedrooms}',
+                          '${pin.bedrooms}',
                           style: AppTextStyles.bodyTiny.copyWith(
                             color: palette.textBody,
                           ),
                         ),
                         const SizedBox(width: 10),
                       ],
-                      if (property.bathrooms > 0) ...[
+                      if (pin.bathrooms != null && pin.bathrooms! > 0) ...[
                         const Icon(
                           Icons.bathroom_outlined,
                           size: 14,
@@ -423,14 +561,14 @@ class _MapScreenState extends State<MapScreen> {
                         ),
                         const SizedBox(width: 3),
                         Text(
-                          '${property.bathrooms}',
+                          '${pin.bathrooms}',
                           style: AppTextStyles.bodyTiny.copyWith(
                             color: palette.textBody,
                           ),
                         ),
                         const SizedBox(width: 10),
                       ],
-                      if (property.area > 0) ...[
+                      if (pin.area > 0) ...[
                         const Icon(
                           Icons.square_foot_outlined,
                           size: 14,
@@ -438,7 +576,7 @@ class _MapScreenState extends State<MapScreen> {
                         ),
                         const SizedBox(width: 3),
                         Text(
-                          formatArea(property.area),
+                          formatArea(pin.area),
                           style: AppTextStyles.bodyTiny.copyWith(
                             color: palette.textBody,
                           ),
@@ -457,19 +595,6 @@ class _MapScreenState extends State<MapScreen> {
         ),
       ),
     );
-  }
-
-  static String _displayLocation(PropertyModel property) {
-    final parts = [
-      property.neighborhood,
-      property.municipality,
-      property.city,
-    ].where((part) => part.isNotEmpty).toList();
-    final deduped = <String>[];
-    for (final part in parts) {
-      if (!deduped.contains(part)) deduped.add(part);
-    }
-    return deduped.join(', ');
   }
 }
 

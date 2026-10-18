@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
-import '../../core/models/property_model.dart';
+import '../../core/models/comparison_entry.dart';
 import '../../core/providers/comparison_provider.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/utils/formatters.dart';
@@ -167,7 +167,7 @@ class ComparisonScreen extends StatelessWidget {
 
   Widget _buildComparisonTable(
     BuildContext context,
-    List<PropertyModel> items,
+    List<ComparisonEntry> items,
     ComparisonProvider provider,
   ) {
     final l10n = AppLocalizations.of(context);
@@ -192,26 +192,26 @@ class ComparisonScreen extends StatelessWidget {
           _buildTableRow(
             context,
             label: l10n.preco,
-            values: items.map((p) => formatPrice(p.price)).toList(),
-            highlight: _bestIndex(items, (p) => -p.price),
+            values: items.map((e) => formatPrice(e.price)).toList(),
+            highlight: _bestIndex(items, (e) => -e.price),
           ),
           _buildTableRow(
             context,
             label: l10n.areaM2,
-            values: items.map((p) => formatArea(p.area)).toList(),
-            highlight: _bestIndex(items, (p) => p.area),
+            values: items.map((e) => formatArea(e.area)).toList(),
+            highlight: _bestIndex(items, (e) => e.area),
           ),
           _buildTableRow(
             context,
             label: l10n.precoPorM2,
-            values: items.map((p) {
-              final ppm = ComparisonProvider.pricePerSquareMeter(p);
+            values: items.map((e) {
+              final ppm = ComparisonProvider.pricePerSquareMeter(e);
               return ppm != null ? formatPrice(ppm) : '—';
             }).toList(),
             highlight: _bestIndex(
               items,
-              (p) {
-                final ppm = ComparisonProvider.pricePerSquareMeter(p);
+              (e) {
+                final ppm = ComparisonProvider.pricePerSquareMeter(e);
                 return ppm != null ? -ppm : double.infinity;
               },
             ),
@@ -219,45 +219,42 @@ class ComparisonScreen extends StatelessWidget {
           _buildTableRow(
             context,
             label: l10n.tipo,
-            values: items.map((p) => _propertyTypeLabel(p.type, l10n)).toList(),
+            values: items.map((e) => _categoryLabel(e.category, l10n)).toList(),
           ),
           _buildTableRow(
             context,
             label: l10n.transacao,
             values: items
-                .map(
-                  (p) => switch (p.transactionType) {
-                    TransactionType.sale => l10n.venda,
-                    TransactionType.rent => l10n.arrendamento,
-                    TransactionType.renew => l10n.renovar,
-                  },
-                )
+                .map((e) => _transactionLabel(e.transactionName, l10n))
                 .toList(),
           ),
           _buildTableRow(
             context,
             label: l10n.quartosLabel,
-            values: items.map((p) => '${p.bedrooms}').toList(),
-            highlight: _bestIndex(items, (p) => p.bedrooms.toDouble()),
+            values: items.map((e) => e.bedrooms?.toString() ?? '—').toList(),
+            highlight: _bestIndex(items, (e) => (e.bedrooms ?? 0).toDouble()),
           ),
           _buildTableRow(
             context,
             label: l10n.casasDeBanhoLabel,
-            values: items.map((p) => '${p.bathrooms}').toList(),
-            highlight: _bestIndex(items, (p) => p.bathrooms.toDouble()),
+            values: items.map((e) => e.bathrooms?.toString() ?? '—').toList(),
+            highlight: _bestIndex(items, (e) => (e.bathrooms ?? 0).toDouble()),
           ),
           _buildTableRow(
             context,
             label: l10n.garagemLabel,
-            values: items.map((p) => '${p.garage}').toList(),
-            highlight: _bestIndex(items, (p) => p.garage.toDouble()),
+            values: items.map((e) => e.garage?.toString() ?? '—').toList(),
+            highlight: _bestIndex(items, (e) => (e.garage ?? 0).toDouble()),
           ),
         ],
       ),
     );
   }
 
-  int? _bestIndex(List<PropertyModel> items, double Function(PropertyModel) score) {
+  int? _bestIndex(
+    List<ComparisonEntry> items,
+    double Function(ComparisonEntry) score,
+  ) {
     if (items.length < 2) return null;
     int best = 0;
     double bestScore = score(items[0]);
@@ -273,7 +270,7 @@ class ComparisonScreen extends StatelessWidget {
 
   Widget _buildTableHeader(
     BuildContext context,
-    List<PropertyModel> items,
+    List<ComparisonEntry> items,
   ) {
     final palette = context.palette;
     return Container(
@@ -374,7 +371,7 @@ class ComparisonScreen extends StatelessWidget {
 
   Widget _buildImagesSection(
     BuildContext context,
-    List<PropertyModel> items,
+    List<ComparisonEntry> items,
   ) {
     final palette = context.palette;
     return Column(
@@ -392,7 +389,7 @@ class ComparisonScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: GestureDetector(
                   onTap: () => Navigator.of(context).pushNamed(
-                    AppRoutes.propertyDetail,
+                    _detailRoute(p),
                     arguments: p.id,
                   ),
                   child: Container(
@@ -433,7 +430,7 @@ class ComparisonScreen extends StatelessWidget {
 
   Widget _buildLocationSection(
     BuildContext context,
-    List<PropertyModel> items,
+    List<ComparisonEntry> items,
   ) {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
@@ -479,7 +476,7 @@ class ComparisonScreen extends StatelessWidget {
 
   Widget _buildFeaturesSection(
     BuildContext context,
-    List<PropertyModel> items,
+    List<ComparisonEntry> items,
     AppLocalizations l10n,
   ) {
     final palette = context.palette;
@@ -553,7 +550,7 @@ class ComparisonScreen extends StatelessWidget {
 
   Widget _buildActionsSection(
     BuildContext context,
-    List<PropertyModel> items,
+    List<ComparisonEntry> items,
     AppLocalizations l10n,
     AppPalette palette,
   ) {
@@ -582,7 +579,7 @@ class ComparisonScreen extends StatelessWidget {
                   icon: Icons.info_outline_rounded,
                   label: l10n.detalhes,
                   onTap: () => Navigator.of(context).pushNamed(
-                    AppRoutes.propertyDetail,
+                    _detailRoute(p),
                     arguments: p.id,
                   ),
                 ),
@@ -630,21 +627,32 @@ class ComparisonScreen extends StatelessWidget {
     );
   }
 
-  String _propertyTypeLabel(PropertyType type, AppLocalizations l10n) {
-    switch (type) {
-      case PropertyType.house:
-        return l10n.casas;
-      case PropertyType.apartment:
-        return l10n.apartamentos;
-      case PropertyType.office:
-        return l10n.escritorio;
-      case PropertyType.warehouse:
-        return l10n.armazens;
-      case PropertyType.condo:
-        return l10n.condominio;
-      case PropertyType.shop:
-        return l10n.loja;
-    }
+  String _detailRoute(ComparisonEntry entry) =>
+      entry.isLand ? AppRoutes.landDetail : AppRoutes.propertyDetail;
+
+  String _transactionLabel(String name, AppLocalizations l10n) {
+    return switch (name) {
+      'rent' => l10n.arrendamento,
+      'renew' => l10n.renovar,
+      _ => l10n.venda,
+    };
+  }
+
+  String _categoryLabel(ComparisonCategory category, AppLocalizations l10n) {
+    return switch (category) {
+      ComparisonCategory.house => l10n.casas,
+      ComparisonCategory.apartment => l10n.apartamentos,
+      ComparisonCategory.office => l10n.escritorio,
+      ComparisonCategory.warehouse => l10n.armazens,
+      ComparisonCategory.condo => l10n.condominio,
+      ComparisonCategory.shop => l10n.loja,
+      ComparisonCategory.urbanLand => l10n.urbano,
+      ComparisonCategory.agriculturalLand => l10n.agricola,
+      ComparisonCategory.industrialLand => l10n.industrial,
+      ComparisonCategory.commercialLand => l10n.comercial,
+      ComparisonCategory.lot => l10n.lote,
+      ComparisonCategory.farm => l10n.fazenda,
+    };
   }
 }
 

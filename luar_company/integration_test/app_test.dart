@@ -5,7 +5,7 @@ import 'package:integration_test/integration_test.dart';
 import 'package:luar_company/main.dart' as app;
 import 'package:luar_company/core/utils/routes.dart';
 import 'package:luar_company/screens/splash/splash_screen.dart';
-import 'package:luar_company/screens/home/home_screen.dart';
+import 'package:luar_company/screens/home/main_shell.dart';
 
 /// Testes de integração (T-036).
 ///
@@ -39,7 +39,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
     await tester.pump(const Duration(milliseconds: 400));
 
-    expect(find.byType(HomeScreen), findsOneWidget);
+    expect(find.byType(MainShell), findsOneWidget);
   });
 
   testWidgets('onGenerateRoute resolve a rota de splash', (tester) async {

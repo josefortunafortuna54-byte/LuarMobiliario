@@ -15,7 +15,7 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets('A app arranca e mostra o ecrã de arranque', (tester) async {
-    app.main();
+    await app.main();
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 
@@ -24,8 +24,9 @@ void main() {
 
   testWidgets('Sem sessão, o splash navega diretamente para o Home (acesso livre)',
       (tester) async {
-    app.main();
+    await app.main();
     await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
 
     expect(find.byType(SplashScreen), findsOneWidget);
 

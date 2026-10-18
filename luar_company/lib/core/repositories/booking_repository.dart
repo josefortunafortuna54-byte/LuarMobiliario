@@ -5,7 +5,7 @@ import '../models/user_model.dart';
 import '../services/supabase_service.dart';
 
 class BookingRepository {
-  final SupabaseClient _client = SupabaseService.client;
+  SupabaseClient get _client => SupabaseService.client;
 
   static const String _selectWithTarget =
       '*, properties(title), lands(title)';

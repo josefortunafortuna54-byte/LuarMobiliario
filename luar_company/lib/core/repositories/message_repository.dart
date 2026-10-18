@@ -4,7 +4,7 @@ import '../models/message_model.dart';
 import '../services/supabase_service.dart';
 
 class MessageRepository {
-  final SupabaseClient _client = SupabaseService.client;
+  SupabaseClient get _client => SupabaseService.client;
 
   Future<List<Map<String, dynamic>>> fetchConversations(String userId) async {
     final response = await _client

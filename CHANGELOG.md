@@ -23,6 +23,11 @@ e este projeto adota o [Semantic Versioning](https://semver.org/lang/pt-BR/).
   normalizar o telefone (`WhatsAppUtil.normalizePhone`), evitando links
   `wa.me` inválidos para números no formato local (ex.: `942 203 497`);
   código duplicado dos ecrãs de detalhe substituído por `WhatsAppUtil.open`.
+- **Arranque**: serviços e repositórios acedem ao cliente Supabase de forma
+  lazy (getter), eliminando o crash no arranque quando a configuração
+  Supabase está em falta (ex.: testes de integração no CI sem
+  `--dart-define`); a inicialização de notificações no `main()` passa a ser
+  protegida com try/catch.
 
 ---
 

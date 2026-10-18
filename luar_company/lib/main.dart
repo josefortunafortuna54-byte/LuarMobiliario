@@ -29,7 +29,11 @@ Future<void> main() async {
     debugPrint('[Luar] Supabase initialization failed: $e');
   }
 
-  await NotificationService().initialize();
+  try {
+    await NotificationService().initialize();
+  } catch (e) {
+    debugPrint('[Luar] Notification initialization failed: $e');
+  }
 
   final themeProvider = await ThemeProvider.load();
   final localeProvider = await LocaleProvider.load();

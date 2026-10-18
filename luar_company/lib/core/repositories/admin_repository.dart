@@ -4,7 +4,7 @@ import '../models/user_model.dart';
 import '../services/supabase_service.dart';
 
 class AdminRepository {
-  final SupabaseClient _client = SupabaseService.client;
+  SupabaseClient get _client => SupabaseService.client;
 
   Future<({int properties, int lands, int users, int unreadMessages})>
       fetchStats() async {

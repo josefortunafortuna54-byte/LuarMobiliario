@@ -5,7 +5,7 @@ import '../models/partner_model.dart';
 import '../services/supabase_service.dart';
 
 class PartnerRepository {
-  final SupabaseClient _client = SupabaseService.client;
+  SupabaseClient get _client => SupabaseService.client;
 
   Future<List<PartnerModel>> fetchAll() async {
     final response = await _client

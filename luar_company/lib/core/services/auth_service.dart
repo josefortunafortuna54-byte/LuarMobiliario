@@ -6,7 +6,7 @@ import '../models/user_model.dart';
 import 'supabase_service.dart';
 
 class AuthService {
-  final SupabaseClient _client = SupabaseService.client;
+  SupabaseClient get _client => SupabaseService.client;
 
   GoTrueClient get _auth => _client.auth;
 

@@ -21,7 +21,10 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 class NotificationService {
-  final SupabaseClient _client = SupabaseService.client;
+  // Acesso lazy: o cliente só é resolvido quando usado, para a app não
+  // crashar no arranque quando o Supabase não está configurado (ex.: testes
+  // de integração sem --dart-define).
+  SupabaseClient get _client => SupabaseService.client;
 
   static final NotificationService _instance = NotificationService._();
   factory NotificationService() => _instance;

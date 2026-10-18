@@ -25,7 +25,7 @@ class StorageUploadException implements Exception {
 /// do ficheiro), validação contra os tipos aceites, verificação de tamanho e
 /// repetição automática em falhas transitórias de rede.
 class StorageService {
-  final SupabaseClient _client = SupabaseService.client;
+  SupabaseClient get _client => SupabaseService.client;
 
   static const _uuid = Uuid();
 

@@ -2,7 +2,7 @@
 
 Como aplicar as migrações SQL ao projeto Supabase de produção.
 
-As migrações vivem em `luar_company/supabase/migrations/` e são aplicadas **por ordem** (`001` → `026`). São idempotentes na sua maioria (`IF NOT EXISTS`, `DROP POLICY IF EXISTS`), pelo que reaplicar é seguro.
+As migrações vivem em `luar_company/supabase/migrations/` e são aplicadas **por ordem** (`001` → `029`). São idempotentes na sua maioria (`IF NOT EXISTS`, `DROP POLICY IF EXISTS`), pelo que reaplicar é seguro.
 
 > O projeto já está ligado (`supabase link`) ao ref `vgwaxjxkknogmwnmuiux`; o pipe `.env`/CLI usa a ligação guardada.
 
@@ -10,7 +10,7 @@ As migrações vivem em `luar_company/supabase/migrations/` e são aplicadas **p
 
 ## Estado
 
-Todas as migrações (`001`–`026`) estão aplicadas e em sync com o projeto de produção (`vgwaxjxkknogmwnmuiux`), confirmado por `supabase migration list --linked`. As últimas aplicadas foram:
+Todas as migrações (`001`–`028`) estão aplicadas e em sync com o projeto de produção (`vgwaxjxkknogmwnmuiux`), confirmado por `supabase migration list --linked`. A `029` está versionada no repositório e deve ser aplicada com `supabase db push`. As últimas são:
 
 | Migration | Ficheiro | O que faz | Estado |
 |---|---|---|---|
@@ -26,6 +26,9 @@ Todas as migrações (`001`–`026`) estão aplicadas e em sync com o projeto de
 | 024 | `024_user_delete_integrity.sql` | Adiciona FK `public.users.id → auth.users` com `ON DELETE CASCADE` (evita perfis órfãos e bloqueio de novo registo com o mesmo email) | Aplicada |
 | 025 | `025_query_optimization.sql` | Índices compostos/parciais para listagens públicas, mensagens, notificações e admin/analytics | Aplicada |
 | 026 | `026_analytics_views.sql` | Adiciona `views` a properties/lands e o RPC `register_listing_view` para métricas de anúncios mais vistos | Aplicada |
+| 027 | `027_agent_audience.sql` | RPC `agent_audience` (SECURITY DEFINER) — nº de seguidores de um agente sem expor quem favoritou | Aplicada |
+| 028 | `028_transaction_type_renew.sql` | Acrescenta `renew` ao enum `transaction_type` (separador "Renovar" dos filtros) | Aplicada |
+| 029 | `029_trigram_search_indexes.sql` | Índices GIN `pg_trgm` para as pesquisas `ilike '%…%'` (localização e pesquisa livre) | A aplicar |
 
 > Sem a 015: agendar visita a um **terreno** falha e o admin não confirma/cancela marcações.
 > Sem a 016: **publicação de vídeos falha** (tabelas e bucket inexistentes).

@@ -2,10 +2,13 @@ AUDITORIA "VERY THOROUGH" - APP FLUTTER LUAR MOBILIÁRIO
 Path: /home/fortuna/Desktop/Luar-Mobiliario/luar_company
 Data: 2026-10-14
 
-NOTA (2026-10-15): A Fase 2 (Luar Discover) já foi IMPLEMENTADA após esta auditoria
-(discover_screen.dart + discover_provider.dart + testes, ver secção FASE 2 atualizada).
-As referências "Discover ausente" nas secções de resumo/mapa abaixo estão desatualizadas.
-Este documento será reescrito no final do plano de evolução (Etapa 9).
+NOTA (2026-10-18): Documento histórico (data de 2026-10-14). A maioria das lacunas
+apontadas abaixo já NÃO se aplica: Discover (F2), mapa com flutter_map (F3), pesquisas
+guardadas (F3), comparação e favoritos (F4), Trust com verificação/denúncias/moderacão (F5),
+Studio (F6), notificações com deep links e preferências (F7) e desempenho/cache/conectividade
+(F8) estão implementados. Ver o estado atual em TASKS.md, ROADMAP.md e PLANO_EXECUCAO.md.
+Notas antigas desatualizadas: "sem dependências de mapa", "sem cached_network_image/connectivity_plus",
+"Discover ausente", "Testes: 28". Mantém-se útil apenas como retrato do ponto de partida.
 
 SUMÁRIO
 - Ficheiros Dart: 88 (lib/* ~20.282 LOC)

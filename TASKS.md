@@ -62,6 +62,10 @@ Registo de tarefas concluídas, em curso e pendentes da plataforma Luar Company 
 | T-052 | Comparação de imóveis lado a lado | Comparison |
 | T-053 | Pesquisas guardadas | Search |
 | T-054 | Base de segurança e confiança (Trust): verificação, denúncias, moderação | Segurança |
+| T-056 | Índices trigram para pesquisas `ilike` (migration 029) | Database |
+| T-057 | Configuração de assinatura de APK (key keystore/secrets) | Android |
+| T-058 | Configuração de bundle identifier para Play Store | Android |
+| T-059 | Testes de integração no CI (emulador Android) | Testes |
 
 ---
 
@@ -70,8 +74,6 @@ Registo de tarefas concluídas, em curso e pendentes da plataforma Luar Company 
 | ID | Tarefa | Módulo | Prioridade |
 |---|---|---|---|
 | T-033 | Aumentar cobertura de testes (unit + widget + integration no CI) | Testes | Alta |
-| T-034 | Configuração de assinatura de APK (key keystore/secrets) | Android | Alta |
-| T-035 | Configuração de bundle identifier para Play Store | Android | Alta |
 | T-036 | Testes de integração com Supabase | Testes | Média |
 | T-055 | Comparação de terrenos (para além de imóveis) | Comparison | Média |
 

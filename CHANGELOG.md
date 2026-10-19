@@ -9,8 +9,20 @@ e este projeto adota o [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## [Unreleased]
 
+### Adicionado
+
+- **Menu Admin no perfil**: acesso direto ao painel de gestão para
+  administradores e agentes (a entrada não aparece a clientes).
+
 ### Alterado
 
+- **Painel admin**: redesenho visual — cabeçalho hero com detalhe dourado e
+  ícone admin, secções com acento gold, cartões de estatística com bordas do
+  tema, métricas e chips legíveis no modo escuro (top-5 com medalhas) e
+  ações rápidas leves com ripple; agora com pull-to-refresh, botão de
+  atualizar na AppBar, barra de progresso e estados de erro com "Tentar
+  novamente". As ações rápidas só-admin (Ver Utilizadores, Denúncias)
+  ficam ocultas para agentes.
 - **Agendamentos**: Após confirmar a marcação de visita, o cliente é registado
   pedindo apenas nome + telefone (`register_guest_client` RPC). O perfil é criado
   em `users` com email sintético `@guest.luar` e ligado à marcação.

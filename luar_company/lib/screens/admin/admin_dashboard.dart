@@ -51,6 +51,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
   Widget build(BuildContext context) {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
+    final isAdmin =
+        context.read<AuthProvider>().user?.role == UserRole.admin;
 
     return Scaffold(
       backgroundColor: palette.background,
@@ -112,7 +114,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       const SizedBox(height: 24),
                       _buildAnalyticsSection(admin, l10n, palette),
                       const SizedBox(height: 24),
-                      _buildQuickActions(context, l10n, palette),
+                      _buildQuickActions(context, l10n, palette, isAdmin),
                       const SizedBox(height: 32),
                     ],
                   ),
@@ -296,7 +298,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
               crossAxisCount: 2,
               mainAxisSpacing: 12,
               crossAxisSpacing: 12,
-              mainAxisExtent: 96,
+              mainAxisExtent: 100,
             ),
             children: [
               _buildStatCard(
@@ -722,6 +724,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     BuildContext context,
     AppLocalizations l10n,
     AppPalette palette,
+    bool isAdmin,
   ) {
     final actions = <({IconData icon, String title, String route})>[
       (
@@ -739,11 +742,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
         title: l10n.agendamentos,
         route: AppRoutes.adminBookings,
       ),
-      (
-        icon: Icons.people_alt_outlined,
-        title: l10n.verUtilizadores,
-        route: AppRoutes.adminUsers,
-      ),
+      if (isAdmin)
+        (
+          icon: Icons.people_alt_outlined,
+          title: l10n.verUtilizadores,
+          route: AppRoutes.adminUsers,
+        ),
       (
         icon: Icons.apartment_rounded,
         title: l10n.gerir,
@@ -754,11 +758,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
         title: l10n.gerirTerrenosCard,
         route: AppRoutes.adminLands,
       ),
-      (
-        icon: Icons.flag_outlined,
-        title: l10n.denuncias,
-        route: AppRoutes.adminReports,
-      ),
+      if (isAdmin)
+        (
+          icon: Icons.flag_outlined,
+          title: l10n.denuncias,
+          route: AppRoutes.adminReports,
+        ),
       (
         icon: Icons.handshake_outlined,
         title: l10n.verParceiros,
@@ -780,7 +785,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
               crossAxisCount: 2,
               mainAxisSpacing: 12,
               crossAxisSpacing: 12,
-              mainAxisExtent: 118,
+              mainAxisExtent: 120,
             ),
             itemCount: actions.length,
             itemBuilder: (_, index) {

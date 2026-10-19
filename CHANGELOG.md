@@ -17,8 +17,15 @@ e este projeto adota o [Semantic Versioning](https://semver.org/lang/pt-BR/).
 - **Perfil (visitante)**: Texto atualizado para refletir o registo automático
   após agendar uma visita.
 
+### Removido
+
+- **Código morto**: ecrã `HomeScreen` (substituído por `MainShell` + separadores)
+  removido do repositório.
+
 ### Corrigido
 
+- **Testes de integração**: `main()` passa a ser aguardado antes das
+  verificações e o assert da rota `home` verifica agora `MainShell`.
 - **WhatsApp**: botão de contacto nos detalhes de imóvel/terreno passa a
   normalizar o telefone (`WhatsAppUtil.normalizePhone`), evitando links
   `wa.me` inválidos para números no formato local (ex.: `942 203 497`);

@@ -267,6 +267,8 @@
   "enviarImagemDe": "Uploading image {atual} of {total}",
   "algoCorreuMal": "Something went wrong",
   "erroDesconhecido": "Unknown error",
+  "configEmFaltaTitulo": "Missing configuration",
+  "configEmFaltaDesc": "The SUPABASE_URL and SUPABASE_ANON_KEY variables were not set for this build. Please contact technical support.",
   "registadoEm": "Registered on",
   "concluida": "Completed",
   "agenteImobiliario": "Real Estate Agent",

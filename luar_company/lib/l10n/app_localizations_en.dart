@@ -856,6 +856,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get erroDesconhecido => 'Unknown error';
 
   @override
+  String get configEmFaltaTitulo => 'Missing configuration';
+
+  @override
+  String get configEmFaltaDesc =>
+      'The SUPABASE_URL and SUPABASE_ANON_KEY variables were not set for this build. Please contact technical support.';
+
+  @override
   String get registadoEm => 'Registered on';
 
   @override

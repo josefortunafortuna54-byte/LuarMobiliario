@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'app.dart';
+import 'core/config/env_config.dart';
 import 'core/providers/app_providers.dart';
 import 'core/providers/locale_provider.dart';
 import 'core/providers/playback_provider.dart';
@@ -9,6 +10,7 @@ import 'core/providers/theme_provider.dart';
 import 'core/services/connectivity_service.dart';
 import 'core/services/notification_service.dart';
 import 'core/services/supabase_service.dart';
+import 'screens/config_error_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,6 +24,14 @@ Future<void> main() async {
   PaintingBinding.instance.imageCache
     ..maximumSizeBytes = 64 * 1024 * 1024
     ..maximumSize = 120;
+
+  if (!EnvConfig.isConfigured) {
+    debugPrint(
+      '[Luar] SUPABASE_URL/SUPABASE_ANON_KEY em falta — a mostrar ecrã de configuração.',
+    );
+    runApp(const ConfigErrorApp());
+    return;
+  }
 
   try {
     await SupabaseService.initialize();

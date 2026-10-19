@@ -862,6 +862,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get erroDesconhecido => 'Erro desconhecido';
 
   @override
+  String get configEmFaltaTitulo => 'Configuração em falta';
+
+  @override
+  String get configEmFaltaDesc =>
+      'As variáveis SUPABASE_URL e SUPABASE_ANON_KEY não foram definidas neste build. Contacte o suporte técnico.';
+
+  @override
   String get registadoEm => 'Registado em';
 
   @override

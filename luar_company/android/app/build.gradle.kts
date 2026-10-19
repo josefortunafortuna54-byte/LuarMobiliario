@@ -17,7 +17,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.luarcompany.luar_company"
+        applicationId = "com.luar_imobiliario"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

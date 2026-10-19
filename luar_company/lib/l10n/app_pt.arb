@@ -267,6 +267,8 @@
   "enviarImagemDe": "A enviar imagem {atual} de {total}",
   "algoCorreuMal": "Algo correu mal",
   "erroDesconhecido": "Erro desconhecido",
+  "configEmFaltaTitulo": "Configuração em falta",
+  "configEmFaltaDesc": "As variáveis SUPABASE_URL e SUPABASE_ANON_KEY não foram definidas neste build. Contacte o suporte técnico.",
   "registadoEm": "Registado em",
   "concluida": "Concluída",
   "agenteImobiliario": "Agente Imobiliário",

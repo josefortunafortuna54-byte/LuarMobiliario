@@ -1700,6 +1700,18 @@ abstract class AppLocalizations {
   /// **'Erro desconhecido'**
   String get erroDesconhecido;
 
+  /// No description provided for @configEmFaltaTitulo.
+  ///
+  /// In pt, this message translates to:
+  /// **'Configuração em falta'**
+  String get configEmFaltaTitulo;
+
+  /// No description provided for @configEmFaltaDesc.
+  ///
+  /// In pt, this message translates to:
+  /// **'As variáveis SUPABASE_URL e SUPABASE_ANON_KEY não foram definidas neste build. Contacte o suporte técnico.'**
+  String get configEmFaltaDesc;
+
   /// No description provided for @registadoEm.
   ///
   /// In pt, this message translates to:

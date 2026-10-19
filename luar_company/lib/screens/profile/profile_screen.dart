@@ -262,6 +262,12 @@ class ProfileScreen extends StatelessWidget {
           title: l10n.meusAnuncios,
           route: AppRoutes.myListings,
         ),
+      if (role == UserRole.admin)
+        _MenuItem(
+          icon: Icons.admin_panel_settings_outlined,
+          title: l10n.admin,
+          route: AppRoutes.adminDashboard,
+        ),
       _MenuItem(
         icon: Icons.favorite_border_rounded,
         title: l10n.favoritos,

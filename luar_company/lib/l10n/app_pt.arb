@@ -610,5 +610,6 @@
   "vendido": "Vendido",
   "arrendado": "Arrendado",
   "historicoDesc": "Os imóveis que consultar ficam guardados aqui.",
-  "renovado": "Renovado"
+  "renovado": "Renovado",
+  "atualizar": "Atualizar"
 }

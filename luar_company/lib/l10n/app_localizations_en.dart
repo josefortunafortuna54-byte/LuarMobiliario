@@ -1929,4 +1929,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get renovado => 'Renewed';
+
+  @override
+  String get atualizar => 'Update';
 }

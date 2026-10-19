@@ -3721,6 +3721,12 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Renovado'**
   String get renovado;
+
+  /// No description provided for @atualizar.
+  ///
+  /// In pt, this message translates to:
+  /// **'Atualizar'**
+  String get atualizar;
 }
 
 class _AppLocalizationsDelegate

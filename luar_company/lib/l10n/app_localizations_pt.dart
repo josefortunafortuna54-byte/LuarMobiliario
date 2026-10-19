@@ -1937,4 +1937,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get renovado => 'Renovado';
+
+  @override
+  String get atualizar => 'Atualizar';
 }

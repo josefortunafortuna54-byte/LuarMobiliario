@@ -610,5 +610,6 @@
   "vendido": "Sold",
   "arrendado": "Rented",
   "historicoDesc": "Properties you view are saved here.",
-  "renovado": "Renewed"
+  "renovado": "Renewed",
+  "atualizar": "Update"
 }

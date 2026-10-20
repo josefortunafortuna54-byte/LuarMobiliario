@@ -3,16 +3,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
 import 'package:luar_company/main.dart' as app;
+import 'package:luar_company/core/config/env_config.dart';
 import 'package:luar_company/core/utils/routes.dart';
+import 'package:luar_company/screens/config_error_screen.dart';
+import 'package:luar_company/screens/home/main_shell.dart';
 import 'package:luar_company/screens/splash/splash_screen.dart';
 import 'package:luar_company/screens/welcome/welcome_screen.dart';
-import 'package:luar_company/screens/home/main_shell.dart';
 import 'package:luar_company/widgets/custom_button.dart';
 
 /// Testes de integração (T-036).
-///
-/// Executar num dispositivo/emulador:
-///   flutter test integration_test -d {device}
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -20,6 +19,11 @@ void main() {
     await app.main();
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
+
+    if (!EnvConfig.isConfigured) {
+      expect(find.byType(ConfigErrorScreen), findsOneWidget);
+      return;
+    }
 
     expect(find.byType(SplashScreen), findsOneWidget);
   });
@@ -31,9 +35,13 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
 
+      if (!EnvConfig.isConfigured) {
+        expect(find.byType(ConfigErrorScreen), findsOneWidget);
+        return;
+      }
+
       expect(find.byType(SplashScreen), findsOneWidget);
 
-      // SplashScreen aguarda ~2s antes de navegar (sem rede nesta fase).
       await tester.runAsync(
         () => Future<void>.delayed(const Duration(seconds: 2)),
       );
@@ -44,7 +52,6 @@ void main() {
       expect(find.byType(WelcomeScreen), findsOneWidget);
       expect(find.byType(MainShell), findsNothing);
 
-      // CTA "Explorar Imóveis" (busca por tipo para não depender do idioma).
       await tester.tap(find.byType(CustomButton).first);
       await tester.pump(const Duration(milliseconds: 450));
       await tester.pump(const Duration(milliseconds: 450));

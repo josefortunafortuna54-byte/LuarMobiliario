@@ -51,3 +51,11 @@ enabled = false
 [functions.send-notification]
 enabled = true
 verify_jwt = true
+
+# Seed de demonstração (imóveis + terrenos + vídeos). Aplicável com:
+#   supabase db push --include-seed   (remoto ligado)
+#   supabase db reset --include-seed  (local)
+# Ordem importa: primeiro as fotos (seed_demo.sql), depois os vídeos.
+# Ambos são idempotentes e só tocam nos anúncios d0000001-*/d0000002-*.
+[db.seed]
+sql_paths = ["./seed_demo.sql", "./seed_demo_videos.sql"]

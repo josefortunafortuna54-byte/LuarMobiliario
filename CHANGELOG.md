@@ -11,6 +11,23 @@ e este projeto adota o [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Seed de demonstração** (`luar_company/supabase/seed_demo.sql` +
+  `seed_demo_videos.sql`): 12 imóveis (casas, apartamentos, escritório, loja,
+  armazém e condomínio) e 7 terrenos (urbano, agrícola, lote, industrial,
+  quinta, comercial e renda), com fotos reais verificadas (Unsplash),
+  18 vídeos MP4 720p de licença livre (Mixkit — 1 vídeo em 11 imóveis e em
+  todos os terrenos; a loja fica só com fotos), preços em AOA e localizações
+  em Luanda, Benguela, Huambo, Huíla e Kwanza Sul. Cinco anúncios ficam em
+  destaque (carrossel da Home), todos com `is_available = true`. Os scripts
+  são idempotentes (UUIDs fixos `d0000001-…`/`d0000002-…` e limpeza prévia
+  desses mesmos anúncios), não tocam em dados reais e podem ser revertidos
+  com os `DELETE` indicados nos cabeçalhos. Já aplicados ao projeto de
+  produção via `supabase db push --include-seed` (o `config.toml` passou a
+  declarar `[db.seed] sql_paths`, também útil no `db reset` local). Nota: os
+  statements são individuais (sem temp tables/`BEGIN`) por compatibilidade
+  com o executor de seed do CLI; e o CLI v2.72.7 só reaplica um seed cujo
+  hash mudou se o caminho do ficheiro mudar (daí os vídeos viverem num
+  ficheiro companheiro, aplicado como novo).
 - **Menu Admin no perfil**: acesso direto ao painel de gestão para
   administradores e agentes (a entrada não aparece a clientes).
 

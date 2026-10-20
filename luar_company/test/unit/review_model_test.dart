@@ -47,10 +47,7 @@ void main() {
       expect(model.userName, '');
       expect(model.rating, 0);
       expect(model.comment, '');
-      expect(
-        model.createdAt,
-        DateTime.fromMillisecondsSinceEpoch(0),
-      );
+      expect(model.createdAt, DateTime.fromMillisecondsSinceEpoch(0));
     });
 
     test('toJson e fromJson são consistentes', () {

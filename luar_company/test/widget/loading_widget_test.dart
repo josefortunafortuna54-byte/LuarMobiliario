@@ -56,9 +56,7 @@ void main() {
 
   group('PropertyCardShimmer', () {
     testWidgets('renders vertical variant by default', (tester) async {
-      await tester.pumpWidget(
-        wrapInApp(const PropertyCardShimmer()),
-      );
+      await tester.pumpWidget(wrapInApp(const PropertyCardShimmer()));
 
       expect(find.byType(PropertyCardShimmer), findsOneWidget);
       expect(find.byType(ShimmerLoading), findsWidgets);

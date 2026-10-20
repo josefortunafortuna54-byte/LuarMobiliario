@@ -1,4 +1,10 @@
-enum PartnerBusinessType { imobiliaria, construtora, corretor, administrador, outro }
+enum PartnerBusinessType {
+  imobiliaria,
+  construtora,
+  corretor,
+  administrador,
+  outro,
+}
 
 PartnerBusinessType _businessTypeFromString(String value) {
   return PartnerBusinessType.values.firstWhere(

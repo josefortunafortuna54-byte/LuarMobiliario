@@ -21,8 +21,8 @@ class ThemeProvider extends ChangeNotifier {
   };
 
   bool get isDarkMode {
-    final brightness = WidgetsBinding
-        .instance.platformDispatcher.platformBrightness;
+    final brightness =
+        WidgetsBinding.instance.platformDispatcher.platformBrightness;
     return switch (_preference) {
       ThemePreference.light => false,
       ThemePreference.dark => true,
@@ -59,6 +59,8 @@ class ThemeProvider extends ChangeNotifier {
   }
 
   Future<void> toggleTheme() async {
-    await setPreference(isDarkMode ? ThemePreference.light : ThemePreference.dark);
+    await setPreference(
+      isDarkMode ? ThemePreference.light : ThemePreference.dark,
+    );
   }
 }

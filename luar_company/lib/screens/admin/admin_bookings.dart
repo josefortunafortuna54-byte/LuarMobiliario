@@ -50,17 +50,16 @@ class _AdminBookingsScreenState extends State<AdminBookingsScreen> {
     return l10n.imovelCurto(short.isEmpty ? l10n.naoInformado : short);
   }
 
-  Future<void> _updateStatus(
-    BookingModel booking,
-    BookingStatus status,
-  ) async {
+  Future<void> _updateStatus(BookingModel booking, BookingStatus status) async {
     final l10n = AppLocalizations.of(context);
     final provider = context.read<BookingProvider>();
     final ok = await provider.updateBookingStatus(booking.id, status);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(ok ? l10n.agendamentoAtualizado : l10n.erroAtualizarDados),
+        content: Text(
+          ok ? l10n.agendamentoAtualizado : l10n.erroAtualizarDados,
+        ),
         backgroundColor: ok ? AppColors.success : AppColors.error,
       ),
     );
@@ -324,10 +323,7 @@ class _AdminBookingsScreenState extends State<AdminBookingsScreen> {
           children: [
             Icon(icon, size: 16, color: color),
             const SizedBox(width: 6),
-            Text(
-              label,
-              style: AppTextStyles.labelSmall.copyWith(color: color),
-            ),
+            Text(label, style: AppTextStyles.labelSmall.copyWith(color: color)),
           ],
         ),
       ),

@@ -8,7 +8,9 @@ void main() {
   group('FeatureChip', () {
     testWidgets('renders label text', (tester) async {
       await tester.pumpWidget(
-        testApp(home: Scaffold(body: FeatureChip(label: 'Piscina'))),
+        testApp(
+          home: Scaffold(body: FeatureChip(label: 'Piscina')),
+        ),
       );
 
       expect(find.text('Piscina'), findsOneWidget);
@@ -28,7 +30,9 @@ void main() {
 
     testWidgets('does not render icon when not provided', (tester) async {
       await tester.pumpWidget(
-        testApp(home: Scaffold(body: FeatureChip(label: 'Varanda'))),
+        testApp(
+          home: Scaffold(body: FeatureChip(label: 'Varanda')),
+        ),
       );
 
       expect(find.byIcon(Icons.garage_outlined), findsNothing);

@@ -9,13 +9,19 @@ abstract final class ErrorMapper {
   /// Mapeia exceções para uma [Failure] amigável ao utilizador.
   static Failure map(Object error, [StackTrace? stackTrace]) {
     if (error is AuthException) {
-      return AuthFailure(error.message.isEmpty ? 'Erro de autenticação' : error.message);
+      return AuthFailure(
+        error.message.isEmpty ? 'Erro de autenticação' : error.message,
+      );
     }
     if (error is PostgrestException) {
-      return ServerFailure(error.message.isEmpty ? 'Erro no servidor' : error.message);
+      return ServerFailure(
+        error.message.isEmpty ? 'Erro no servidor' : error.message,
+      );
     }
     if (error is StorageException) {
-      return StorageFailure(error.message.isEmpty ? 'Erro ao armazenar ficheiro' : error.message);
+      return StorageFailure(
+        error.message.isEmpty ? 'Erro ao armazenar ficheiro' : error.message,
+      );
     }
     if (error is FormatException) {
       return const ValidationFailure('Dados inválidos');

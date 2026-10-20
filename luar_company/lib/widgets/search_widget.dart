@@ -72,7 +72,9 @@ class _SearchWidgetState extends State<SearchWidget> {
   Widget build(BuildContext context) {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
-    final hintText = widget.hintText.isEmpty ? l10n.pesquisarImoveis : widget.hintText;
+    final hintText = widget.hintText.isEmpty
+        ? l10n.pesquisarImoveis
+        : widget.hintText;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeInOut,

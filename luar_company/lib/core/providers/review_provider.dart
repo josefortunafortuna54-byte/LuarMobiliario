@@ -26,9 +26,9 @@ class ReviewProvider extends ChangeNotifier {
 
   /// Pré-carrega as contagens dos imóveis do feed (só as que faltam).
   Future<void> loadCounts(List<String> propertyIds) async {
-    final missing =
-        propertyIds.where((id) => id.isNotEmpty && !_counts.containsKey(id))
-            .toList();
+    final missing = propertyIds
+        .where((id) => id.isNotEmpty && !_counts.containsKey(id))
+        .toList();
     if (missing.isEmpty) return;
 
     try {

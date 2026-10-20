@@ -59,9 +59,8 @@ class ReportModel {
     return ReportModel(
       id: json['id'] as String? ?? '',
       reporterId: json['reporter_id'] as String? ?? '',
-      reporterName: (json['reporter'] as Map<String, dynamic>?)?['name']
-              as String? ??
-          '',
+      reporterName:
+          (json['reporter'] as Map<String, dynamic>?)?['name'] as String? ?? '',
       targetType: ReportTarget.fromString(json['target_type'] as String?),
       targetId: json['target_id'] as String? ?? '',
       reason: json['reason'] as String? ?? '',

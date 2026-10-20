@@ -51,8 +51,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
   Widget build(BuildContext context) {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
-    final isAdmin =
-        context.read<AuthProvider>().user?.role == UserRole.admin;
+    final isAdmin = context.read<AuthProvider>().user?.role == UserRole.admin;
 
     return Scaffold(
       backgroundColor: palette.background,
@@ -142,17 +141,26 @@ class _AdminDashboardState extends State<AdminDashboard> {
           Positioned(
             top: -48,
             right: -36,
-            child: _decorationCircle(140, AppColors.gold.withValues(alpha: 0.10)),
+            child: _decorationCircle(
+              140,
+              AppColors.gold.withValues(alpha: 0.10),
+            ),
           ),
           Positioned(
             top: 42,
             right: 84,
-            child: _decorationCircle(56, AppColors.white.withValues(alpha: 0.06)),
+            child: _decorationCircle(
+              56,
+              AppColors.white.withValues(alpha: 0.06),
+            ),
           ),
           Positioned(
             top: -32,
             left: -44,
-            child: _decorationCircle(120, AppColors.white.withValues(alpha: 0.05)),
+            child: _decorationCircle(
+              120,
+              AppColors.white.withValues(alpha: 0.05),
+            ),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 28, 24, 30),
@@ -262,10 +270,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: AppTextStyles.h6.copyWith(color: palette.textTitle),
-        ),
+        Text(title, style: AppTextStyles.h6.copyWith(color: palette.textTitle)),
         const SizedBox(height: 8),
         Container(
           width: 32,
@@ -447,9 +452,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         const SizedBox(width: 12),
         Text(
           l10n.carregandoAnalise,
-          style: AppTextStyles.bodySmall.copyWith(
-            color: palette.textSecondary,
-          ),
+          style: AppTextStyles.bodySmall.copyWith(color: palette.textSecondary),
         ),
       ],
     );
@@ -536,9 +539,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         const SizedBox(height: 18),
         Text(
           l10n.porTipo,
-          style: AppTextStyles.bodySmallBold.copyWith(
-            color: palette.textTitle,
-          ),
+          style: AppTextStyles.bodySmallBold.copyWith(color: palette.textTitle),
         ),
         const SizedBox(height: 8),
         Wrap(
@@ -556,9 +557,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         const SizedBox(height: 18),
         Text(
           l10n.maisVistos,
-          style: AppTextStyles.bodySmallBold.copyWith(
-            color: palette.textTitle,
-          ),
+          style: AppTextStyles.bodySmallBold.copyWith(color: palette.textTitle),
         ),
         const SizedBox(height: 10),
         if (analytics.topViewed.isEmpty)
@@ -569,9 +568,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             ),
           )
         else
-          ...analytics.topViewed.take(5).toList().asMap().entries.map((
-            entry,
-          ) {
+          ...analytics.topViewed.take(5).toList().asMap().entries.map((entry) {
             final rank = entry.key + 1;
             final item = entry.value;
             final isTopRank = rank <= 3;
@@ -585,9 +582,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: isTopRank
-                          ? AppColors.gold
-                          : palette.surfaceAlt,
+                      color: isTopRank ? AppColors.gold : palette.surfaceAlt,
                       border: isTopRank
                           ? null
                           : Border.all(color: palette.border),
@@ -714,9 +709,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       case 'farm':
         return l10n.fazenda;
       default:
-        return type.isEmpty
-            ? type
-            : type[0].toUpperCase() + type.substring(1);
+        return type.isEmpty ? type : type[0].toUpperCase() + type.substring(1);
     }
   }
 

@@ -43,9 +43,7 @@ void main() {
     });
 
     testWidgets('shows clear button when text is entered', (tester) async {
-      await tester.pumpWidget(
-        wrapInApp(SearchWidget(onSearch: (v) {})),
-      );
+      await tester.pumpWidget(wrapInApp(SearchWidget(onSearch: (v) {})));
 
       expect(find.byIcon(Icons.close_rounded), findsNothing);
 
@@ -55,8 +53,9 @@ void main() {
       expect(find.byIcon(Icons.close_rounded), findsOneWidget);
     });
 
-    testWidgets('clear button clears text and calls onSearch with empty',
-        (tester) async {
+    testWidgets('clear button clears text and calls onSearch with empty', (
+      tester,
+    ) async {
       String? submitted;
 
       await tester.pumpWidget(
@@ -73,14 +72,13 @@ void main() {
       expect(find.text('texto'), findsNothing);
     });
 
-    testWidgets('shows filter (tune) button when onFilterTap is provided',
-        (tester) async {
+    testWidgets('shows filter (tune) button when onFilterTap is provided', (
+      tester,
+    ) async {
       var filterTapped = false;
 
       await tester.pumpWidget(
-        wrapInApp(
-          SearchWidget(onFilterTap: () => filterTapped = true),
-        ),
+        wrapInApp(SearchWidget(onFilterTap: () => filterTapped = true)),
       );
 
       expect(find.byIcon(Icons.tune_rounded), findsOneWidget);
@@ -89,8 +87,9 @@ void main() {
       expect(filterTapped, isTrue);
     });
 
-    testWidgets('does not show filter button when onFilterTap is null',
-        (tester) async {
+    testWidgets('does not show filter button when onFilterTap is null', (
+      tester,
+    ) async {
       await tester.pumpWidget(wrapInApp(const SearchWidget()));
 
       expect(find.byIcon(Icons.tune_rounded), findsNothing);
@@ -99,9 +98,7 @@ void main() {
     testWidgets('respects external controller', (tester) async {
       final controller = TextEditingController(text: 'Kilamba');
 
-      await tester.pumpWidget(
-        wrapInApp(SearchWidget(controller: controller)),
-      );
+      await tester.pumpWidget(wrapInApp(SearchWidget(controller: controller)));
 
       expect(find.text('Kilamba'), findsOneWidget);
 

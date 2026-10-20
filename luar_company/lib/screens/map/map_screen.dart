@@ -52,11 +52,7 @@ class _MapPin {
 /// pesquisa no topo, pins (com clusters) no mapa, cartão do anúncio no fundo
 /// e botão para recentrar a vista.
 class MapScreen extends StatefulWidget {
-  const MapScreen({
-    super.key,
-    this.propertyRepository,
-    this.landRepository,
-  });
+  const MapScreen({super.key, this.propertyRepository, this.landRepository});
 
   /// Repositórios opcionais para injeção em testes.
   final PropertyRepository? propertyRepository;
@@ -280,9 +276,7 @@ class _MapScreenState extends State<MapScreen> {
                 userAgentPackageName: 'com.luarcompany.luar_company',
               ),
               MarkerClusterLayerWidget(options: _clusterOptions()),
-              const SimpleAttributionWidget(
-                source: Text('© OpenStreetMap'),
-              ),
+              const SimpleAttributionWidget(source: Text('© OpenStreetMap')),
             ],
           ),
           SafeArea(
@@ -302,8 +296,7 @@ class _MapScreenState extends State<MapScreen> {
               ),
             ),
           ),
-          if (!_isLoading && _visible.isEmpty)
-            _buildEmptyBanner(l10n, palette),
+          if (!_isLoading && _visible.isEmpty) _buildEmptyBanner(l10n, palette),
           Positioned(
             right: 14,
             bottom: _selected != null ? 210 : 24,
@@ -321,7 +314,9 @@ class _MapScreenState extends State<MapScreen> {
               child: _buildPinCard(_selected!, palette),
             ),
           if (_isLoading)
-            const Center(child: CircularProgressIndicator(color: AppColors.gold)),
+            const Center(
+              child: CircularProgressIndicator(color: AppColors.gold),
+            ),
         ],
       ),
     );
@@ -473,10 +468,8 @@ class _MapScreenState extends State<MapScreen> {
 
   Widget _buildPinCard(_MapPin pin, AppPalette palette) {
     return GestureDetector(
-      onTap: () => Navigator.of(context).pushNamed(
-        pin.detailRoute,
-        arguments: pin.id,
-      ),
+      onTap: () =>
+          Navigator.of(context).pushNamed(pin.detailRoute, arguments: pin.id),
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
@@ -531,9 +524,7 @@ class _MapScreenState extends State<MapScreen> {
                 children: [
                   Text(
                     formatPrice(pin.price),
-                    style: AppTextStyles.h6.copyWith(
-                      color: palette.textTitle,
-                    ),
+                    style: AppTextStyles.h6.copyWith(color: palette.textTitle),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -600,10 +591,7 @@ class _MapScreenState extends State<MapScreen> {
                 ],
               ),
             ),
-            Icon(
-              Icons.chevron_right_rounded,
-              color: palette.textMuted,
-            ),
+            Icon(Icons.chevron_right_rounded, color: palette.textMuted),
           ],
         ),
       ),

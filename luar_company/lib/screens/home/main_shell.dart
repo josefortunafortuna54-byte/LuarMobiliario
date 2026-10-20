@@ -47,10 +47,7 @@ class _MainShellState extends State<MainShell> {
   Widget _screenFor(int index) {
     switch (index) {
       case 0:
-        return DiscoverScreen(
-          isActive: _index == 0,
-          onSelectTab: _select,
-        );
+        return DiscoverScreen(isActive: _index == 0, onSelectTab: _select);
       case 1:
         return const SearchScreen();
       case 2:

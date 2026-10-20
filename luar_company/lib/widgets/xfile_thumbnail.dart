@@ -23,10 +23,7 @@ class XFileThumbnail extends StatelessWidget {
           return Container(
             color: palette.surfaceAlt,
             alignment: Alignment.center,
-            child: Icon(
-              Icons.broken_image_outlined,
-              color: palette.textMuted,
-            ),
+            child: Icon(Icons.broken_image_outlined, color: palette.textMuted),
           );
         }
         return Container(

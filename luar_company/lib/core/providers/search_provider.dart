@@ -397,10 +397,10 @@ class SearchProvider extends ChangeNotifier {
     );
     final landSlice = slicePage(lands, _pageSize);
 
-    return PageSlice(
-      [...propertySlice.items, ...landSlice.items],
-      propertySlice.hasMore || landSlice.hasMore,
-    );
+    return PageSlice([
+      ...propertySlice.items,
+      ...landSlice.items,
+    ], propertySlice.hasMore || landSlice.hasMore);
   }
 
   List<PropertyModel> get propertyResults {

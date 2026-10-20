@@ -34,13 +34,22 @@ void main() {
   group('PartnerBusinessType', () {
     test('has five values', () {
       expect(PartnerBusinessType.values.length, 5);
-      expect(PartnerBusinessType.values,
-          contains(PartnerBusinessType.imobiliaria));
       expect(
-          PartnerBusinessType.values, contains(PartnerBusinessType.construtora));
-      expect(PartnerBusinessType.values, contains(PartnerBusinessType.corretor));
-      expect(PartnerBusinessType.values,
-          contains(PartnerBusinessType.administrador));
+        PartnerBusinessType.values,
+        contains(PartnerBusinessType.imobiliaria),
+      );
+      expect(
+        PartnerBusinessType.values,
+        contains(PartnerBusinessType.construtora),
+      );
+      expect(
+        PartnerBusinessType.values,
+        contains(PartnerBusinessType.corretor),
+      );
+      expect(
+        PartnerBusinessType.values,
+        contains(PartnerBusinessType.administrador),
+      );
       expect(PartnerBusinessType.values, contains(PartnerBusinessType.outro));
     });
   });

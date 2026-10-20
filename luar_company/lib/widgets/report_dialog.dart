@@ -20,11 +20,9 @@ Future<void> showReportDialog(
 
   if (!isAuthenticated) {
     final l10n = AppLocalizations.of(context);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(l10n.reportarRequerLogin),
-      ),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(l10n.reportarRequerLogin)));
     return Future.value();
   }
 
@@ -184,7 +182,9 @@ class _ReportSheetState extends State<_ReportSheet> {
                       label,
                       style: AppTextStyles.bodySmall.copyWith(
                         color: selected ? AppColors.error : palette.textBody,
-                        fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                        fontWeight: selected
+                            ? FontWeight.w600
+                            : FontWeight.w400,
                       ),
                     ),
                   ),

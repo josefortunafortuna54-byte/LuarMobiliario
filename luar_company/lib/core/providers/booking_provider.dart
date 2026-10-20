@@ -76,16 +76,17 @@ class BookingProvider extends ChangeNotifier {
   ) async {
     final allIndex = _allBookings.indexWhere((b) => b.id == bookingId);
     final index = _bookings.indexWhere((b) => b.id == bookingId);
-    final previous =
-        allIndex != -1
-            ? _allBookings[allIndex]
-            : (index != -1 ? _bookings[index] : null);
+    final previous = allIndex != -1
+        ? _allBookings[allIndex]
+        : (index != -1 ? _bookings[index] : null);
 
     try {
       await _repository.updateStatus(bookingId, status);
 
       if (allIndex != -1) {
-        _allBookings[allIndex] = _allBookings[allIndex].copyWith(status: status);
+        _allBookings[allIndex] = _allBookings[allIndex].copyWith(
+          status: status,
+        );
       }
       if (index != -1) {
         _bookings[index] = _bookings[index].copyWith(status: status);
@@ -100,12 +101,10 @@ class BookingProvider extends ChangeNotifier {
         NotificationService().sendNotification(
           userId: previous.userId!,
           title: 'Reserva confirmada',
-          body:
-              'A sua visita a "${previous.propertyTitle}" foi confirmada.',
-          route:
-              previous.isLand
-                  ? '/lands/${previous.landId}'
-                  : '/properties/${previous.propertyId}',
+          body: 'A sua visita a "${previous.propertyTitle}" foi confirmada.',
+          route: previous.isLand
+              ? '/lands/${previous.landId}'
+              : '/properties/${previous.propertyId}',
           category: NotificationCategory.bookings,
         );
       }

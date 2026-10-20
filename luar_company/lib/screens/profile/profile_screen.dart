@@ -252,8 +252,7 @@ class ProfileScreen extends StatelessWidget {
   }) {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
-    final canManageListings =
-        role == UserRole.agent || role == UserRole.admin;
+    final canManageListings = role == UserRole.agent || role == UserRole.admin;
 
     final menuItems = [
       if (canManageListings)
@@ -540,7 +539,9 @@ class _ProfileStatsState extends State<_ProfileStats> {
             Container(width: 1, height: 44, color: palette.border),
             Expanded(
               child: _StatItem(
-                value: _followers == null ? null : _formatFollowers(_followers!),
+                value: _followers == null
+                    ? null
+                    : _formatFollowers(_followers!),
                 label: l10n.seguidores,
               ),
             ),

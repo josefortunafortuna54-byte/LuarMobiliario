@@ -209,13 +209,25 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
       return _buildRoute(const AdminReportsScreen(), settings);
 
     case AppRoutes.chat:
-      return _buildRoute(const ChatScreen(), settings, arguments: settings.arguments);
+      return _buildRoute(
+        const ChatScreen(),
+        settings,
+        arguments: settings.arguments,
+      );
 
     case AppRoutes.propertyForm:
-      return _buildRoute(const PropertyFormScreen(), settings, arguments: settings.arguments);
+      return _buildRoute(
+        const PropertyFormScreen(),
+        settings,
+        arguments: settings.arguments,
+      );
 
     case AppRoutes.landForm:
-      return _buildRoute(const LandFormScreen(), settings, arguments: settings.arguments);
+      return _buildRoute(
+        const LandFormScreen(),
+        settings,
+        arguments: settings.arguments,
+      );
 
     case AppRoutes.editProfile:
       return _buildRoute(const EditProfileScreen(), settings);

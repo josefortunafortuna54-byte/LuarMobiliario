@@ -42,7 +42,8 @@ class ComparisonProvider extends ChangeNotifier {
   ///
   /// Retorna `true` se foi adicionado com sucesso, `false` se já estava na
   /// lista ou se o limite foi atingido.
-  bool add(PropertyModel property) => _add(ComparisonEntry.fromProperty(property));
+  bool add(PropertyModel property) =>
+      _add(ComparisonEntry.fromProperty(property));
 
   /// Adiciona um terreno à lista de comparação.
   bool addLand(LandModel land) => _add(ComparisonEntry.fromLand(land));

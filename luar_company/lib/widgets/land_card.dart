@@ -90,29 +90,29 @@ class LandCard extends StatelessWidget {
     final palette = context.palette;
     return RepaintBoundary(
       child: GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 132,
-        decoration: BoxDecoration(
-          color: palette.surface,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.navy.withValues(alpha: 0.08),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Row(
-          children: [
-            SizedBox(width: 132, child: _buildImage(context, height: 132)),
-            Expanded(child: _buildHorizontalContent(context)),
-          ],
+        onTap: onTap,
+        child: Container(
+          height: 132,
+          decoration: BoxDecoration(
+            color: palette.surface,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.navy.withValues(alpha: 0.08),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Row(
+            children: [
+              SizedBox(width: 132, child: _buildImage(context, height: 132)),
+              Expanded(child: _buildHorizontalContent(context)),
+            ],
+          ),
         ),
       ),
-    ),
     );
   }
 

@@ -168,34 +168,44 @@ void main() {
       expect(provider.error, 'rating_invalid');
     });
 
-    test('submit devolve false e grava erro quando o repositório falha', () async {
-      final provider = ReviewProvider(
-        repository: _FakeReviewRepository(throwOnUpsert: true),
-      );
+    test(
+      'submit devolve false e grava erro quando o repositório falha',
+      () async {
+        final provider = ReviewProvider(
+          repository: _FakeReviewRepository(throwOnUpsert: true),
+        );
 
-      final ok = await provider.submit(
-        propertyId: 'p1',
-        userId: 'u1',
-        rating: 4,
-      );
+        final ok = await provider.submit(
+          propertyId: 'p1',
+          userId: 'u1',
+          rating: 4,
+        );
 
-      expect(ok, isFalse);
-      expect(provider.error, contains('falha'));
-    });
+        expect(ok, isFalse);
+        expect(provider.error, contains('falha'));
+      },
+    );
 
-    test('hasUserReviewed e reviewByUser detetam a avaliação do utilizador', () async {
-      final repo = _FakeReviewRepository(reviews: [_review('r1', userId: 'u1')]);
-      final provider = ReviewProvider(repository: repo);
-      await provider.load('p1');
+    test(
+      'hasUserReviewed e reviewByUser detetam a avaliação do utilizador',
+      () async {
+        final repo = _FakeReviewRepository(
+          reviews: [_review('r1', userId: 'u1')],
+        );
+        final provider = ReviewProvider(repository: repo);
+        await provider.load('p1');
 
-      expect(provider.hasUserReviewed('u1'), isTrue);
-      expect(provider.hasUserReviewed('u2'), isFalse);
-      expect(provider.reviewByUser('u1')?.id, 'r1');
-      expect(provider.reviewByUser('u2'), isNull);
-    });
+        expect(provider.hasUserReviewed('u1'), isTrue);
+        expect(provider.hasUserReviewed('u2'), isFalse);
+        expect(provider.reviewByUser('u1')?.id, 'r1');
+        expect(provider.reviewByUser('u2'), isNull);
+      },
+    );
 
     test('remove retira a avaliação e devolve true', () async {
-      final repo = _FakeReviewRepository(reviews: [_review('r1', userId: 'u1')]);
+      final repo = _FakeReviewRepository(
+        reviews: [_review('r1', userId: 'u1')],
+      );
       final provider = ReviewProvider(repository: repo);
       await provider.load('p1');
 
@@ -222,13 +232,16 @@ void main() {
       expect(provider.reviews.length, 1);
     });
 
-    test('remove devolve false quando o utilizador não tem avaliação', () async {
-      final provider = ReviewProvider(repository: _FakeReviewRepository());
+    test(
+      'remove devolve false quando o utilizador não tem avaliação',
+      () async {
+        final provider = ReviewProvider(repository: _FakeReviewRepository());
 
-      final ok = await provider.remove('u9');
+        final ok = await provider.remove('u9');
 
-      expect(ok, isFalse);
-    });
+        expect(ok, isFalse);
+      },
+    );
   });
 }
 

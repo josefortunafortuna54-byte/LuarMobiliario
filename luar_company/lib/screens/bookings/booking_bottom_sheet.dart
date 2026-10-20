@@ -417,9 +417,7 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
             icon: const Icon(Icons.chat_bubble_outline, size: 20),
             label: Text(
               l10n.falarWhatsapp,
-              style: AppTextStyles.buttonLarge.copyWith(
-                color: AppColors.white,
-              ),
+              style: AppTextStyles.buttonLarge.copyWith(color: AppColors.white),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.whatsapp,
@@ -437,9 +435,7 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
           onPressed: () => Navigator.pop(context),
           child: Text(
             l10n.concluir,
-            style: AppTextStyles.buttonMedium.copyWith(
-              color: palette.textBody,
-            ),
+            style: AppTextStyles.buttonMedium.copyWith(color: palette.textBody),
           ),
         ),
       ],

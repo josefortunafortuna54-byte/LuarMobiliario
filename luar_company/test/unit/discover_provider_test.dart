@@ -34,10 +34,7 @@ PropertyModel _property(String id) {
 }
 
 class _FakePropertyRepository extends PropertyRepository {
-  _FakePropertyRepository({
-    this.pages = const [],
-    this.throwOnFetch = false,
-  });
+  _FakePropertyRepository({this.pages = const [], this.throwOnFetch = false});
 
   final List<List<PropertyModel>> pages;
   final bool throwOnFetch;
@@ -93,21 +90,23 @@ void main() {
       expect(provider.hasMore, isFalse);
     });
 
-    test('load sinaliza hasMore falso quando a página é exatamente cheia',
-        () async {
-      final exactPage = List.generate(
-        AppConstants.defaultPageSize,
-        (i) => _property('$i'),
-      );
-      final provider = DiscoverProvider(
-        repository: _FakePropertyRepository(pages: [exactPage]),
-      );
+    test(
+      'load sinaliza hasMore falso quando a página é exatamente cheia',
+      () async {
+        final exactPage = List.generate(
+          AppConstants.defaultPageSize,
+          (i) => _property('$i'),
+        );
+        final provider = DiscoverProvider(
+          repository: _FakePropertyRepository(pages: [exactPage]),
+        );
 
-      await provider.load();
+        await provider.load();
 
-      expect(provider.items.length, AppConstants.defaultPageSize);
-      expect(provider.hasMore, isFalse);
-    });
+        expect(provider.items.length, AppConstants.defaultPageSize);
+        expect(provider.hasMore, isFalse);
+      },
+    );
 
     test('load define error quando o repositório falha', () async {
       final provider = DiscoverProvider(

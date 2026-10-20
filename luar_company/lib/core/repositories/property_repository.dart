@@ -9,16 +9,23 @@ class PropertyRepository {
   SupabaseClient get _client => SupabaseService.client;
 
   List<PropertyModel> _mapResponse(List<dynamic> response) {
-    return response.map((e) => _mapRow(Map<String, dynamic>.from(e as Map))).toList();
+    return response
+        .map((e) => _mapRow(Map<String, dynamic>.from(e as Map)))
+        .toList();
   }
 
   PropertyModel _mapRow(Map<String, dynamic> json) {
-    final images = extractMediaUrls(json.remove('property_images'), 'image_url');
-    final videos = extractMediaUrls(json.remove('property_videos'), 'video_url');
-    return PropertyModel.fromJson(json).copyWith(
-      images: images,
-      videos: videos,
+    final images = extractMediaUrls(
+      json.remove('property_images'),
+      'image_url',
     );
+    final videos = extractMediaUrls(
+      json.remove('property_videos'),
+      'video_url',
+    );
+    return PropertyModel.fromJson(
+      json,
+    ).copyWith(images: images, videos: videos);
   }
 
   PostgrestFilterBuilder<dynamic> _applyFilters(
@@ -89,9 +96,7 @@ class PropertyRepository {
           .select('*, property_images(image_url), property_videos(video_url)')
           .eq('is_available', true),
       filters,
-    )
-        .order('created_at', ascending: false)
-        .range(from, to);
+    ).order('created_at', ascending: false).range(from, to);
 
     return _mapResponse(response as List);
   }
@@ -173,7 +178,10 @@ class PropertyRepository {
 
     await _client.from('properties').update(data).eq('id', property.id);
 
-    await _client.from('property_images').delete().eq('property_id', property.id);
+    await _client
+        .from('property_images')
+        .delete()
+        .eq('property_id', property.id);
     if (imageUrls.isNotEmpty) {
       final imageRecords = imageUrls
           .map((url) => {'property_id': property.id, 'image_url': url})
@@ -181,7 +189,10 @@ class PropertyRepository {
       await _client.from('property_images').insert(imageRecords);
     }
 
-    await _client.from('property_videos').delete().eq('property_id', property.id);
+    await _client
+        .from('property_videos')
+        .delete()
+        .eq('property_id', property.id);
     if (videoUrls.isNotEmpty) {
       final videoRecords = videoUrls
           .map((url) => {'property_id': property.id, 'video_url': url})

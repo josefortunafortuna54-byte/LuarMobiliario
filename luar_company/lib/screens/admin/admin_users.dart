@@ -689,7 +689,9 @@ class _UserDetailSheetState extends State<_UserDetailSheet> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(success ? l10n.verificacaoAlterada : l10n.erroVerificacao),
+        content: Text(
+          success ? l10n.verificacaoAlterada : l10n.erroVerificacao,
+        ),
         backgroundColor: success ? AppColors.success : AppColors.error,
       ),
     );

@@ -128,10 +128,9 @@ class ReportProvider extends ChangeNotifier {
             title: 'Anúncio ocultado',
             body:
                 'O seu anúncio foi ocultado dos resultados após revisão da moderação.',
-            route:
-                targetType == ReportTarget.land
-                    ? '/lands/$targetId'
-                    : '/properties/$targetId',
+            route: targetType == ReportTarget.land
+                ? '/lands/$targetId'
+                : '/properties/$targetId',
             category: NotificationCategory.listings,
           );
         }

@@ -49,8 +49,10 @@ void main() {
     });
 
     test('devolve lista vazia quando a chave não existe', () {
-      expect(popMediaUrls(<String, dynamic>{'title': 'Casa'}, 'videos'),
-          isEmpty);
+      expect(
+        popMediaUrls(<String, dynamic>{'title': 'Casa'}, 'videos'),
+        isEmpty,
+      );
     });
   });
 }

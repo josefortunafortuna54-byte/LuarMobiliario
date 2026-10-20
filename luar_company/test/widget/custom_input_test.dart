@@ -83,8 +83,9 @@ void main() {
       expect(field.enabled, isFalse);
     });
 
-    testWidgets('uses initialValue when provided without controller',
-        (tester) async {
+    testWidgets('uses initialValue when provided without controller', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         wrapInApp(const CustomInput(initialValue: 'Pré-preenchido')),
       );

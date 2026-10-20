@@ -49,19 +49,25 @@ const List<AppCategory> landCategories = [
 ];
 
 /// Chaves de filtro de imóveis, incluindo a pseudo-categoria "Todos" ('').
-List<String> get propertyFilterKeys =>
-    ['', ...propertyCategories.map((c) => c.key)];
+List<String> get propertyFilterKeys => [
+  '',
+  ...propertyCategories.map((c) => c.key),
+];
 
 /// Chaves de filtro de terrenos, incluindo a pseudo-categoria "Todos" ('').
 List<String> get landFilterKeys => ['', ...landCategories.map((c) => c.key)];
 
 /// Etiquetas de filtro de imóveis (índice 0 = "Todos").
-List<String> propertyFilterLabels(AppLocalizations l10n) =>
-    [l10n.todos, ...propertyCategories.map((c) => propertyCategoryLabel(c.key, l10n))];
+List<String> propertyFilterLabels(AppLocalizations l10n) => [
+  l10n.todos,
+  ...propertyCategories.map((c) => propertyCategoryLabel(c.key, l10n)),
+];
 
 /// Etiquetas de filtro de terrenos (índice 0 = "Todos").
-List<String> landFilterLabels(AppLocalizations l10n) =>
-    [l10n.todos, ...landCategories.map((c) => landCategoryLabel(c.key, l10n))];
+List<String> landFilterLabels(AppLocalizations l10n) => [
+  l10n.todos,
+  ...landCategories.map((c) => landCategoryLabel(c.key, l10n)),
+];
 
 String propertyCategoryLabel(String key, AppLocalizations l10n) =>
     switch (key) {

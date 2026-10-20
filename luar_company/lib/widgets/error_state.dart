@@ -34,12 +34,18 @@ class ErrorState extends StatelessWidget {
                 color: AppColors.error.withValues(alpha: 0.12),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.error_outline_rounded, size: 36, color: AppColors.error),
+              child: const Icon(
+                Icons.error_outline_rounded,
+                size: 36,
+                color: AppColors.error,
+              ),
             ),
             const SizedBox(height: 16),
             Text(
               l10n.erro,
-              style: AppTextStyles.h3.copyWith(color: context.palette.textTitle),
+              style: AppTextStyles.h3.copyWith(
+                color: context.palette.textTitle,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),

@@ -65,7 +65,10 @@ void main() {
     });
 
     test('retorna (adminProperties) para rota estática válida', () {
-      expect(AppRoutes.parse('/admin/properties')!.name, AppRoutes.adminProperties);
+      expect(
+        AppRoutes.parse('/admin/properties')!.name,
+        AppRoutes.adminProperties,
+      );
     });
 
     test('retorna (propertyDetail) com id válido', () {

@@ -7,7 +7,7 @@ class AdminRepository {
   SupabaseClient get _client => SupabaseService.client;
 
   Future<({int properties, int lands, int users, int unreadMessages})>
-      fetchStats() async {
+  fetchStats() async {
     final results = await Future.wait([
       _client.from('properties').select('id').eq('is_available', true),
       _client.from('lands').select('id').eq('is_available', true),
@@ -118,17 +118,21 @@ class AdminRepository {
     final viewed = <TopViewedListing>[];
     for (final p in properties) {
       final map = p as Map;
-      viewed.add(TopViewedListing(
-        title: '${map['title']}',
-        views: (map['views'] as num?)?.toInt() ?? 0,
-      ));
+      viewed.add(
+        TopViewedListing(
+          title: '${map['title']}',
+          views: (map['views'] as num?)?.toInt() ?? 0,
+        ),
+      );
     }
     for (final l in lands) {
       final map = l as Map;
-      viewed.add(TopViewedListing(
-        title: '${map['title']}',
-        views: (map['views'] as num?)?.toInt() ?? 0,
-      ));
+      viewed.add(
+        TopViewedListing(
+          title: '${map['title']}',
+          views: (map['views'] as num?)?.toInt() ?? 0,
+        ),
+      );
     }
     viewed.sort((a, b) => b.views.compareTo(a.views));
     final topViewed = viewed.where((v) => v.views > 0).take(5).toList();
@@ -137,7 +141,9 @@ class AdminRepository {
       newUsers30d: newUsers30d,
       pendingBookings: pendingBookings,
       totalBookings: bookings.length,
-      averageSalePrice: salePricesCount > 0 ? salePricesSum / salePricesCount : 0,
+      averageSalePrice: salePricesCount > 0
+          ? salePricesSum / salePricesCount
+          : 0,
       propertiesByType: propertiesByType,
       landsByType: landsByType,
       topViewed: topViewed,

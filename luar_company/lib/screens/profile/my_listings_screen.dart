@@ -148,10 +148,7 @@ class _MyListingsScreenState extends State<MyListingsScreen>
                     color: AppColors.gold.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(
-                    Icons.home_outlined,
-                    color: AppColors.gold,
-                  ),
+                  child: const Icon(Icons.home_outlined, color: AppColors.gold),
                 ),
                 title: Text(l10n.imoveis, style: AppTextStyles.bodyMedium),
                 onTap: () {
@@ -229,10 +226,7 @@ class _MyListingsScreenState extends State<MyListingsScreen>
           ? const LoadingWidget(isFullScreen: true)
           : TabBarView(
               controller: _tabController,
-              children: [
-                _buildPropertiesTab(l10n),
-                _buildLandsTab(l10n),
-              ],
+              children: [_buildPropertiesTab(l10n), _buildLandsTab(l10n)],
             ),
     );
   }
@@ -261,10 +255,9 @@ class _MyListingsScreenState extends State<MyListingsScreen>
             isAvailable: property.isAvailable,
             imageUrl: property.images.isNotEmpty ? property.images.first : null,
             accentIcon: Icons.home_outlined,
-            onEdit: () => Navigator.of(context).pushNamed(
-              AppRoutes.propertyForm,
-              arguments: property,
-            ),
+            onEdit: () => Navigator.of(
+              context,
+            ).pushNamed(AppRoutes.propertyForm, arguments: property),
             onToggle: () => _toggleProperty(property),
           );
         },
@@ -294,10 +287,9 @@ class _MyListingsScreenState extends State<MyListingsScreen>
             isAvailable: land.isAvailable,
             imageUrl: land.images.isNotEmpty ? land.images.first : null,
             accentIcon: Icons.landscape_outlined,
-            onEdit: () => Navigator.of(context).pushNamed(
-              AppRoutes.landForm,
-              arguments: land,
-            ),
+            onEdit: () => Navigator.of(
+              context,
+            ).pushNamed(AppRoutes.landForm, arguments: land),
             onToggle: () => _toggleLand(land),
           );
         },

@@ -62,17 +62,19 @@ void main() {
 
   group('purposePropertyTypes (finalidade)', () {
     test('residential devolve apenas tipos residenciais', () {
-      expect(
-        purposePropertyTypes('residential'),
-        ['house', 'apartment', 'condo'],
-      );
+      expect(purposePropertyTypes('residential'), [
+        'house',
+        'apartment',
+        'condo',
+      ]);
     });
 
     test('commercial devolve apenas tipos comerciais', () {
-      expect(
-        purposePropertyTypes('commercial'),
-        ['office', 'warehouse', 'shop'],
-      );
+      expect(purposePropertyTypes('commercial'), [
+        'office',
+        'warehouse',
+        'shop',
+      ]);
     });
 
     test('sem finalidade devolve null', () {

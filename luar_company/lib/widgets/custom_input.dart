@@ -153,8 +153,9 @@ class _CustomInputState extends State<CustomInput> {
                 color: AppColors.error,
               ),
               filled: true,
-              fillColor:
-                  widget.enabled ? palette.inputFill : palette.surfaceAlt,
+              fillColor: widget.enabled
+                  ? palette.inputFill
+                  : palette.surfaceAlt,
               contentPadding: EdgeInsets.symmetric(
                 horizontal: 14,
                 vertical: widget.maxLines > 1 ? 16 : 14,

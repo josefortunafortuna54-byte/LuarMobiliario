@@ -31,11 +31,7 @@ class AuthRepository {
 
   Future<void> resetPassword(String email) => _authService.resetPassword(email);
 
-  Future<void> updateProfile({
-    String? name,
-    String? phone,
-    String? avatarUrl,
-  }) {
+  Future<void> updateProfile({String? name, String? phone, String? avatarUrl}) {
     return _authService.updateProfile(
       name: name,
       phone: phone,

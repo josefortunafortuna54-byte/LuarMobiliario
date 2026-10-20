@@ -109,7 +109,8 @@ class _AdminReportsScreenState extends State<AdminReportsScreen> {
                     message: l10n.gestaoCompleta,
                   )
                 : RefreshIndicator(
-                    onRefresh: () => context.read<ReportProvider>().loadReports(),
+                    onRefresh: () =>
+                        context.read<ReportProvider>().loadReports(),
                     color: AppColors.gold,
                     child: ListView.separated(
                       padding: const EdgeInsets.symmetric(
@@ -287,10 +288,8 @@ class _AdminReportsScreenState extends State<AdminReportsScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => _ReportActionsSheet(
-        report: report,
-        onChanged: () => setState(() {}),
-      ),
+      builder: (_) =>
+          _ReportActionsSheet(report: report, onChanged: () => setState(() {})),
     );
   }
 }
@@ -336,7 +335,8 @@ class _ReportActionsSheetState extends State<_ReportActionsSheet> {
     final actorId = context.read<AuthProvider>().user?.id ?? '';
     final provider = context.read<ReportProvider>();
     final admin = context.read<AdminProvider>();
-    final isOpen = report.status == ReportStatus.pending ||
+    final isOpen =
+        report.status == ReportStatus.pending ||
         report.status == ReportStatus.reviewing;
 
     return Container(

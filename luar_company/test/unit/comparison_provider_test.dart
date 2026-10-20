@@ -80,8 +80,10 @@ void main() {
   group('ComparisonEntry.fromProperty', () {
     test('mapeia tipo de imóvel e transação', () {
       final entry = ComparisonEntry.fromProperty(
-        _property(type: PropertyType.apartment,
-            transactionType: TransactionType.rent),
+        _property(
+          type: PropertyType.apartment,
+          transactionType: TransactionType.rent,
+        ),
       );
 
       expect(entry.category, ComparisonCategory.apartment);
@@ -111,8 +113,7 @@ void main() {
   group('ComparisonEntry.fromLand', () {
     test('mapeia tipo de terreno e deixa campos de imóvel nulos', () {
       final entry = ComparisonEntry.fromLand(
-        _land(type: LandType.farm,
-            transactionType: LandTransactionType.rent),
+        _land(type: LandType.farm, transactionType: LandTransactionType.rent),
       );
 
       expect(entry.category, ComparisonCategory.farm);

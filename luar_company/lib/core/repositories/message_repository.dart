@@ -55,7 +55,9 @@ class MessageRepository {
             'lastMessage': msg['content'] ?? '',
             'lastMessageTime': msg['created_at'] ?? '',
             'unreadCount':
-                (msg['receiver_id'] == userId && msg['is_read'] == false) ? 1 : 0,
+                (msg['receiver_id'] == userId && msg['is_read'] == false)
+                ? 1
+                : 0,
           };
         }
       }
@@ -135,8 +137,10 @@ class MessageRepository {
           ),
           callback: (payload) {
             final newMsg = MessageModel.fromJson(payload.newRecord);
-            if ((newMsg.senderId == otherUserId && newMsg.receiverId == userId) ||
-                (newMsg.senderId == userId && newMsg.receiverId == otherUserId)) {
+            if ((newMsg.senderId == otherUserId &&
+                    newMsg.receiverId == userId) ||
+                (newMsg.senderId == userId &&
+                    newMsg.receiverId == otherUserId)) {
               onNewMessage(newMsg);
             }
           },

@@ -18,23 +18,25 @@ void main() {
 
     testWidgets('renders single initial for single name', (tester) async {
       await tester.pumpWidget(
-        testApp(home: Scaffold(body: AvatarWidget(name: 'Ana'))),
+        testApp(
+          home: Scaffold(body: AvatarWidget(name: 'Ana')),
+        ),
       );
 
       expect(find.text('A'), findsOneWidget);
     });
 
     testWidgets('renders question mark when name is null', (tester) async {
-      await tester.pumpWidget(
-        testApp(home: Scaffold(body: AvatarWidget())),
-      );
+      await tester.pumpWidget(testApp(home: Scaffold(body: AvatarWidget())));
 
       expect(find.text('?'), findsOneWidget);
     });
 
     testWidgets('renders question mark for empty name', (tester) async {
       await tester.pumpWidget(
-        testApp(home: Scaffold(body: AvatarWidget(name: '   '))),
+        testApp(
+          home: Scaffold(body: AvatarWidget(name: '   ')),
+        ),
       );
 
       expect(find.text('?'), findsOneWidget);
@@ -44,10 +46,7 @@ void main() {
       await tester.pumpWidget(
         testApp(
           home: Scaffold(
-            body: AvatarWidget(
-              name: 'Carlos',
-              showOnlineIndicator: true,
-            ),
+            body: AvatarWidget(name: 'Carlos', showOnlineIndicator: true),
           ),
         ),
       );
@@ -61,10 +60,7 @@ void main() {
       await tester.pumpWidget(
         testApp(
           home: Scaffold(
-            body: AvatarWidget(
-              name: 'Carlos',
-              onTap: () => tapped = true,
-            ),
+            body: AvatarWidget(name: 'Carlos', onTap: () => tapped = true),
           ),
         ),
       );

@@ -23,16 +23,13 @@ class ReportRepository {
   }
 
   Future<List<ReportModel>> fetchAll({ReportStatus? status}) async {
-    final query = _client.from('reports').select('*, reporter:reporter_id(name)');
+    final query = _client
+        .from('reports')
+        .select('*, reporter:reporter_id(name)');
 
-    final filtered = status != null
-        ? query.eq('status', status.value)
-        : query;
+    final filtered = status != null ? query.eq('status', status.value) : query;
 
-    final response = await filtered.order(
-      'created_at',
-      ascending: false,
-    );
+    final response = await filtered.order('created_at', ascending: false);
 
     return (response as List<dynamic>)
         .map((json) => ReportModel.fromJson(json as Map<String, dynamic>))
@@ -61,7 +58,10 @@ class ReportRepository {
     required String targetId,
   }) async {
     final table = targetType == ReportTarget.land ? 'lands' : 'properties';
-    await _client.from(table).update({'is_available': false}).eq('id', targetId);
+    await _client
+        .from(table)
+        .update({'is_available': false})
+        .eq('id', targetId);
   }
 
   /// Devolve o agente dono de um anúncio (para notificar na moderação).

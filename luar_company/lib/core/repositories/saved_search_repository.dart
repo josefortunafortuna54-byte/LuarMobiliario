@@ -23,16 +23,11 @@ class SavedSearchRepository {
     required String name,
     required Map<String, dynamic> filters,
   }) async {
-    final response =
-        await _client
-            .from('saved_searches')
-            .insert({
-              'user_id': userId,
-              'name': name,
-              'filters': filters,
-            })
-            .select()
-            .single();
+    final response = await _client
+        .from('saved_searches')
+        .insert({'user_id': userId, 'name': name, 'filters': filters})
+        .select()
+        .single();
 
     return SavedSearchModel.fromJson(response);
   }

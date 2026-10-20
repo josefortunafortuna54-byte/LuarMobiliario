@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 import '../core/constants/app_colors.dart';
 import '../core/constants/app_text_styles.dart';
 import '../core/theme/app_palette.dart';
@@ -42,7 +41,9 @@ class EmptyState extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               title,
-              style: AppTextStyles.h3.copyWith(color: context.palette.textTitle),
+              style: AppTextStyles.h3.copyWith(
+                color: context.palette.textTitle,
+              ),
               textAlign: TextAlign.center,
             ),
             if (message != null && message!.isNotEmpty) ...[

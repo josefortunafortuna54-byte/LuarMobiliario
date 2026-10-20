@@ -188,8 +188,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget>
             ),
           ),
         ),
-        if (dimmed)
-          Container(color: AppColors.black.withValues(alpha: 0.35)),
+        if (dimmed) Container(color: AppColors.black.withValues(alpha: 0.35)),
       ],
     );
   }

@@ -9,7 +9,9 @@ void main() {
     testWidgets('renders title, icon and count', (tester) async {
       await tester.pumpWidget(
         testApp(
-          home: Scaffold(body: CategoryCard(icon: Icons.home, title: 'Casas', count: 5)),
+          home: Scaffold(
+            body: CategoryCard(icon: Icons.home, title: 'Casas', count: 5),
+          ),
         ),
       );
 
@@ -21,7 +23,9 @@ void main() {
     testWidgets('uses singular for count of 1', (tester) async {
       await tester.pumpWidget(
         testApp(
-          home: Scaffold(body: CategoryCard(icon: Icons.home, title: 'Casas', count: 1)),
+          home: Scaffold(
+            body: CategoryCard(icon: Icons.home, title: 'Casas', count: 1),
+          ),
         ),
       );
 
@@ -51,7 +55,9 @@ void main() {
     testWidgets('does not throw when onTap is null', (tester) async {
       await tester.pumpWidget(
         testApp(
-          home: Scaffold(body: CategoryCard(icon: Icons.grid_view, title: 'Todas', count: 0)),
+          home: Scaffold(
+            body: CategoryCard(icon: Icons.grid_view, title: 'Todas', count: 0),
+          ),
         ),
       );
 

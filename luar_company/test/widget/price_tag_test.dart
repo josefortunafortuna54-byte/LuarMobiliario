@@ -6,8 +6,9 @@ import '../helpers/test_app.dart';
 
 void main() {
   group('PriceTag', () {
-    testWidgets('renders formatted price with default currency',
-        (tester) async {
+    testWidgets('renders formatted price with default currency', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         testApp(home: Scaffold(body: PriceTag(price: 1500000))),
       );
@@ -18,9 +19,7 @@ void main() {
 
     testWidgets('shows /mes suffix when isRent is true', (tester) async {
       await tester.pumpWidget(
-        testApp(
-          home: Scaffold(body: PriceTag(price: 250000, isRent: true)),
-        ),
+        testApp(home: Scaffold(body: PriceTag(price: 250000, isRent: true))),
       );
 
       expect(find.text('250.000 Kz'), findsOneWidget);
@@ -40,9 +39,7 @@ void main() {
 
     testWidgets('formats large numbers with dots', (tester) async {
       await tester.pumpWidget(
-        testApp(
-          home: Scaffold(body: PriceTag(price: 123456789)),
-        ),
+        testApp(home: Scaffold(body: PriceTag(price: 123456789))),
       );
 
       expect(find.text('123.456.789 Kz'), findsOneWidget);

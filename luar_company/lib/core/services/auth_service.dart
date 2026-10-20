@@ -92,12 +92,12 @@ class AuthService {
       if (name != null) userAttributes['name'] = name;
 
       if (userAttributes.isNotEmpty) {
-        await _auth.updateUser(
-          UserAttributes(data: userAttributes),
-        );
+        await _auth.updateUser(UserAttributes(data: userAttributes));
       }
     } catch (e) {
-if (kDebugMode) {       debugPrint('[Luar] Failed to update auth profile: $e'); }
+      if (kDebugMode) {
+        debugPrint('[Luar] Failed to update auth profile: $e');
+      }
     }
 
     if (currentUser != null) {

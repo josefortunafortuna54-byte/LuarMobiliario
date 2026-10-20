@@ -7,8 +7,7 @@ import '../services/supabase_service.dart';
 class BookingRepository {
   SupabaseClient get _client => SupabaseService.client;
 
-  static const String _selectWithTarget =
-      '*, properties(title), lands(title)';
+  static const String _selectWithTarget = '*, properties(title), lands(title)';
 
   Future<List<BookingModel>> fetchByUser(String userId) async {
     final response = await _client
@@ -48,8 +47,9 @@ class BookingRepository {
           .rpc(
             'create_guest_booking',
             params: {
-              'p_property_id':
-                  booking.propertyId.isEmpty ? null : booking.propertyId,
+              'p_property_id': booking.propertyId.isEmpty
+                  ? null
+                  : booking.propertyId,
               'p_land_id': booking.landId,
               'p_user_name': booking.userName,
               'p_user_phone': booking.userPhone,
@@ -87,11 +87,10 @@ class BookingRepository {
     required String bookingId,
   }) async {
     final response = await _client
-        .rpc('register_guest_client', params: {
-          'p_name': name,
-          'p_phone': phone,
-          'p_booking_id': bookingId,
-        })
+        .rpc(
+          'register_guest_client',
+          params: {'p_name': name, 'p_phone': phone, 'p_booking_id': bookingId},
+        )
         .single();
 
     return UserModel.fromJson(response);

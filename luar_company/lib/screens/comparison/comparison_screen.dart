@@ -72,9 +72,8 @@ class ComparisonScreen extends StatelessWidget {
       title: l10n.comparacaoVaziaTitulo,
       message: l10n.comparacaoVaziaSubtitulo,
       actionLabel: l10n.explorarImoveis,
-      onAction: () => Navigator.of(context).pushReplacementNamed(
-        AppRoutes.discover,
-      ),
+      onAction: () =>
+          Navigator.of(context).pushReplacementNamed(AppRoutes.discover),
     );
   }
 
@@ -208,13 +207,10 @@ class ComparisonScreen extends StatelessWidget {
               final ppm = ComparisonProvider.pricePerSquareMeter(e);
               return ppm != null ? formatPrice(ppm) : '—';
             }).toList(),
-            highlight: _bestIndex(
-              items,
-              (e) {
-                final ppm = ComparisonProvider.pricePerSquareMeter(e);
-                return ppm != null ? -ppm : double.infinity;
-              },
-            ),
+            highlight: _bestIndex(items, (e) {
+              final ppm = ComparisonProvider.pricePerSquareMeter(e);
+              return ppm != null ? -ppm : double.infinity;
+            }),
           ),
           _buildTableRow(
             context,
@@ -268,10 +264,7 @@ class ComparisonScreen extends StatelessWidget {
     return best;
   }
 
-  Widget _buildTableHeader(
-    BuildContext context,
-    List<ComparisonEntry> items,
-  ) {
+  Widget _buildTableHeader(BuildContext context, List<ComparisonEntry> items) {
     final palette = context.palette;
     return Container(
       color: AppColors.navy.withValues(alpha: 0.04),
@@ -335,35 +328,35 @@ class ComparisonScreen extends StatelessWidget {
             ),
           ),
           ...values.asMap().entries.map(
-                (entry) => Expanded(
-                  child: Center(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: entry.key == highlight
-                          ? BoxDecoration(
-                              color: AppColors.gold.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(6),
-                            )
-                          : null,
-                      child: Text(
-                        entry.value,
-                        style: AppTextStyles.bodySmall.copyWith(
-                          color: entry.key == highlight
-                              ? AppColors.gold
-                              : palette.textBody,
-                          fontWeight: entry.key == highlight
-                              ? FontWeight.w700
-                              : FontWeight.w400,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
+            (entry) => Expanded(
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: entry.key == highlight
+                      ? BoxDecoration(
+                          color: AppColors.gold.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(6),
+                        )
+                      : null,
+                  child: Text(
+                    entry.value,
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: entry.key == highlight
+                          ? AppColors.gold
+                          : palette.textBody,
+                      fontWeight: entry.key == highlight
+                          ? FontWeight.w700
+                          : FontWeight.w400,
                     ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ),
+            ),
+          ),
         ],
       ),
     );
@@ -383,46 +376,47 @@ class ComparisonScreen extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         Row(
-          children: items.map(
-            (p) => Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: GestureDetector(
-                  onTap: () => Navigator.of(context).pushNamed(
-                    _detailRoute(p),
-                    arguments: p.id,
-                  ),
-                  child: Container(
-                    height: 120,
-                    decoration: BoxDecoration(
-                      color: palette.surfaceAlt,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    child: p.images.isNotEmpty
-                        ? Image.network(
-                            p.images.first,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) => Center(
-                              child: Icon(
-                                Icons.apartment_rounded,
-                                size: 36,
-                                color: palette.textMuted,
+          children: items
+              .map(
+                (p) => Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: GestureDetector(
+                      onTap: () => Navigator.of(
+                        context,
+                      ).pushNamed(_detailRoute(p), arguments: p.id),
+                      child: Container(
+                        height: 120,
+                        decoration: BoxDecoration(
+                          color: palette.surfaceAlt,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: p.images.isNotEmpty
+                            ? Image.network(
+                                p.images.first,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, _, _) => Center(
+                                  child: Icon(
+                                    Icons.apartment_rounded,
+                                    size: 36,
+                                    color: palette.textMuted,
+                                  ),
+                                ),
+                              )
+                            : Center(
+                                child: Icon(
+                                  Icons.apartment_rounded,
+                                  size: 36,
+                                  color: palette.textMuted,
+                                ),
                               ),
-                            ),
-                          )
-                        : Center(
-                            child: Icon(
-                              Icons.apartment_rounded,
-                              size: 36,
-                              color: palette.textMuted,
-                            ),
-                          ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-          ).toList(),
+              )
+              .toList(),
         ),
       ],
     );
@@ -500,49 +494,43 @@ class ComparisonScreen extends StatelessWidget {
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: allFeatures.map(
-            (feature) {
-              final hasInAll = items.every((p) => p.features.contains(feature));
-              return Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
+          children: allFeatures.map((feature) {
+            final hasInAll = items.every((p) => p.features.contains(feature));
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: hasInAll
+                    ? AppColors.gold.withValues(alpha: 0.15)
+                    : palette.border,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
                   color: hasInAll
-                      ? AppColors.gold.withValues(alpha: 0.15)
-                      : palette.border,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: hasInAll
-                        ? AppColors.gold.withValues(alpha: 0.4)
-                        : palette.borderStrong,
+                      ? AppColors.gold.withValues(alpha: 0.4)
+                      : palette.borderStrong,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    hasInAll
+                        ? Icons.check_circle_rounded
+                        : Icons.remove_circle_outline_rounded,
+                    size: 14,
+                    color: hasInAll ? AppColors.gold : palette.textMuted,
                   ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      hasInAll
-                          ? Icons.check_circle_rounded
-                          : Icons.remove_circle_outline_rounded,
-                      size: 14,
-                      color: hasInAll ? AppColors.gold : palette.textMuted,
+                  const SizedBox(width: 6),
+                  Text(
+                    feature,
+                    style: AppTextStyles.bodyTiny.copyWith(
+                      color: hasInAll ? palette.textTitle : palette.textMuted,
+                      fontWeight: hasInAll ? FontWeight.w600 : FontWeight.w400,
                     ),
-                    const SizedBox(width: 6),
-                    Text(
-                      feature,
-                      style: AppTextStyles.bodyTiny.copyWith(
-                        color: hasInAll ? palette.textTitle : palette.textMuted,
-                        fontWeight:
-                            hasInAll ? FontWeight.w600 : FontWeight.w400,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ).toList(),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
         ),
       ],
     );
@@ -578,10 +566,9 @@ class ComparisonScreen extends StatelessWidget {
                 _SmallActionButton(
                   icon: Icons.info_outline_rounded,
                   label: l10n.detalhes,
-                  onTap: () => Navigator.of(context).pushNamed(
-                    _detailRoute(p),
-                    arguments: p.id,
-                  ),
+                  onTap: () => Navigator.of(
+                    context,
+                  ).pushNamed(_detailRoute(p), arguments: p.id),
                 ),
                 const SizedBox(width: 8),
                 _SmallActionButton(

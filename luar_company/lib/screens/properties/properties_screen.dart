@@ -28,7 +28,8 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
 
   List<String> get _filterKeys => propertyFilterKeys;
 
-  List<String> _filterLabels(AppLocalizations l10n) => propertyFilterLabels(l10n);
+  List<String> _filterLabels(AppLocalizations l10n) =>
+      propertyFilterLabels(l10n);
 
   String _sortLabel(String key, AppLocalizations l10n) => switch (key) {
     'priceAsc' => l10n.menorPreco,

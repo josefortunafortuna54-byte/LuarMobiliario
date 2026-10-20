@@ -498,9 +498,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
       childAspectRatio: 0.92,
       children: categories.map((entry) {
         final key = entry.category.key;
-        final selected = entry.isLand
-            ? _landType == key
-            : _propertyType == key;
+        final selected = entry.isLand ? _landType == key : _propertyType == key;
         final label = entry.isLand
             ? landCategoryLabel(key, l10n)
             : propertyCategoryLabel(key, l10n);

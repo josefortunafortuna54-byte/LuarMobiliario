@@ -4,9 +4,7 @@ import 'package:luar_company/widgets/empty_state.dart';
 
 void main() {
   Widget wrap(Widget child) {
-    return MaterialApp(
-      home: Scaffold(body: child),
-    );
+    return MaterialApp(home: Scaffold(body: child));
   }
 
   testWidgets('renders icon, title and message', (tester) async {
@@ -27,12 +25,7 @@ void main() {
 
   testWidgets('renders without message', (tester) async {
     await tester.pumpWidget(
-      wrap(
-        const EmptyState(
-          icon: Icons.search_off,
-          title: 'Sem resultados',
-        ),
-      ),
+      wrap(const EmptyState(icon: Icons.search_off, title: 'Sem resultados')),
     );
 
     expect(find.text('Sem resultados'), findsOneWidget);

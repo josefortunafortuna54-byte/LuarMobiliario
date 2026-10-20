@@ -9,7 +9,9 @@ class LandRepository {
   SupabaseClient get _client => SupabaseService.client;
 
   List<LandModel> _mapResponse(List<dynamic> response) {
-    return response.map((e) => _mapRow(Map<String, dynamic>.from(e as Map))).toList();
+    return response
+        .map((e) => _mapRow(Map<String, dynamic>.from(e as Map)))
+        .toList();
   }
 
   LandModel _mapRow(Map<String, dynamic> json) {
@@ -77,9 +79,7 @@ class LandRepository {
           .select('*, land_images(image_url), land_videos(video_url)')
           .eq('is_available', true),
       filters,
-    )
-        .order('created_at', ascending: false)
-        .range(from, to);
+    ).order('created_at', ascending: false).range(from, to);
 
     return _mapResponse(response as List);
   }
@@ -309,7 +309,10 @@ class LandRepository {
 
   /// Ativa ou desativa a publicação de um terreno do próprio agente.
   Future<void> setAvailable(String id, bool available) async {
-    await _client.from('lands').update({'is_available': available}).eq('id', id);
+    await _client
+        .from('lands')
+        .update({'is_available': available})
+        .eq('id', id);
   }
 
   Future<List<LandModel>> fetchByIds(List<String> ids) async {

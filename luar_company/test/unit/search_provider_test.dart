@@ -33,34 +33,36 @@ void main() {
       expect(snapshot.containsKey('city'), isFalse);
     });
 
-    test('restoreFilters repõe todos os filtros e limpa estado de resultados',
-        () async {
-      final provider = SearchProvider();
-      provider.setFilter(
-        query: 'terreno',
-        transactionType: 'rent',
-        municipality: 'Talatona',
-        bedrooms: 2,
-      );
-      provider.setSort('priceDesc');
-      final snapshot = provider.snapshotFilters();
+    test(
+      'restoreFilters repõe todos os filtros e limpa estado de resultados',
+      () async {
+        final provider = SearchProvider();
+        provider.setFilter(
+          query: 'terreno',
+          transactionType: 'rent',
+          municipality: 'Talatona',
+          bedrooms: 2,
+        );
+        provider.setSort('priceDesc');
+        final snapshot = provider.snapshotFilters();
 
-      // Estado "sujo" que o restore tem de limpar.
-      provider.setFilter(query: 'outro');
-      provider.clearFilters();
-      provider.setSort('recent');
+        // Estado "sujo" que o restore tem de limpar.
+        provider.setFilter(query: 'outro');
+        provider.clearFilters();
+        provider.setSort('recent');
 
-      provider.restoreFilters(snapshot);
+        provider.restoreFilters(snapshot);
 
-      expect(provider.query, 'terreno');
-      expect(provider.transactionType, 'rent');
-      expect(provider.municipality, 'Talatona');
-      expect(provider.bedrooms, 2);
-      expect(provider.sortOption, 'priceDesc');
-      expect(provider.results, isEmpty);
-      expect(provider.error, isNull);
-      expect(provider.activeFilterCount, 4);
-    });
+        expect(provider.query, 'terreno');
+        expect(provider.transactionType, 'rent');
+        expect(provider.municipality, 'Talatona');
+        expect(provider.bedrooms, 2);
+        expect(provider.sortOption, 'priceDesc');
+        expect(provider.results, isEmpty);
+        expect(provider.error, isNull);
+        expect(provider.activeFilterCount, 4);
+      },
+    );
 
     test('restoreFilters com mapa vazio limpa os filtros', () {
       final provider = SearchProvider();

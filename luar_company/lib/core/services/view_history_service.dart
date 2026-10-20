@@ -14,7 +14,8 @@ class ViewHistory {
   static const String landPrefix = 'l:';
 
   /// Regista a visita a um imóvel (o mais recente fica em primeiro).
-  static Future<void> recordProperty(String id) => _record('$propertyPrefix$id');
+  static Future<void> recordProperty(String id) =>
+      _record('$propertyPrefix$id');
 
   /// Regista a visita a um terreno.
   static Future<void> recordLand(String id) => _record('$landPrefix$id');

@@ -15,27 +15,30 @@ void main() {
       expect(report.reviewedAt, isNull);
     });
 
-    test('fromJson converte campos da BD (enums, datas e join do reporter)', () {
-      final report = ReportModel.fromJson(const {
-        'id': 'r1',
-        'reporter_id': 'u1',
-        'reporter': {'name': 'Maria'},
-        'target_type': 'land',
-        'target_id': 'l1',
-        'reason': 'scam',
-        'details': 'suspeito',
-        'status': 'reviewing',
-        'reviewed_by': 'admin1',
-        'reviewed_at': '2026-10-15T10:00:00Z',
-        'created_at': '2026-10-14T08:30:00Z',
-      });
+    test(
+      'fromJson converte campos da BD (enums, datas e join do reporter)',
+      () {
+        final report = ReportModel.fromJson(const {
+          'id': 'r1',
+          'reporter_id': 'u1',
+          'reporter': {'name': 'Maria'},
+          'target_type': 'land',
+          'target_id': 'l1',
+          'reason': 'scam',
+          'details': 'suspeito',
+          'status': 'reviewing',
+          'reviewed_by': 'admin1',
+          'reviewed_at': '2026-10-15T10:00:00Z',
+          'created_at': '2026-10-14T08:30:00Z',
+        });
 
-      expect(report.reporterName, 'Maria');
-      expect(report.targetType, ReportTarget.land);
-      expect(report.status, ReportStatus.reviewing);
-      expect(report.reviewedBy, 'admin1');
-      expect(report.createdAt, DateTime.parse('2026-10-14T08:30:00Z'));
-    });
+        expect(report.reporterName, 'Maria');
+        expect(report.targetType, ReportTarget.land);
+        expect(report.status, ReportStatus.reviewing);
+        expect(report.reviewedBy, 'admin1');
+        expect(report.createdAt, DateTime.parse('2026-10-14T08:30:00Z'));
+      },
+    );
 
     test('enums revertem para valores da BD', () {
       expect(ReportTarget.user.value, 'user');

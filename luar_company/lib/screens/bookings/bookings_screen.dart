@@ -310,7 +310,10 @@ class _BookingsScreenState extends State<BookingsScreen>
                         booking.propertyTitle.isNotEmpty
                             ? booking.propertyTitle
                             : l10n.imovelCurto(
-                                _shortPropertyId(l10n, _bookingTargetId(booking)),
+                                _shortPropertyId(
+                                  l10n,
+                                  _bookingTargetId(booking),
+                                ),
                               ),
                         style: AppTextStyles.bodyMediumBold,
                         maxLines: 1,

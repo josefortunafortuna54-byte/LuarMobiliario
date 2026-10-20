@@ -47,8 +47,7 @@ Future<void> showSettingsSheet(BuildContext context) async {
                   ),
                   _ChoiceTile(
                     label: l10n.temaClaro,
-                    selected:
-                        themeProvider.preference == ThemePreference.light,
+                    selected: themeProvider.preference == ThemePreference.light,
                     palette: palette,
                     onTap: () {
                       themeProvider.setPreference(ThemePreference.light);
@@ -57,8 +56,7 @@ Future<void> showSettingsSheet(BuildContext context) async {
                   ),
                   _ChoiceTile(
                     label: l10n.temaEscuro,
-                    selected:
-                        themeProvider.preference == ThemePreference.dark,
+                    selected: themeProvider.preference == ThemePreference.dark,
                     palette: palette,
                     onTap: () {
                       themeProvider.setPreference(ThemePreference.dark);

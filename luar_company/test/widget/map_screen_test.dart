@@ -110,8 +110,9 @@ Future<void> _settle(WidgetTester tester) async {
 
 void main() {
   group('MapScreen', () {
-    testWidgets('carrega todas as páginas de imóveis e terrenos',
-        (tester) async {
+    testWidgets('carrega todas as páginas de imóveis e terrenos', (
+      tester,
+    ) async {
       final fullPage = List.generate(_mapPageSize + 1, (i) => _property('$i'));
       final fullLandPage = List.generate(_mapPageSize + 1, (i) => _land('$i'));
       final properties = _FakePropertyRepository(

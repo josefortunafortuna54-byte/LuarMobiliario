@@ -17,7 +17,9 @@ import 'supabase_service.dart';
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // O sistema mostra a notificação automaticamente; nada a fazer aqui.
-if (kDebugMode) {   debugPrint('[Luar] Mensagem em segundo plano: ${message.messageId}'); }
+  if (kDebugMode) {
+    debugPrint('[Luar] Mensagem em segundo plano: ${message.messageId}');
+  }
 }
 
 class NotificationService {
@@ -65,13 +67,17 @@ class NotificationService {
         );
         _firebaseInitialized = true;
       } else {
-if (kDebugMode) {         debugPrint(
-          '[Luar] Firebase não configurado. Notificações push desativadas.',
-        ); }
+        if (kDebugMode) {
+          debugPrint(
+            '[Luar] Firebase não configurado. Notificações push desativadas.',
+          );
+        }
       }
     } catch (e) {
       _firebaseInitialized = false;
-if (kDebugMode) {       debugPrint('[Luar] Firebase initialization failed: $e'); }
+      if (kDebugMode) {
+        debugPrint('[Luar] Firebase initialization failed: $e');
+      }
     }
 
     if (!_firebaseInitialized) return;
@@ -95,9 +101,7 @@ if (kDebugMode) {       debugPrint('[Luar] Firebase initialization failed: $e');
 
         // O token FCM pode ser rotacionado pelo Google; regrista o novo
         // sempre que isso acontece para a entrega push não ficar obsoleta.
-        FirebaseMessaging.instance.onTokenRefresh.listen((
-          String token,
-        ) {
+        FirebaseMessaging.instance.onTokenRefresh.listen((String token) {
           final userId = _client.auth.currentUser?.id;
           if (userId != null) saveTokenToDatabase(userId);
         });
@@ -110,7 +114,9 @@ if (kDebugMode) {       debugPrint('[Luar] Firebase initialization failed: $e');
         }
       }
     } catch (e) {
-if (kDebugMode) {       debugPrint('[Luar] Firebase messaging setup failed: $e'); }
+      if (kDebugMode) {
+        debugPrint('[Luar] Firebase messaging setup failed: $e');
+      }
     }
   }
 
@@ -151,15 +157,16 @@ if (kDebugMode) {       debugPrint('[Luar] Firebase messaging setup failed: $e')
     try {
       return await FirebaseMessaging.instance.getToken();
     } catch (e) {
-if (kDebugMode) {       debugPrint('[Luar] Failed to get FCM token: $e'); }
+      if (kDebugMode) {
+        debugPrint('[Luar] Failed to get FCM token: $e');
+      }
       return null;
     }
   }
 
-  Stream<String> get onTokenRefresh =>
-      _firebaseInitialized
-          ? FirebaseMessaging.instance.onTokenRefresh
-          : const Stream<String>.empty();
+  Stream<String> get onTokenRefresh => _firebaseInitialized
+      ? FirebaseMessaging.instance.onTokenRefresh
+      : const Stream<String>.empty();
 
   /// Regista o token do dispositivo na tabela `device_tokens` (upsert).
   Future<void> saveTokenToDatabase(String userId) async {
@@ -185,7 +192,9 @@ if (kDebugMode) {       debugPrint('[Luar] Failed to get FCM token: $e'); }
           .eq('platform', _platform)
           .neq('token', token);
     } catch (e) {
-if (kDebugMode) {       debugPrint('[Luar] Failed to save token: $e'); }
+      if (kDebugMode) {
+        debugPrint('[Luar] Failed to save token: $e');
+      }
     }
   }
 
@@ -222,7 +231,9 @@ if (kDebugMode) {       debugPrint('[Luar] Failed to save token: $e'); }
         },
       );
     } catch (e) {
-if (kDebugMode) {       debugPrint('[Luar] Failed to send notification: $e'); }
+      if (kDebugMode) {
+        debugPrint('[Luar] Failed to send notification: $e');
+      }
     }
   }
 
@@ -311,7 +322,9 @@ if (kDebugMode) {       debugPrint('[Luar] Failed to send notification: $e'); }
     final parsed = AppRoutes.parse(route);
     if (parsed == null) {
       if (route != null && route.isNotEmpty) {
-if (kDebugMode) {         debugPrint('[Luar] Rota de notificação rejeitada: $route'); }
+        if (kDebugMode) {
+          debugPrint('[Luar] Rota de notificação rejeitada: $route');
+        }
       }
       return;
     }
@@ -355,7 +368,9 @@ if (kDebugMode) {         debugPrint('[Luar] Rota de notificação rejeitada: $r
       }
       await FirebaseMessaging.instance.deleteToken();
     } catch (e) {
-if (kDebugMode) {       debugPrint('[Luar] Failed to delete token: $e'); }
+      if (kDebugMode) {
+        debugPrint('[Luar] Failed to delete token: $e');
+      }
     }
   }
 }

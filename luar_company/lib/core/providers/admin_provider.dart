@@ -106,10 +106,9 @@ class AdminProvider extends ChangeNotifier {
       NotificationService().sendNotification(
         userId: userId,
         title: verified ? 'Conta verificada' : 'Verificação removida',
-        body:
-            verified
-                ? 'O seu perfil de anunciante já está verificado.'
-                : 'A verificação do seu perfil foi removida.',
+        body: verified
+            ? 'O seu perfil de anunciante já está verificado.'
+            : 'A verificação do seu perfil foi removida.',
         route: '/profile',
         category: NotificationCategory.system,
       );

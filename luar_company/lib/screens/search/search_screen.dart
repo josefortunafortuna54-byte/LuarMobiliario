@@ -155,8 +155,8 @@ class _SearchScreenState extends State<SearchScreen> {
           provider.transactionType == 'sale'
               ? l10n.venda
               : provider.transactionType == 'rent'
-                  ? l10n.arrendamento
-                  : l10n.renovar,
+              ? l10n.arrendamento
+              : l10n.renovar,
           () => _removeFilter(provider, 'transactionType'),
         ),
       );
@@ -187,10 +187,7 @@ class _SearchScreenState extends State<SearchScreen> {
     }
     if (provider.city != null) {
       chips.add(
-        _FilterChipData(
-          provider.city!,
-          () => _removeFilter(provider, 'city'),
-        ),
+        _FilterChipData(provider.city!, () => _removeFilter(provider, 'city')),
       );
     }
     if (provider.municipality != null) {
@@ -204,9 +201,7 @@ class _SearchScreenState extends State<SearchScreen> {
     if (provider.purpose != null) {
       chips.add(
         _FilterChipData(
-          provider.purpose == 'residential'
-              ? l10n.residencial
-              : l10n.comercial,
+          provider.purpose == 'residential' ? l10n.residencial : l10n.comercial,
           () => _removeFilter(provider, 'purpose'),
         ),
       );
@@ -318,9 +313,7 @@ class _SearchScreenState extends State<SearchScreen> {
     if (!wasSelected && comparison.canCompare) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            l10n.imovelAdicionadoComparacao(comparison.count),
-          ),
+          content: Text(l10n.imovelAdicionadoComparacao(comparison.count)),
           backgroundColor: AppColors.gold,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -384,7 +377,11 @@ class _SearchScreenState extends State<SearchScreen> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.sort_rounded, size: 18, color: palette.textSecondary),
+                  Icon(
+                    Icons.sort_rounded,
+                    size: 18,
+                    color: palette.textSecondary,
+                  ),
                   const SizedBox(width: 4),
                   Text(
                     l10n.ordenar,
@@ -402,7 +399,11 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  PopupMenuItem<String> _sortMenuItem(String value, String label, IconData icon) {
+  PopupMenuItem<String> _sortMenuItem(
+    String value,
+    String label,
+    IconData icon,
+  ) {
     return PopupMenuItem(
       value: value,
       child: Row(
@@ -548,33 +549,32 @@ class _SearchScreenState extends State<SearchScreen> {
             Consumer<ComparisonProvider>(
               builder: (context, comparison, _) {
                 return Column(
-                  children: properties.map(
-                    (p) => Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: PropertyCard(
-                        imageUrl: p.images.isNotEmpty ? p.images.first : '',
-                        title: p.title,
-                        location: '${p.neighborhood}, ${p.city}',
-                        price: p.price,
-                        listingType: p.transactionType.listingType,
-                        bedrooms: p.bedrooms,
-                        bathrooms: p.bathrooms,
-                        area: p.area,
-                        isCompared: comparison.isSelected(p.id),
-                        agentVerified: p.agentVerified,
-                        onCompareTap: () => _toggleComparison(
-                          context,
-                          comparison,
-                          p,
+                  children: properties
+                      .map(
+                        (p) => Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: PropertyCard(
+                            imageUrl: p.images.isNotEmpty ? p.images.first : '',
+                            title: p.title,
+                            location: '${p.neighborhood}, ${p.city}',
+                            price: p.price,
+                            listingType: p.transactionType.listingType,
+                            bedrooms: p.bedrooms,
+                            bathrooms: p.bathrooms,
+                            area: p.area,
+                            isCompared: comparison.isSelected(p.id),
+                            agentVerified: p.agentVerified,
+                            onCompareTap: () =>
+                                _toggleComparison(context, comparison, p),
+                            onTap: () => Navigator.pushNamed(
+                              context,
+                              AppRoutes.propertyDetail,
+                              arguments: p.id,
+                            ),
+                          ),
                         ),
-                        onTap: () => Navigator.pushNamed(
-                          context,
-                          AppRoutes.propertyDetail,
-                          arguments: p.id,
-                        ),
-                      ),
-                    ),
-                  ).toList(),
+                      )
+                      .toList(),
                 );
               },
             ),

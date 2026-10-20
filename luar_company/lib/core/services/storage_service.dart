@@ -120,11 +120,13 @@ class StorageService {
     Object? lastError;
     for (var attempt = 1; attempt <= _maxAttempts; attempt++) {
       try {
-        await _client.storage.from(bucket).uploadBinary(
-          uploadPath,
-          bytes,
-          fileOptions: FileOptions(upsert: true, contentType: mimeType),
-        );
+        await _client.storage
+            .from(bucket)
+            .uploadBinary(
+              uploadPath,
+              bytes,
+              fileOptions: FileOptions(upsert: true, contentType: mimeType),
+            );
         return _client.storage.from(bucket).getPublicUrl(uploadPath);
       } catch (e) {
         lastError = e;

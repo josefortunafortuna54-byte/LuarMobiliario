@@ -27,21 +27,17 @@ class ReviewRepository {
     required int rating,
     String comment = '',
   }) async {
-    final response =
-        await _client
-            .from('reviews')
-            .upsert(
-              {
-                'property_id': propertyId,
-                'user_id': userId,
-                'rating': rating,
-                'comment': comment,
-                'updated_at': DateTime.now().toIso8601String(),
-              },
-              onConflict: 'property_id,user_id',
-            )
-            .select('*, user:users(name)')
-            .single();
+    final response = await _client
+        .from('reviews')
+        .upsert({
+          'property_id': propertyId,
+          'user_id': userId,
+          'rating': rating,
+          'comment': comment,
+          'updated_at': DateTime.now().toIso8601String(),
+        }, onConflict: 'property_id,user_id')
+        .select('*, user:users(name)')
+        .single();
 
     return ReviewModel.fromJson(response);
   }

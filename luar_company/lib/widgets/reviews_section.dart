@@ -15,11 +15,7 @@ import 'avatar_widget.dart';
 /// Mostra no ecrã de detalhe; o utilizador autenticado (que não seja o dono
 /// do anúncio) pode criar/atualizar a sua avaliação.
 class ReviewsSection extends StatefulWidget {
-  const ReviewsSection({
-    super.key,
-    required this.propertyId,
-    this.agentId,
-  });
+  const ReviewsSection({super.key, required this.propertyId, this.agentId});
 
   final String propertyId;
   final String? agentId;
@@ -100,11 +96,7 @@ class _ReviewsSectionState extends State<ReviewsSection> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
-                  Icons.star_rounded,
-                  size: 16,
-                  color: AppColors.gold,
-                ),
+                const Icon(Icons.star_rounded, size: 16, color: AppColors.gold),
                 const SizedBox(width: 4),
                 Text(
                   provider.averageRating.toStringAsFixed(1),

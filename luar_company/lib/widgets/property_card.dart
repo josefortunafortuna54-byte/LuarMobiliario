@@ -152,7 +152,11 @@ class PropertyCard extends StatelessWidget {
     );
   }
 
-  Widget _buildImage({double? height, double? width, required BuildContext context}) {
+  Widget _buildImage({
+    double? height,
+    double? width,
+    required BuildContext context,
+  }) {
     return Stack(
       children: [
         SizedBox(
@@ -286,14 +290,18 @@ class PropertyCard extends StatelessWidget {
                               ? Icons.check_circle_rounded
                               : Icons.add_circle_outline_rounded,
                           size: 16,
-                          color: isCompared ? AppColors.gold : palette.textMuted,
+                          color: isCompared
+                              ? AppColors.gold
+                              : palette.textMuted,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           isCompared ? l10n.comparando : l10n.comparar,
                           style: AppTextStyles.buttonSmall.copyWith(
                             fontSize: 11,
-                            color: isCompared ? AppColors.gold : palette.textBody,
+                            color: isCompared
+                                ? AppColors.gold
+                                : palette.textBody,
                           ),
                         ),
                       ],
@@ -428,7 +436,10 @@ class PropertyCard extends StatelessWidget {
     );
   }
 
-  Widget _buildFeaturesRow({bool compact = false, required BuildContext context}) {
+  Widget _buildFeaturesRow({
+    bool compact = false,
+    required BuildContext context,
+  }) {
     final iconSize = compact ? 14.0 : 16.0;
     final textSize = compact ? AppTextStyles.bodyTiny : AppTextStyles.bodySmall;
     final spacing = compact ? 6.0 : 8.0;
@@ -503,7 +514,11 @@ class _FeatureItem extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: iconSize, color: iconColor ?? context.palette.textMuted),
+        Icon(
+          icon,
+          size: iconSize,
+          color: iconColor ?? context.palette.textMuted,
+        ),
         const SizedBox(width: 4),
         Text(
           text,

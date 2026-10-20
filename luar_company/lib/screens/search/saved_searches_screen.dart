@@ -82,7 +82,7 @@ class _SavedSearchesScreenState extends State<SavedSearchesScreen> {
             return EmptyState(
               icon: Icons.bookmark_border,
               title: l10n.semPesquisasGuardadas,
-              subtitle: l10n.guardarPesquisa,
+              message: l10n.guardarPesquisa,
             );
           }
           if (provider.isLoading) {
@@ -116,7 +116,7 @@ class _SavedSearchesScreenState extends State<SavedSearchesScreen> {
             return EmptyState(
               icon: Icons.bookmark_border,
               title: l10n.semPesquisasGuardadas,
-              subtitle: l10n.guardarPesquisa,
+              message: l10n.guardarPesquisa,
             );
           }
 

@@ -107,7 +107,7 @@ class _PartnersScreenState extends State<PartnersScreen> {
             return EmptyState(
               icon: Icons.handshake_outlined,
               title: l10n.nenhumParceiro,
-              subtitle: l10n.osParceirosAqui,
+              message: l10n.osParceirosAqui,
             );
           }
 

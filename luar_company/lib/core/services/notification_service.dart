@@ -17,7 +17,7 @@ import 'supabase_service.dart';
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // O sistema mostra a notificação automaticamente; nada a fazer aqui.
-  debugPrint('[Luar] Mensagem em segundo plano: ${message.messageId}');
+if (kDebugMode) {   debugPrint('[Luar] Mensagem em segundo plano: ${message.messageId}'); }
 }
 
 class NotificationService {
@@ -65,13 +65,13 @@ class NotificationService {
         );
         _firebaseInitialized = true;
       } else {
-        debugPrint(
+if (kDebugMode) {         debugPrint(
           '[Luar] Firebase não configurado. Notificações push desativadas.',
-        );
+        ); }
       }
     } catch (e) {
       _firebaseInitialized = false;
-      debugPrint('[Luar] Firebase initialization failed: $e');
+if (kDebugMode) {       debugPrint('[Luar] Firebase initialization failed: $e'); }
     }
 
     if (!_firebaseInitialized) return;
@@ -110,7 +110,7 @@ class NotificationService {
         }
       }
     } catch (e) {
-      debugPrint('[Luar] Firebase messaging setup failed: $e');
+if (kDebugMode) {       debugPrint('[Luar] Firebase messaging setup failed: $e'); }
     }
   }
 
@@ -151,7 +151,7 @@ class NotificationService {
     try {
       return await FirebaseMessaging.instance.getToken();
     } catch (e) {
-      debugPrint('[Luar] Failed to get FCM token: $e');
+if (kDebugMode) {       debugPrint('[Luar] Failed to get FCM token: $e'); }
       return null;
     }
   }
@@ -185,7 +185,7 @@ class NotificationService {
           .eq('platform', _platform)
           .neq('token', token);
     } catch (e) {
-      debugPrint('[Luar] Failed to save token: $e');
+if (kDebugMode) {       debugPrint('[Luar] Failed to save token: $e'); }
     }
   }
 
@@ -222,7 +222,7 @@ class NotificationService {
         },
       );
     } catch (e) {
-      debugPrint('[Luar] Failed to send notification: $e');
+if (kDebugMode) {       debugPrint('[Luar] Failed to send notification: $e'); }
     }
   }
 
@@ -311,7 +311,7 @@ class NotificationService {
     final parsed = AppRoutes.parse(route);
     if (parsed == null) {
       if (route != null && route.isNotEmpty) {
-        debugPrint('[Luar] Rota de notificação rejeitada: $route');
+if (kDebugMode) {         debugPrint('[Luar] Rota de notificação rejeitada: $route'); }
       }
       return;
     }
@@ -355,7 +355,7 @@ class NotificationService {
       }
       await FirebaseMessaging.instance.deleteToken();
     } catch (e) {
-      debugPrint('[Luar] Failed to delete token: $e');
+if (kDebugMode) {       debugPrint('[Luar] Failed to delete token: $e'); }
     }
   }
 }

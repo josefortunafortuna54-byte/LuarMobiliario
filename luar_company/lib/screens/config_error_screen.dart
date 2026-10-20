@@ -40,7 +40,7 @@ class ConfigErrorScreen extends StatelessWidget {
         child: EmptyState(
           icon: Icons.cloud_off_rounded,
           title: l10n.configEmFaltaTitulo,
-          subtitle: l10n.configEmFaltaDesc,
+          message: l10n.configEmFaltaDesc,
         ),
       ),
     );

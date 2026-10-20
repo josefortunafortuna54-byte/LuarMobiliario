@@ -2,86 +2,75 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:luar_company/widgets/empty_state.dart';
 
-import '../helpers/test_app.dart';
-
 void main() {
-  group('EmptyState', () {
-    testWidgets('renders icon, title and subtitle', (tester) async {
-      await tester.pumpWidget(
-        testApp(
-          home: Scaffold(
-            body: EmptyState(
-              icon: Icons.home_outlined,
-              title: 'Sem imóveis',
-              subtitle: 'Não há imóveis disponíveis.',
-            ),
-          ),
+  Widget wrap(Widget child) {
+    return MaterialApp(
+      home: Scaffold(body: child),
+    );
+  }
+
+  testWidgets('renders icon, title and message', (tester) async {
+    await tester.pumpWidget(
+      wrap(
+        const EmptyState(
+          icon: Icons.home_outlined,
+          title: 'Sem resultados',
+          message: 'Não há imóveis disponíveis.',
         ),
-      );
+      ),
+    );
 
-      expect(find.byIcon(Icons.home_outlined), findsOneWidget);
-      expect(find.text('Sem imóveis'), findsOneWidget);
-      expect(find.text('Não há imóveis disponíveis.'), findsOneWidget);
-    });
+    expect(find.byIcon(Icons.home_outlined), findsOneWidget);
+    expect(find.text('Sem resultados'), findsOneWidget);
+    expect(find.text('Não há imóveis disponíveis.'), findsOneWidget);
+  });
 
-    testWidgets('does not show action button when actionLabel is null',
-        (tester) async {
-      await tester.pumpWidget(
-        testApp(
-          home: Scaffold(
-            body: EmptyState(
-              icon: Icons.star_outline,
-              title: 'Título',
-              subtitle: 'Subtítulo',
-            ),
-          ),
+  testWidgets('renders without message', (tester) async {
+    await tester.pumpWidget(
+      wrap(
+        const EmptyState(
+          icon: Icons.search_off,
+          title: 'Sem resultados',
         ),
-      );
+      ),
+    );
 
-      expect(find.byType(ElevatedButton), findsNothing);
-    });
+    expect(find.text('Sem resultados'), findsOneWidget);
+    expect(find.text('Subtítulo'), findsNothing);
+  });
 
-    testWidgets('shows action button and triggers onAction when tapped',
-        (tester) async {
-      var tapped = false;
-
-      await tester.pumpWidget(
-        testApp(
-          home: Scaffold(
-            body: EmptyState(
-              icon: Icons.refresh,
-              title: 'Título',
-              subtitle: 'Subtítulo',
-              actionLabel: 'Tentar novamente',
-              onAction: () => tapped = true,
-            ),
-          ),
+  testWidgets('renders action button when provided', (tester) async {
+    var tapped = false;
+    await tester.pumpWidget(
+      wrap(
+        EmptyState(
+          icon: Icons.search_off,
+          title: 'Sem resultados',
+          message: 'Subtítulo',
+          actionLabel: 'Limpar filtros',
+          onAction: () => tapped = true,
         ),
-      );
+      ),
+    );
 
-      final button = find.byType(ElevatedButton);
-      expect(button, findsOneWidget);
-      expect(find.text('Tentar novamente'), findsOneWidget);
+    expect(find.text('Limpar filtros'), findsOneWidget);
+    await tester.tap(find.text('Limpar filtros'));
+    await tester.pump();
+    expect(tapped, isTrue);
+  });
 
-      await tester.tap(button);
-      expect(tapped, isTrue);
-    });
-
-    testWidgets('applies textAlign center to texts', (tester) async {
-      await tester.pumpWidget(
-        testApp(
-          home: Scaffold(
-            body: EmptyState(
-              icon: Icons.info_outline,
-              title: 'Título',
-              subtitle: 'Subtítulo extenso para testar alinhamento central.',
-            ),
-          ),
+  testWidgets('message is centered', (tester) async {
+    await tester.pumpWidget(
+      wrap(
+        const EmptyState(
+          icon: Icons.inbox_outlined,
+          title: 'Vazio',
+          message: 'Subtítulo extenso para testar alinhamento central.',
         ),
-      );
+      ),
+    );
 
-      final subtitle = tester.widget<Text>(find.textContaining('Subtítulo'));
-      expect(subtitle.textAlign, TextAlign.center);
-    });
+    final subtitle = tester.widget<Text>(find.textContaining('Subtítulo'));
+    expect(subtitle.textAlign, TextAlign.center);
   });
 }

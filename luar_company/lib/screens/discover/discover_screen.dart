@@ -389,7 +389,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> with RouteAware {
             EmptyState(
               icon: icon,
               title: title,
-              subtitle: subtitle,
+              message: subtitle,
               actionLabel: actionLabel,
               onAction: onAction,
             ),

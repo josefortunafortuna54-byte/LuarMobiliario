@@ -97,7 +97,7 @@ class AuthService {
         );
       }
     } catch (e) {
-      debugPrint('[Luar] Failed to update auth profile: $e');
+if (kDebugMode) {       debugPrint('[Luar] Failed to update auth profile: $e'); }
     }
 
     if (currentUser != null) {

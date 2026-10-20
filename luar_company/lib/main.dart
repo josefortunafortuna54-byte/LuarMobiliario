@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'app.dart';
@@ -26,9 +27,11 @@ Future<void> main() async {
     ..maximumSize = 120;
 
   if (!EnvConfig.isConfigured) {
-    debugPrint(
-      '[Luar] SUPABASE_URL/SUPABASE_ANON_KEY em falta — a mostrar ecrã de configuração.',
-    );
+    if (kDebugMode) {
+      debugPrint(
+        '[Luar] SUPABASE_URL/SUPABASE_ANON_KEY em falta — a mostrar ecrã de configuração.',
+      );
+    }
     runApp(const ConfigErrorApp());
     return;
   }
@@ -36,13 +39,17 @@ Future<void> main() async {
   try {
     await SupabaseService.initialize();
   } catch (e) {
-    debugPrint('[Luar] Supabase initialization failed: $e');
+    if (kDebugMode) {
+      debugPrint('[Luar] Supabase initialization failed: $e');
+    }
   }
 
   try {
     await NotificationService().initialize();
   } catch (e) {
-    debugPrint('[Luar] Notification initialization failed: $e');
+    if (kDebugMode) {
+      debugPrint('[Luar] Notification initialization failed: $e');
+    }
   }
 
   final themeProvider = await ThemeProvider.load();

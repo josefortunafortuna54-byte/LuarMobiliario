@@ -82,7 +82,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
           return EmptyState(
             icon: Icons.chat_bubble_outline_rounded,
             title: l10n.semMensagens,
-            subtitle: l10n.suasConversas,
+            message: l10n.suasConversas,
           );
         }
 

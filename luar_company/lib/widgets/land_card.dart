@@ -54,30 +54,32 @@ class LandCard extends StatelessWidget {
     if (variant == PropertyCardVariant.horizontal) {
       return _buildHorizontal(context);
     }
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: context.palette.surface,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.navy.withValues(alpha: 0.08),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-            ),
-            BoxShadow(
-              color: AppColors.navy.withValues(alpha: 0.03),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [_buildImage(context), _buildContent(context)],
+    return RepaintBoundary(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: context.palette.surface,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.navy.withValues(alpha: 0.08),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+              BoxShadow(
+                color: AppColors.navy.withValues(alpha: 0.03),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [_buildImage(context), _buildContent(context)],
+          ),
         ),
       ),
     );
@@ -86,7 +88,8 @@ class LandCard extends StatelessWidget {
   /// Variante horizontal: miniatura à esquerda, conteúdo à direita.
   Widget _buildHorizontal(BuildContext context) {
     final palette = context.palette;
-    return GestureDetector(
+    return RepaintBoundary(
+      child: GestureDetector(
       onTap: onTap,
       child: Container(
         height: 132,
@@ -109,6 +112,7 @@ class LandCard extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 

@@ -317,7 +317,7 @@ class _EmptyListings extends StatelessWidget {
     return EmptyState(
       icon: Icons.home_work_outlined,
       title: l10n.semAnuncios,
-      subtitle: l10n.semAnunciosSubtitulo,
+      message: l10n.semAnunciosSubtitulo,
       actionLabel: l10n.novoAnuncio,
       onAction: onCreate,
     );

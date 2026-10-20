@@ -1,3 +1,4 @@
+import 'package:visibility_detector/visibility_detector.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -41,6 +42,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget>
   bool _isAppActive = true;
   bool _userPaused = false;
   bool _wantsPlay = false;
+  bool _isVisible = true;
 
   @override
   void initState() {
@@ -122,7 +124,8 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget>
         (widget.autoPlay || _wantsPlay) &&
         widget.isActive &&
         _isAppActive &&
-        !_userPaused;
+        !_userPaused &&
+        _isVisible;
 
     if (!mounted) return;
     if (shouldPlay && !controller.value.isPlaying) {
@@ -193,6 +196,20 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget>
 
   @override
   Widget build(BuildContext context) {
+    return VisibilityDetector(
+      key: Key('video-${widget.url}'),
+      onVisibilityChanged: (info) {
+        final visible = info.visibleFraction > 0.6;
+        if (visible != _isVisible) {
+          _isVisible = visible;
+          _syncPlayback();
+        }
+      },
+      child: _buildContent(),
+    );
+  }
+
+  Widget _buildContent() {
     if (_hasError) {
       return Stack(
         fit: StackFit.expand,

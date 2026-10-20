@@ -70,7 +70,7 @@ class ComparisonScreen extends StatelessWidget {
     return EmptyState(
       icon: Icons.compare_arrows_rounded,
       title: l10n.comparacaoVaziaTitulo,
-      subtitle: l10n.comparacaoVaziaSubtitulo,
+      message: l10n.comparacaoVaziaSubtitulo,
       actionLabel: l10n.explorarImoveis,
       onAction: () => Navigator.of(context).pushReplacementNamed(
         AppRoutes.discover,

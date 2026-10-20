@@ -106,7 +106,7 @@ class _AdminReportsScreenState extends State<AdminReportsScreen> {
                 ? EmptyState(
                     icon: Icons.flag_outlined,
                     title: l10n.semDenuncias,
-                    subtitle: l10n.gestaoCompleta,
+                    message: l10n.gestaoCompleta,
                   )
                 : RefreshIndicator(
                     onRefresh: () => context.read<ReportProvider>().loadReports(),

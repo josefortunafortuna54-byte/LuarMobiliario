@@ -5,7 +5,9 @@ import 'package:integration_test/integration_test.dart';
 import 'package:luar_company/main.dart' as app;
 import 'package:luar_company/core/utils/routes.dart';
 import 'package:luar_company/screens/splash/splash_screen.dart';
+import 'package:luar_company/screens/welcome/welcome_screen.dart';
 import 'package:luar_company/screens/home/main_shell.dart';
+import 'package:luar_company/widgets/custom_button.dart';
 
 /// Testes de integração (T-036).
 ///
@@ -22,29 +24,44 @@ void main() {
     expect(find.byType(SplashScreen), findsOneWidget);
   });
 
-  testWidgets('Sem sessão, o splash navega diretamente para o Home (acesso livre)',
-      (tester) async {
-    await app.main();
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 300));
+  testWidgets(
+    'Sem sessão, o splash mostra as boas-vindas e o CTA leva ao Home',
+    (tester) async {
+      await app.main();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
-    expect(find.byType(SplashScreen), findsOneWidget);
+      expect(find.byType(SplashScreen), findsOneWidget);
 
-    // SplashScreen aguarda ~2s antes de navegar (sem rede nesta fase).
-    await tester.runAsync(
-      () => Future<void>.delayed(const Duration(seconds: 2)),
-    );
+      // SplashScreen aguarda ~2s antes de navegar (sem rede nesta fase).
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(seconds: 2)),
+      );
 
-    await tester.pump(const Duration(milliseconds: 400));
-    await tester.pump(const Duration(milliseconds: 400));
-    await tester.pump(const Duration(milliseconds: 400));
+      await tester.pump(const Duration(milliseconds: 450));
+      await tester.pump(const Duration(milliseconds: 450));
 
-    expect(find.byType(MainShell), findsOneWidget);
-  });
+      expect(find.byType(WelcomeScreen), findsOneWidget);
+      expect(find.byType(MainShell), findsNothing);
+
+      // CTA "Explorar Imóveis" (busca por tipo para não depender do idioma).
+      await tester.tap(find.byType(CustomButton).first);
+      await tester.pump(const Duration(milliseconds: 450));
+      await tester.pump(const Duration(milliseconds: 450));
+
+      expect(find.byType(MainShell), findsOneWidget);
+    },
+  );
 
   testWidgets('onGenerateRoute resolve a rota de splash', (tester) async {
     final route = onGenerateRoute(const RouteSettings(name: AppRoutes.splash));
     expect(route, isNotNull);
     expect(route.settings.name, AppRoutes.splash);
+  });
+
+  testWidgets('onGenerateRoute resolve a rota de welcome', (tester) async {
+    final route = onGenerateRoute(const RouteSettings(name: AppRoutes.welcome));
+    expect(route, isNotNull);
+    expect(route.settings.name, AppRoutes.welcome);
   });
 }

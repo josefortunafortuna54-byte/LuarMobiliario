@@ -30,9 +30,24 @@ e este projeto adota o [Semantic Versioning](https://semver.org/lang/pt-BR/).
   ficheiro companheiro, aplicado como novo).
 - **Menu Admin no perfil**: acesso direto ao painel de gestão para
   administradores e agentes (a entrada não aparece a clientes).
+- **Widgets de arranque**: `PremiumSplashBackground` (gradiente hero com
+  orbes douradas animadas) e `GoldShimmerRing` (anel com varredura de brilho
+  à volta do logo), reutilizados pelo splash e pelas boas-vindas.
 
 ### Alterado
 
+- **Fluxo de arranque (Splash → Welcome → Home)**: o splash passa a
+  navegar para o ecrã de boas-vindas (antes ia direto ao Home), com
+  transição suave de fade+zoom (`startupFadeRoute`). Em notificações de
+  arranque frio, o splash salta as boas-vindas e vai direto ao destino
+  (`NotificationService.hasPendingNavigation`).
+- **Splash**: redesenho premium — fundo com orbes douradas animadas, logo
+  com anel shimmer e glow, e barra de carregamento gold (substitui o
+  spinner circular).
+- **Boas-vindas**: redesenho premium em ecrã inteiro navy+gold com
+  entrada escalonada (fade + slide-up), grelha de cartões "glass" com as
+  7 features (substitui a lista vertical) e CTA "Explorar Imóveis";
+  comporta-se bem em telemóvel, tablet e desktop.
 - **Painel admin**: redesenho visual — cabeçalho hero com detalhe dourado e
   ícone admin, secções com acento gold, cartões de estatística com bordas do
   tema, métricas e chips legíveis no modo escuro (top-5 com medalhas) e

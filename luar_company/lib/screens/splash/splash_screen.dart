@@ -7,6 +7,10 @@ import '../../core/providers/auth_provider.dart';
 import '../../core/services/notification_service.dart';
 import '../../core/utils/routes.dart';
 import '../../l10n/app_localizations.dart';
+import '../home/main_shell.dart';
+import '../welcome/welcome_screen.dart';
+import '../../widgets/gold_shimmer_ring.dart';
+import '../../widgets/premium_splash_background.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -61,7 +65,7 @@ class _SplashScreenState extends State<SplashScreen>
     await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
 
-    // Acesso livre: o utilizador entra diretamente no Home sem obrigação de login.
+    // Acesso livre: o utilizador entra diretamente no App sem obrigação de login.
     // Se existir sessão, restauramos o utilizador para funcionalidades autenticadas.
     try {
       final auth = context.read<AuthProvider>();
@@ -71,10 +75,18 @@ class _SplashScreenState extends State<SplashScreen>
     }
 
     if (!mounted) return;
-    Navigator.of(context).pushReplacementNamed(AppRoutes.home);
 
-    // Notificação de arranque frio: navegar só agora, com o Navigator pronto.
-    NotificationService().consumePendingNavigation();
+    // Notificação de arranque frio: salta as boas-vindas e vai direto ao destino.
+    final hasPending = NotificationService().hasPendingNavigation;
+    Navigator.of(context).pushReplacement(
+      startupFadeRoute(
+        hasPending ? const MainShell() : const WelcomeScreen(),
+        RouteSettings(name: hasPending ? AppRoutes.home : AppRoutes.welcome),
+      ),
+    );
+    if (hasPending) {
+      NotificationService().consumePendingNavigation();
+    }
   }
 
   @override
@@ -88,10 +100,7 @@ class _SplashScreenState extends State<SplashScreen>
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: AppColors.navy,
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(gradient: AppColors.heroGradient),
+      body: PremiumSplashBackground(
         child: AnimatedBuilder(
           animation: _controller,
           builder: (context, _) {
@@ -142,15 +151,23 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                 ),
                 const Spacer(flex: 3),
-                SizedBox(
-                  width: 28,
-                  height: 28,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.5,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      AppColors.gold.withValues(alpha: 0.7),
+                FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: SizedBox(
+                    width: 160,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(2),
+                      child: LinearProgressIndicator(
+                        minHeight: 3,
+                        backgroundColor: AppColors.white.withValues(
+                          alpha: 0.15,
+                        ),
+                        valueColor: const AlwaysStoppedAnimation<Color>(
+                          AppColors.goldLight,
+                        ),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
                     ),
-                    backgroundColor: AppColors.gold.withValues(alpha: 0.15),
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -163,26 +180,39 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Widget _buildLogo() {
-    return Container(
-      width: 120,
-      height: 120,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.gold.withValues(alpha: 0.2),
-            blurRadius: 40,
-            spreadRadius: 4,
+    return GoldShimmerRing(
+      size: 120,
+      radius: 28,
+      borderWidth: 2,
+      child: Container(
+        width: 120,
+        height: 120,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(28),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.gold.withValues(alpha: 0.25),
+              blurRadius: 48,
+              spreadRadius: 6,
+            ),
+            BoxShadow(
+              color: AppColors.black.withValues(alpha: 0.3),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Image.asset(
+          'logo.png',
+          fit: BoxFit.cover,
+          // Fallback se o asset falhar (não quebra o arranque).
+          errorBuilder: (context, error, stackTrace) => const ColoredBox(
+            color: AppColors.navyLight,
+            child: Icon(Icons.apartment_rounded, color: AppColors.gold),
           ),
-          BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        ),
       ),
-      clipBehavior: Clip.antiAlias,
-      child: Image.asset('logo.png', fit: BoxFit.cover),
     );
   }
 }

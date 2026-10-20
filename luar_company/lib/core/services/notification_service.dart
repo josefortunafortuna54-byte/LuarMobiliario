@@ -327,6 +327,11 @@ class NotificationService {
     if (parsed != null) _pendingRoute = parsed;
   }
 
+  /// Existe uma rota de notificação de arranque frio por consumir?
+  /// O splash usa isto para saltar o ecrã de boas-vindas e ir direto
+  /// para o destino da notificação.
+  bool get hasPendingNavigation => _pendingRoute != null;
+
   /// Empurra a rota pendente (cold start), se existir. Chamado pelo splash
   /// depois de navegar para o home, quando o Navigator já está pronto.
   void consumePendingNavigation() {

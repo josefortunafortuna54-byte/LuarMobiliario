@@ -243,6 +243,27 @@ String? _idFromPath(String path, String prefix) {
   return id.isEmpty || id.contains(':') ? null : id;
 }
 
+/// Transição suave (fade + zoom subtil) usada no fluxo de arranque
+/// (splash → welcome → home), mais contínua que o slide horizontal padrão.
+PageRouteBuilder startupFadeRoute(Widget page, RouteSettings settings) {
+  return PageRouteBuilder(
+    settings: settings,
+    transitionDuration: const Duration(milliseconds: 450),
+    reverseTransitionDuration: const Duration(milliseconds: 300),
+    pageBuilder: (context, animation, secondaryAnimation) => page,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      final curved = CurvedAnimation(parent: animation, curve: Curves.easeOut);
+      return FadeTransition(
+        opacity: curved,
+        child: ScaleTransition(
+          scale: Tween<double>(begin: 1.04, end: 1.0).animate(curved),
+          child: child,
+        ),
+      );
+    },
+  );
+}
+
 PageRouteBuilder _buildRoute(
   Widget page,
   RouteSettings settings, {

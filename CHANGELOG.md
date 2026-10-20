@@ -30,9 +30,15 @@ e este projeto adota o [Semantic Versioning](https://semver.org/lang/pt-BR/).
   ficheiro companheiro, aplicado como novo).
 - **Menu Admin no perfil**: acesso direto ao painel de gestão para
   administradores e agentes (a entrada não aparece a clientes).
-- **Widgets de arranque**: `PremiumSplashBackground` (gradiente hero com
-  orbes douradas animadas) e `GoldShimmerRing` (anel com varredura de brilho
-  à volta do logo), reutilizados pelo splash e pelas boas-vindas.
+- **Widgets de arranque**: `PremiumSplashBackground` (foto de fundo com
+  scrim navy e orbes douradas animadas) e `GoldShimmerRing` (anel com
+  varredura de brilho à volta do logo), reutilizados pelo splash e pelas
+  boas-vindas.
+- **Imagem de fundo do arranque** (`luar_company/fundo.jpeg`): usada nos
+  ecrãs anteriores à Home (splash e boas-vindas) por trás de um scrim navy
+  que garante a legibilidade do conteúdo. O asset foi redimensionado para
+  1920px e comprimido (≈420 KB) para não pesar no arranque; se o asset
+  falhar, o fundo cai no gradiente navy sem partir o ecrã.
 
 ### Alterado
 

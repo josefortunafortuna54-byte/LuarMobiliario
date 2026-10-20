@@ -6,8 +6,9 @@ import '../core/constants/app_colors.dart';
 
 /// Fundo premium do fluxo de arranque (splash e welcome).
 ///
-/// Gradiente navy + orbes douradas com brilho suave que flutuam
-/// devagar, garantindo um aspeto coerente entre os dois ecrãs.
+/// Foto de fundo (`fundo.jpeg`) com scrim navy + orbes douradas com brilho
+/// suave que flutuam devagar, garantindo um aspeto coerente entre os dois
+/// ecrãs e legibilidade do conteúdo por cima da imagem.
 class PremiumSplashBackground extends StatefulWidget {
   const PremiumSplashBackground({super.key, required this.child});
 
@@ -38,6 +39,18 @@ class _PremiumSplashBackgroundState extends State<PremiumSplashBackground>
       child: Stack(
         fit: StackFit.expand,
         children: [
+          // Foto de fundo (fallback: só o gradiente navy, sem quebrar).
+          Image.asset(
+            'fundo.jpeg',
+            fit: BoxFit.cover,
+            excludeFromSemantics: true,
+            errorBuilder: (context, error, stackTrace) =>
+                const SizedBox.shrink(),
+          ),
+          // Scrim navy: garante contraste do texto/cartões sobre a foto.
+          const DecoratedBox(
+            decoration: BoxDecoration(gradient: _backgroundScrim),
+          ),
           RepaintBoundary(
             child: AnimatedBuilder(
               animation: _controller,
@@ -51,6 +64,19 @@ class _PremiumSplashBackgroundState extends State<PremiumSplashBackground>
     );
   }
 }
+
+/// Escurece o topo/base para o conteúdo respirar e satura o centro para a
+/// foto ganhar o tom navy da marca.
+const LinearGradient _backgroundScrim = LinearGradient(
+  begin: Alignment.topCenter,
+  end: Alignment.bottomCenter,
+  colors: [
+    Color(0xB30E3A4B), // navy 70%
+    Color(0x8C17576B), // navyLight 55%
+    Color(0xE6081F27), // navyDark 90%
+  ],
+  stops: [0.0, 0.45, 1.0],
+);
 
 class _OrbsPainter extends CustomPainter {
   const _OrbsPainter(this.progress);

@@ -59,3 +59,6 @@ captures/
 
 # Diretórios genéricos do SO
 Thumbs.db
+
+# Estado local de agentes de IA (sessões, planos e ficheiros de continuação)
+.omo/

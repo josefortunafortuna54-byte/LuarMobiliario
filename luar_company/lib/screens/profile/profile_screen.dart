@@ -10,6 +10,7 @@ import '../../core/repositories/favorite_repository.dart';
 import '../../core/repositories/land_repository.dart';
 import '../../core/repositories/property_repository.dart';
 import '../../core/theme/app_palette.dart';
+import '../../core/utils/permissions.dart';
 import '../../core/utils/responsive.dart';
 import '../../core/utils/routes.dart';
 import '../../l10n/app_localizations.dart';
@@ -252,7 +253,7 @@ class ProfileScreen extends StatelessWidget {
   }) {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
-    final canManageListings = role == UserRole.agent || role == UserRole.admin;
+    final canManageListings = Permissions.canCreateListing(role);
 
     final menuItems = [
       if (canManageListings)
@@ -261,7 +262,7 @@ class ProfileScreen extends StatelessWidget {
           title: l10n.meusAnuncios,
           route: AppRoutes.myListings,
         ),
-      if (canManageListings)
+      if (Permissions.canAccessAdminPanel(role))
         _MenuItem(
           icon: Icons.admin_panel_settings_outlined,
           title: l10n.admin,

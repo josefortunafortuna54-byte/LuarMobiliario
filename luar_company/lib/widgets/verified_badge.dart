@@ -34,6 +34,8 @@ class VerifiedBadge extends StatelessWidget {
           SizedBox(width: compact ? 3 : 4),
           Text(
             AppLocalizations.of(context).verificado,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: AppTextStyles.labelSmall.copyWith(
               color: AppColors.info,
               fontSize: compact ? 9 : 10,

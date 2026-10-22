@@ -37,11 +37,19 @@ class PriceTag extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.baseline,
       textBaseline: TextBaseline.alphabetic,
       children: [
-        Text(text, style: _textStyle),
+        Flexible(
+          child: Text(
+            text,
+            style: _textStyle,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
         if (isRent) ...[
           const SizedBox(width: 2),
           Text(
             AppLocalizations.of(context).perMes,
+            maxLines: 1,
             style: AppTextStyles.bodySmall.copyWith(
               color: context.palette.textSecondary,
               fontWeight: FontWeight.w500,

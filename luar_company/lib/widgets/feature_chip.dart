@@ -39,6 +39,8 @@ class FeatureChip extends StatelessWidget {
           ],
           Text(
             label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: AppTextStyles.bodyTiny.copyWith(
               color: foregroundColor ?? palette.textBody,
               fontWeight: FontWeight.w500,

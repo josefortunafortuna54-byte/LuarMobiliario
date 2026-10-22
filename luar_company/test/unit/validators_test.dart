@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:luar_company/core/constants/app_constants.dart';
 import 'package:luar_company/core/utils/validators.dart';
 
 void main() {
@@ -160,6 +161,51 @@ void main() {
       expect(
         Validators.match('abc', r'^\d+$', customMessage: 'Só números'),
         'Só números',
+      );
+    });
+  });
+
+  group('Validators.adminPassword', () {
+    test('returns error for null value', () {
+      expect(Validators.adminPassword(null), 'Introduza a palavra-passe');
+    });
+
+    test('returns error for empty string', () {
+      expect(Validators.adminPassword(''), 'Introduza a palavra-passe');
+    });
+
+    test('rejects the legacy 6-digit PIN', () {
+      expect(
+        Validators.adminPassword('123456'),
+        'A palavra-passe deve ter pelo menos 10 caracteres',
+      );
+    });
+
+    test('returns error for a 9-character password', () {
+      expect(
+        Validators.adminPassword('abc1234xy'),
+        'A palavra-passe deve ter pelo menos 10 caracteres',
+      );
+    });
+
+    test('returns null for a password with the minimum length', () {
+      expect(Validators.adminPassword('abc1234xyz'), isNull);
+    });
+
+    test('ignores surrounding whitespace when measuring the length', () {
+      expect(Validators.adminPassword('  abc1234xyz  '), isNull);
+    });
+
+    test('uses the minimum length from AppConstants', () {
+      expect(
+        Validators.adminPassword(
+          'a' * (AppConstants.adminPasswordMinLength - 1),
+        ),
+        isNotNull,
+      );
+      expect(
+        Validators.adminPassword('a' * AppConstants.adminPasswordMinLength),
+        isNull,
       );
     });
   });

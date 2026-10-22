@@ -9,6 +9,13 @@ abstract final class AppConstants {
   // ── Admin ────────────────────────────────────────────────────────
   // Valor carregado de EnvConfig - nao hardcode aqui
 
+  /// Comprimento mínimo da palavra-passe do administrador.
+  ///
+  /// O PIN de 6 dígitos deixou de ser aceite: a palavra-passe do admin é
+  /// usada directamente como credencial Supabase Auth, pelo que tem de ter
+  /// resistência real a força bruta.
+  static const int adminPasswordMinLength = 10;
+
   // ── Contact ────────────────────────────────────────────────────────
 
   static const String whatsappNumber = '244942203497';

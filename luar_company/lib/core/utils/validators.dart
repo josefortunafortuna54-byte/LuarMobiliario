@@ -1,4 +1,5 @@
 import '../../l10n/app_localizations.dart';
+import '../constants/app_constants.dart';
 
 class Validators {
   Validators._();
@@ -91,6 +92,25 @@ class Validators {
     final regex = RegExp(pattern);
     if (!regex.hasMatch(value.trim())) {
       return customMessage ?? l10n?.formatoInvalido ?? 'Formato inválido';
+    }
+    return null;
+  }
+
+  /// Política de palavra-passe do administrador.
+  ///
+  /// O ecrã de login do administrador usava um PIN de 6 dígitos como
+  /// credencial do Supabase Auth — 1 000 000 de combinações contra o
+  /// endpoint de autenticação. A palavra-passe é agora real e tem de ter
+  /// resistência a força bruta, pelo que o mínimo é de
+  /// [AppConstants.adminPasswordMinLength] caracteres.
+  static String? adminPassword(String? value, {AppLocalizations? l10n}) {
+    if (value == null || value.trim().isEmpty) {
+      return l10n?.insiraPasse ?? 'Introduza a palavra-passe';
+    }
+    if (value.trim().length < AppConstants.adminPasswordMinLength) {
+      return l10n?.passeMinCaracteres ??
+          'A palavra-passe deve ter pelo menos '
+              '${AppConstants.adminPasswordMinLength} caracteres';
     }
     return null;
   }

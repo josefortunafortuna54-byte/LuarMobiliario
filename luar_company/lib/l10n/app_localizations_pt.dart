@@ -1511,22 +1511,23 @@ class AppLocalizationsPt extends AppLocalizations {
   String get contactos => 'Contactos';
 
   @override
-  String get insiraEmailPasse => 'Insira o email e a sua passe de acesso';
+  String get insiraEmailPasse => 'Insira o email e a sua palavra-passe';
 
   @override
-  String get passeAcesso => 'Passe de acesso';
+  String get passeAcesso => 'Palavra-passe';
 
   @override
-  String get passeHint => '6 dígitos';
+  String get passeHint => 'Mínimo 10 caracteres';
 
   @override
-  String get insiraPasse => 'Insira a sua passe de acesso';
+  String get insiraPasse => 'Insira a sua palavra-passe';
 
   @override
-  String get passe6Digitos => 'A passe deve ter 6 dígitos';
+  String get passeMinCaracteres =>
+      'A palavra-passe deve ter pelo menos 10 caracteres';
 
   @override
-  String get passeIncorreta => 'Email ou passe de acesso incorretos';
+  String get passeIncorreta => 'Email ou palavra-passe incorretos';
 
   @override
   String get entrar => 'Entrar';

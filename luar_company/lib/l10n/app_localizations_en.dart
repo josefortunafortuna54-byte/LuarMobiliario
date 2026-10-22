@@ -1504,22 +1504,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get contactos => 'Contacts';
 
   @override
-  String get insiraEmailPasse => 'Enter your email and access passcode';
+  String get insiraEmailPasse => 'Enter your email and password';
 
   @override
-  String get passeAcesso => 'Access passcode';
+  String get passeAcesso => 'Password';
 
   @override
-  String get passeHint => '6 digits';
+  String get passeHint => 'At least 10 characters';
 
   @override
-  String get insiraPasse => 'Enter your access passcode';
+  String get insiraPasse => 'Enter your password';
 
   @override
-  String get passe6Digitos => 'Passcode must be 6 digits';
+  String get passeMinCaracteres => 'Password must be at least 10 characters';
 
   @override
-  String get passeIncorreta => 'Invalid email or access passcode';
+  String get passeIncorreta => 'Invalid email or password';
 
   @override
   String get entrar => 'Sign in';

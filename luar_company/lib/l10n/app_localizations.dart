@@ -2903,37 +2903,37 @@ abstract class AppLocalizations {
   /// No description provided for @insiraEmailPasse.
   ///
   /// In pt, this message translates to:
-  /// **'Insira o email e a sua passe de acesso'**
+  /// **'Insira o email e a sua palavra-passe'**
   String get insiraEmailPasse;
 
   /// No description provided for @passeAcesso.
   ///
   /// In pt, this message translates to:
-  /// **'Passe de acesso'**
+  /// **'Palavra-passe'**
   String get passeAcesso;
 
   /// No description provided for @passeHint.
   ///
   /// In pt, this message translates to:
-  /// **'6 dígitos'**
+  /// **'Mínimo 10 caracteres'**
   String get passeHint;
 
   /// No description provided for @insiraPasse.
   ///
   /// In pt, this message translates to:
-  /// **'Insira a sua passe de acesso'**
+  /// **'Insira a sua palavra-passe'**
   String get insiraPasse;
 
-  /// No description provided for @passe6Digitos.
+  /// No description provided for @passeMinCaracteres.
   ///
   /// In pt, this message translates to:
-  /// **'A passe deve ter 6 dígitos'**
-  String get passe6Digitos;
+  /// **'A palavra-passe deve ter pelo menos 10 caracteres'**
+  String get passeMinCaracteres;
 
   /// No description provided for @passeIncorreta.
   ///
   /// In pt, this message translates to:
-  /// **'Email ou passe de acesso incorretos'**
+  /// **'Email ou palavra-passe incorretos'**
   String get passeIncorreta;
 
   /// No description provided for @entrar.

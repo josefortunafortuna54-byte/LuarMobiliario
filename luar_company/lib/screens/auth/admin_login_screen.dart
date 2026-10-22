@@ -13,6 +13,7 @@ import '../../core/theme/app_palette.dart';
 import '../../core/utils/permissions.dart';
 import '../../core/utils/responsive.dart';
 import '../../core/utils/routes.dart';
+import '../../core/utils/validators.dart';
 import '../../l10n/app_localizations.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_input.dart';
@@ -129,10 +130,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   }
 
   String? _validatePass(String? value) {
-    final l10n = AppLocalizations.of(context);
-    if (value == null || value.isEmpty) return l10n.insiraPasse;
-    if (value.trim().length != 6) return l10n.passe6Digitos;
-    return null;
+    return Validators.adminPassword(value, l10n: AppLocalizations.of(context));
   }
 
   @override
@@ -260,7 +258,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                 label: l10n.passeAcesso,
                 hint: l10n.passeHint,
                 prefixIcon: Icons.lock_outline_rounded,
-                keyboardType: TextInputType.number,
+                keyboardType: TextInputType.text,
                 textInputAction: TextInputAction.done,
                 obscureText: true,
                 controller: _passController,

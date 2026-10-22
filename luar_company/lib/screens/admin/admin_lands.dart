@@ -141,50 +141,59 @@ class _AdminLandsScreenState extends State<AdminLandsScreen> {
         ),
         iconTheme: const IconThemeData(color: AppColors.gold),
       ),
-      body: Column(
-        children: [
-          _buildSearchBar(),
-          Expanded(
-            child: Consumer<LandProvider>(
-              builder: (context, provider, _) {
-                if (provider.isLoading && provider.lands.isEmpty) {
-                  return Center(
-                    child: LoadingWidget(
-                      message: AppLocalizations.of(context).carregandoTerrenos,
-                    ),
-                  );
-                }
-
-                _filterLands(provider.lands);
-
-                if (provider.lands.isEmpty) {
-                  return _buildEmptyState();
-                }
-
-                if (_filteredLands.isEmpty) {
-                  return _buildNoResults();
-                }
-
-                return RefreshIndicator(
-                  onRefresh: () => provider.loadLands(),
-                  color: AppColors.gold,
-                  child: ListView.separated(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    itemCount: _filteredLands.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 12),
-                    itemBuilder: (context, index) {
-                      final land = _filteredLands[index];
-                      return _buildLandTile(land);
-                    },
-                  ),
-                );
-              },
-            ),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: Responsive.contentMaxWidth(context),
           ),
-        ],
+          child: Column(
+            children: [
+              _buildSearchBar(),
+              Expanded(
+                child: Consumer<LandProvider>(
+                  builder: (context, provider, _) {
+                    if (provider.isLoading && provider.lands.isEmpty) {
+                      return Center(
+                        child: LoadingWidget(
+                          message: AppLocalizations.of(
+                            context,
+                          ).carregandoTerrenos,
+                        ),
+                      );
+                    }
+
+                    _filterLands(provider.lands);
+
+                    if (provider.lands.isEmpty) {
+                      return _buildEmptyState();
+                    }
+
+                    if (_filteredLands.isEmpty) {
+                      return _buildNoResults();
+                    }
+
+                    return RefreshIndicator(
+                      onRefresh: () => provider.loadLands(),
+                      color: AppColors.gold,
+                      child: ListView.separated(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        itemCount: _filteredLands.length,
+                        separatorBuilder: (_, _) => const SizedBox(height: 12),
+                        itemBuilder: (context, index) {
+                          final land = _filteredLands[index];
+                          return _buildLandTile(land);
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.pushNamed(context, AppRoutes.landForm),

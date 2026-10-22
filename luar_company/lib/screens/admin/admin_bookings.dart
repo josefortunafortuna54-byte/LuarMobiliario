@@ -99,43 +99,52 @@ class _AdminBookingsScreenState extends State<AdminBookingsScreen> {
         ),
         iconTheme: const IconThemeData(color: AppColors.gold),
       ),
-      body: Column(
-        children: [
-          _buildFilterBar(),
-          Expanded(
-            child: Consumer<BookingProvider>(
-              builder: (context, provider, _) {
-                if (provider.isLoading && provider.allBookings.isEmpty) {
-                  return Center(
-                    child: LoadingWidget(message: l10n.carregandoAgendamentos),
-                  );
-                }
-
-                final bookings = _statusFilter == null
-                    ? provider.allBookings
-                    : provider.allBookings
-                          .where((b) => b.status == _statusFilter)
-                          .toList();
-
-                if (bookings.isEmpty) {
-                  return _buildEmptyState();
-                }
-
-                return RefreshIndicator(
-                  onRefresh: () => provider.loadAllBookings(),
-                  color: AppColors.gold,
-                  child: ListView.separated(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: bookings.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 12),
-                    itemBuilder: (_, index) =>
-                        _buildBookingCard(bookings[index]),
-                  ),
-                );
-              },
-            ),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: Responsive.contentMaxWidth(context),
           ),
-        ],
+          child: Column(
+            children: [
+              _buildFilterBar(),
+              Expanded(
+                child: Consumer<BookingProvider>(
+                  builder: (context, provider, _) {
+                    if (provider.isLoading && provider.allBookings.isEmpty) {
+                      return Center(
+                        child: LoadingWidget(
+                          message: l10n.carregandoAgendamentos,
+                        ),
+                      );
+                    }
+
+                    final bookings = _statusFilter == null
+                        ? provider.allBookings
+                        : provider.allBookings
+                              .where((b) => b.status == _statusFilter)
+                              .toList();
+
+                    if (bookings.isEmpty) {
+                      return _buildEmptyState();
+                    }
+
+                    return RefreshIndicator(
+                      onRefresh: () => provider.loadAllBookings(),
+                      color: AppColors.gold,
+                      child: ListView.separated(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: bookings.length,
+                        separatorBuilder: (_, _) => const SizedBox(height: 12),
+                        itemBuilder: (_, index) =>
+                            _buildBookingCard(bookings[index]),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -152,46 +161,57 @@ class _AdminBookingsScreenState extends State<AdminBookingsScreen> {
     ];
 
     return Container(
-      height: 60,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
         color: palette.surface,
         border: Border(bottom: BorderSide(color: palette.borderStrong)),
       ),
-      child: ListView.separated(
+      // Altura intrínseca (sem fixa) — evita corte vertical de chips com
+      // fontes grandes do sistema.
+      child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        itemCount: filters.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 8),
-        itemBuilder: (_, index) {
-          final (label, status) = filters[index];
-          final isSelected = _statusFilter == status;
-          return Center(
-            child: GestureDetector(
-              onTap: () => setState(() => _statusFilter = status),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: isSelected ? AppColors.navy : Colors.transparent,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: isSelected ? AppColors.navy : palette.textMuted,
-                  ),
-                ),
-                child: Text(
-                  label,
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: isSelected ? AppColors.white : palette.textBody,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+        child: Row(
+          children: [
+            for (var i = 0; i < filters.length; i++) ...[
+              if (i > 0) const SizedBox(width: 8),
+              Builder(
+                builder: (context) {
+                  final (label, status) = filters[i];
+                  final isSelected = _statusFilter == status;
+                  return GestureDetector(
+                    onTap: () => setState(() => _statusFilter = status),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isSelected ? AppColors.navy : Colors.transparent,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: isSelected
+                              ? AppColors.navy
+                              : palette.textMuted,
+                        ),
+                      ),
+                      child: Text(
+                        label,
+                        maxLines: 1,
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: isSelected
+                              ? AppColors.white
+                              : palette.textBody,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
-            ),
-          );
-        },
+            ],
+          ],
+        ),
       ),
     );
   }

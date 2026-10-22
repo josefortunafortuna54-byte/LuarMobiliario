@@ -101,37 +101,46 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
         ),
         iconTheme: const IconThemeData(color: AppColors.gold),
       ),
-      body: Column(
-        children: [
-          _buildSearchBar(),
-          _buildUserCount(),
-          Expanded(
-            child: _isLoading
-                ? const Center(
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.gold),
-                    ),
-                  )
-                : _filteredUsers.isEmpty
-                ? _buildEmptyState()
-                : RefreshIndicator(
-                    onRefresh: _loadUsers,
-                    color: AppColors.gold,
-                    child: ListView.separated(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      itemCount: _filteredUsers.length,
-                      separatorBuilder: (_, _) => const SizedBox(height: 8),
-                      itemBuilder: (context, index) {
-                        final user = _filteredUsers[index];
-                        return _buildUserTile(user);
-                      },
-                    ),
-                  ),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: Responsive.contentMaxWidth(context),
           ),
-        ],
+          child: Column(
+            children: [
+              _buildSearchBar(),
+              _buildUserCount(),
+              Expanded(
+                child: _isLoading
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            AppColors.gold,
+                          ),
+                        ),
+                      )
+                    : _filteredUsers.isEmpty
+                    ? _buildEmptyState()
+                    : RefreshIndicator(
+                        onRefresh: _loadUsers,
+                        color: AppColors.gold,
+                        child: ListView.separated(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          itemCount: _filteredUsers.length,
+                          separatorBuilder: (_, _) => const SizedBox(height: 8),
+                          itemBuilder: (context, index) {
+                            final user = _filteredUsers[index];
+                            return _buildUserTile(user);
+                          },
+                        ),
+                      ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

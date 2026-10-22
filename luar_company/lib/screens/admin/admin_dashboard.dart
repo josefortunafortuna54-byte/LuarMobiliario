@@ -307,8 +307,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
           GridView(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: Responsive.gridColumns(
+                context,
+                mobile: 2,
+                tablet: 3,
+                desktop: 4,
+              ),
               mainAxisSpacing: 12,
               crossAxisSpacing: 12,
               mainAxisExtent: 100,
@@ -782,8 +787,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: Responsive.gridColumns(
+                context,
+                mobile: 2,
+                tablet: 3,
+                desktop: 4,
+              ),
               mainAxisSpacing: 12,
               crossAxisSpacing: 12,
               mainAxisExtent: 120,

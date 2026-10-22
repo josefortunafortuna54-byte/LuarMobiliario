@@ -136,50 +136,59 @@ class _AdminPropertiesScreenState extends State<AdminPropertiesScreen> {
         ),
         iconTheme: const IconThemeData(color: AppColors.gold),
       ),
-      body: Column(
-        children: [
-          _buildSearchBar(),
-          Expanded(
-            child: Consumer<PropertyProvider>(
-              builder: (context, provider, _) {
-                if (provider.isLoading && provider.properties.isEmpty) {
-                  return Center(
-                    child: LoadingWidget(
-                      message: AppLocalizations.of(context).carregandoImoveis,
-                    ),
-                  );
-                }
-
-                _filterProperties(provider.properties);
-
-                if (provider.properties.isEmpty) {
-                  return _buildEmptyState();
-                }
-
-                if (_filteredProperties.isEmpty) {
-                  return _buildNoResults();
-                }
-
-                return RefreshIndicator(
-                  onRefresh: () => provider.loadProperties(),
-                  color: AppColors.gold,
-                  child: ListView.separated(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    itemCount: _filteredProperties.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 12),
-                    itemBuilder: (context, index) {
-                      final property = _filteredProperties[index];
-                      return _buildPropertyTile(property);
-                    },
-                  ),
-                );
-              },
-            ),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: Responsive.contentMaxWidth(context),
           ),
-        ],
+          child: Column(
+            children: [
+              _buildSearchBar(),
+              Expanded(
+                child: Consumer<PropertyProvider>(
+                  builder: (context, provider, _) {
+                    if (provider.isLoading && provider.properties.isEmpty) {
+                      return Center(
+                        child: LoadingWidget(
+                          message: AppLocalizations.of(
+                            context,
+                          ).carregandoImoveis,
+                        ),
+                      );
+                    }
+
+                    _filterProperties(provider.properties);
+
+                    if (provider.properties.isEmpty) {
+                      return _buildEmptyState();
+                    }
+
+                    if (_filteredProperties.isEmpty) {
+                      return _buildNoResults();
+                    }
+
+                    return RefreshIndicator(
+                      onRefresh: () => provider.loadProperties(),
+                      color: AppColors.gold,
+                      child: ListView.separated(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        itemCount: _filteredProperties.length,
+                        separatorBuilder: (_, _) => const SizedBox(height: 12),
+                        itemBuilder: (context, index) {
+                          final property = _filteredProperties[index];
+                          return _buildPropertyTile(property);
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.pushNamed(context, AppRoutes.propertyForm),

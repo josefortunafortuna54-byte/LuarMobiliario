@@ -102,41 +102,50 @@ class _AdminReportsScreenState extends State<AdminReportsScreen> {
         ),
         iconTheme: const IconThemeData(color: AppColors.gold),
       ),
-      body: Column(
-        children: [
-          _buildFilters(l10n),
-          Expanded(
-            child: provider.isLoading && provider.reports.isEmpty
-                ? const Center(
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.gold),
-                    ),
-                  )
-                : reports.isEmpty
-                ? EmptyState(
-                    icon: Icons.flag_outlined,
-                    title: l10n.semDenuncias,
-                    message: l10n.gestaoCompleta,
-                  )
-                : RefreshIndicator(
-                    onRefresh: () =>
-                        context.read<ReportProvider>().loadReports(),
-                    color: AppColors.gold,
-                    child: ListView.separated(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      itemCount: reports.length,
-                      separatorBuilder: (_, _) => const SizedBox(height: 8),
-                      itemBuilder: (context, index) {
-                        final report = reports[index];
-                        return _buildReportTile(report, l10n, palette);
-                      },
-                    ),
-                  ),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: Responsive.contentMaxWidth(context),
           ),
-        ],
+          child: Column(
+            children: [
+              _buildFilters(l10n),
+              Expanded(
+                child: provider.isLoading && provider.reports.isEmpty
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            AppColors.gold,
+                          ),
+                        ),
+                      )
+                    : reports.isEmpty
+                    ? EmptyState(
+                        icon: Icons.flag_outlined,
+                        title: l10n.semDenuncias,
+                        message: l10n.gestaoCompleta,
+                      )
+                    : RefreshIndicator(
+                        onRefresh: () =>
+                            context.read<ReportProvider>().loadReports(),
+                        color: AppColors.gold,
+                        child: ListView.separated(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          itemCount: reports.length,
+                          separatorBuilder: (_, _) => const SizedBox(height: 8),
+                          itemBuilder: (context, index) {
+                            final report = reports[index];
+                            return _buildReportTile(report, l10n, palette);
+                          },
+                        ),
+                      ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

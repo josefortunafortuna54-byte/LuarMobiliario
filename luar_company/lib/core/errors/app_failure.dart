@@ -20,6 +20,15 @@ class ValidationFailure extends Failure {
   const ValidationFailure(super.message);
 }
 
+/// Erro de permissão: a operação foi recusada pelas políticas RLS ou pelo
+/// role do utilizador.
+///
+/// Corresponde aos códigos Postgres `42501` (insufficient_privilege) e
+/// `PGRST301`, e a respostas 401/403 do PostgREST.
+class PermissionFailure extends Failure {
+  const PermissionFailure(super.message);
+}
+
 /// Erro de servidor/Backend.
 class ServerFailure extends Failure {
   const ServerFailure(super.message);

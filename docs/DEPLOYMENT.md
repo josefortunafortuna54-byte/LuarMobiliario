@@ -70,6 +70,39 @@ EOF
 
 Referencie `key.properties` no `android/app/build.gradle.kts`.
 
+### Compatibilidade e Distribuição do APK
+
+**Requisitos mínimos do dispositivo**
+
+| Item | Valor |
+|---|---|
+| Android mínimo | **7.0 (API 24)** — `minSdk` definido pelo Flutter 3.44 e exigido pelo plugin `app_links`; tentar baixar abaixo de 24 falha no manifest merge |
+| ABIs incluídos | `arm64-v8a`, `armeabi-v7a`, `x86_64` (APK "fat" — cobre dispositivos 32 e 64 bits) |
+| Assinatura | `android/app/android.jks` (alias `luar`) — a mesma usada localmente e no CI (secret `KEYSTORE_BASE64`) |
+
+> **IMPORTANTE:** dispositivos com Android **inferior a 7.0** falham na primeira instalação com **"App não instalado"**. Isto não é um bug do APK — o sistema rejeita pacotes com `minSdk` superior à versão do dispositivo. Verifique a versão Android do dispositivo em **Definições → Sobre o telefone**.
+
+**APK vs AAB — não confundir**
+
+- Distribuição direta (loja de ficheiros/WhatsApp/site): usar **`app-release.apk`**.
+- Google Play: usar **`app-release.aab`** (o AAB **não** pode ser instalado diretamente no telemóvel; tentar dá erro de parsing ou "App não instalado").
+
+**Verificação de integridade**
+
+O `scripts/build_apk.sh` imprime o `SHA-256` do APK gerado. Antes de instalar noutro dispositivo, confirme que o ficheiro transferido tem o mesmo tamanho e hash. Transferências truncadas (WhatsApp, Bluetooth, ligações lentas) causam "App não instalado" em alguns fabricantes.
+
+**Troubleshooting — "App não instalado" na primeira instalação**
+
+| Causa provável | Como confirmar | Solução |
+|---|---|---|
+| Android < 7.0 | Definições → Sobre o telefone | Dispositivo incompatível (mínimo Android 7.0) |
+| Ficheiro corrompido/truncado | SHA-256 diferente do publicado | Re-transferir o APK (não via WhatsApp/compressão) |
+| APK enviado por engano como AAB | Extensão/nome do ficheiro | Enviar `app-release.apk` |
+| "Fontes desconhecidas" desativadas | Diálogo do sistema | Permitir instalação da app de ficheiros |
+| Play Protect bloqueou | Diálogo "App bloqueado" | Aceitar "Instalar mesmo assim" (apenas para APKs oficiais verificados) |
+
+> Os jobs de build do CI **falham** se os secrets de assinatura estiverem ausentes — nunca é distribuído um APK assinado com a chave de debug (que causaria conflitos de assinatura em atualizações).
+
 ---
 
 ## iOS

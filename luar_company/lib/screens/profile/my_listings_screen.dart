@@ -9,6 +9,7 @@ import '../../core/providers/auth_provider.dart';
 import '../../core/repositories/land_repository.dart';
 import '../../core/repositories/property_repository.dart';
 import '../../core/theme/app_palette.dart';
+import '../../core/utils/responsive.dart';
 import '../../core/utils/routes.dart';
 import '../../l10n/app_localizations.dart';
 import '../../widgets/empty_state.dart';
@@ -222,12 +223,19 @@ class _MyListingsScreenState extends State<MyListingsScreen>
           ],
         ),
       ),
-      body: _isLoading
-          ? const LoadingWidget(isFullScreen: true)
-          : TabBarView(
-              controller: _tabController,
-              children: [_buildPropertiesTab(l10n), _buildLandsTab(l10n)],
-            ),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: Responsive.contentMaxWidth(context),
+          ),
+          child: _isLoading
+              ? const LoadingWidget(isFullScreen: true)
+              : TabBarView(
+                  controller: _tabController,
+                  children: [_buildPropertiesTab(l10n), _buildLandsTab(l10n)],
+                ),
+        ),
+      ),
     );
   }
 

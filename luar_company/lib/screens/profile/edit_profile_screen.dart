@@ -7,6 +7,7 @@ import '../../core/constants/app_text_styles.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/services/storage_service.dart';
 import '../../core/theme/app_palette.dart';
+import '../../core/utils/responsive.dart';
 import '../../l10n/app_localizations.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_input.dart';
@@ -116,82 +117,89 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
         iconTheme: const IconThemeData(color: AppColors.gold),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Consumer<AuthProvider>(
-          builder: (context, auth, _) {
-            return Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  const SizedBox(height: 16),
-                  GestureDetector(
-                    onTap: _pickAvatar,
-                    child: Stack(
-                      children: [
-                        AvatarWidget(
-                          imageUrl: _avatarUrl ?? '',
-                          name: auth.user?.name ?? 'U',
-                          size: AvatarSize.large,
-                          borderColor: AppColors.gold,
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: AppColors.gold,
+      body: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: Responsive.contentMaxWidth(context),
+          ),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Consumer<AuthProvider>(
+              builder: (context, auth, _) {
+                return Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 16),
+                      GestureDetector(
+                        onTap: _pickAvatar,
+                        child: Stack(
+                          children: [
+                            AvatarWidget(
+                              imageUrl: _avatarUrl ?? '',
+                              name: auth.user?.name ?? 'U',
+                              size: AvatarSize.large,
+                              borderColor: AppColors.gold,
                             ),
-                            child: const Icon(
-                              Icons.camera_alt_rounded,
-                              size: 16,
-                              color: AppColors.white,
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: AppColors.gold,
+                                ),
+                                child: const Icon(
+                                  Icons.camera_alt_rounded,
+                                  size: 16,
+                                  color: AppColors.white,
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 32),
+                      CustomInput(
+                        label: l10n.nomeCompleto,
+                        hint: l10n.oSeuNome,
+                        prefixIcon: Icons.person_outline,
+                        controller: _nameController,
+                        validator: (v) =>
+                            (v == null || v.isEmpty) ? l10n.insiraNome : null,
+                        enabled: !auth.isLoading,
+                      ),
+                      const SizedBox(height: 16),
+                      CustomInput(
+                        label: l10n.telefone,
+                        hint: '+244 9XX XXX XXX',
+                        prefixIcon: Icons.phone_outlined,
+                        keyboardType: TextInputType.phone,
+                        controller: _phoneController,
+                        enabled: !auth.isLoading,
+                      ),
+                      const SizedBox(height: 12),
+                      CustomInput(
+                        label: l10n.email,
+                        prefixIcon: Icons.email_outlined,
+                        controller: _emailController,
+                        enabled: false,
+                      ),
+                      const SizedBox(height: 32),
+                      CustomButton(
+                        text: l10n.guardarAlteracoes,
+                        isFullWidth: true,
+                        size: CustomButtonSize.large,
+                        isLoading: auth.isLoading,
+                        onPressed: _handleSave,
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 32),
-                  CustomInput(
-                    label: l10n.nomeCompleto,
-                    hint: l10n.oSeuNome,
-                    prefixIcon: Icons.person_outline,
-                    controller: _nameController,
-                    validator: (v) =>
-                        (v == null || v.isEmpty) ? l10n.insiraNome : null,
-                    enabled: !auth.isLoading,
-                  ),
-                  const SizedBox(height: 16),
-                  CustomInput(
-                    label: l10n.telefone,
-                    hint: '+244 9XX XXX XXX',
-                    prefixIcon: Icons.phone_outlined,
-                    keyboardType: TextInputType.phone,
-                    controller: _phoneController,
-                    enabled: !auth.isLoading,
-                  ),
-                  const SizedBox(height: 12),
-                  CustomInput(
-                    label: l10n.email,
-                    prefixIcon: Icons.email_outlined,
-                    controller: _emailController,
-                    enabled: false,
-                  ),
-                  const SizedBox(height: 32),
-                  CustomButton(
-                    text: l10n.guardarAlteracoes,
-                    isFullWidth: true,
-                    size: CustomButtonSize.large,
-                    isLoading: auth.isLoading,
-                    onPressed: _handleSave,
-                  ),
-                ],
-              ),
-            );
-          },
+                );
+              },
+            ),
+          ),
         ),
       ),
     );

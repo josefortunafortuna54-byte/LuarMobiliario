@@ -7,6 +7,7 @@ import '../../core/models/partner_model.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/providers/partner_provider.dart';
 import '../../core/theme/app_palette.dart';
+import '../../core/utils/responsive.dart';
 import '../../l10n/app_localizations.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_input.dart';
@@ -144,77 +145,85 @@ class _PartnerFormScreenState extends State<PartnerFormScreen> {
         ),
         iconTheme: const IconThemeData(color: AppColors.gold),
       ),
-      body: _isSaving
-          ? LoadingWidget(isFullScreen: true, message: l10n.guardando)
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(l10n.dadosEmpresa, style: AppTextStyles.h6),
-                    const SizedBox(height: 16),
-                    CustomInput(
-                      label: l10n.nomeEmpresa,
-                      hint: l10n.exNomeEmpresa,
-                      prefixIcon: Icons.business_outlined,
-                      controller: _companyController,
-                      validator: (v) =>
-                          (v == null || v.isEmpty) ? l10n.obrigatorio : null,
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
+      body: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: Responsive.contentMaxWidth(context),
+          ),
+          child: _isSaving
+              ? LoadingWidget(isFullScreen: true, message: l10n.guardando)
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: CustomInput(
-                            label: l10n.nifLabel,
-                            hint: '123456789',
-                            prefixIcon: Icons.badge_outlined,
-                            controller: _nifController,
-                          ),
+                        Text(l10n.dadosEmpresa, style: AppTextStyles.h6),
+                        const SizedBox(height: 16),
+                        CustomInput(
+                          label: l10n.nomeEmpresa,
+                          hint: l10n.exNomeEmpresa,
+                          prefixIcon: Icons.business_outlined,
+                          controller: _companyController,
+                          validator: (v) => (v == null || v.isEmpty)
+                              ? l10n.obrigatorio
+                              : null,
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(child: _buildBusinessTypeDropdown()),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: CustomInput(
+                                label: l10n.nifLabel,
+                                hint: '123456789',
+                                prefixIcon: Icons.badge_outlined,
+                                controller: _nifController,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(child: _buildBusinessTypeDropdown()),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        Text(l10n.contactos, style: AppTextStyles.h6),
+                        const SizedBox(height: 16),
+                        CustomInput(
+                          label: l10n.endereco,
+                          hint: l10n.ruaNumeroMunicipio,
+                          prefixIcon: Icons.place_outlined,
+                          controller: _addressController,
+                        ),
+                        const SizedBox(height: 16),
+                        CustomInput(
+                          label: l10n.whatsappLabel,
+                          hint: '+244 9XX XXX XXX',
+                          prefixIcon: Icons.chat_bubble_outline_rounded,
+                          keyboardType: TextInputType.phone,
+                          controller: _whatsappController,
+                        ),
+                        const SizedBox(height: 16),
+                        CustomInput(
+                          label: l10n.licenca,
+                          hint: l10n.numeroLicenca,
+                          prefixIcon: Icons.fact_check_outlined,
+                          controller: _licenseController,
+                        ),
+                        const SizedBox(height: 32),
+                        CustomButton(
+                          text: l10n.guadarPerfil,
+                          isFullWidth: true,
+                          size: CustomButtonSize.large,
+                          isLoading: _isSaving,
+                          onPressed: _handleSave,
+                        ),
+                        const SizedBox(height: 32),
                       ],
                     ),
-                    const SizedBox(height: 24),
-                    Text(l10n.contactos, style: AppTextStyles.h6),
-                    const SizedBox(height: 16),
-                    CustomInput(
-                      label: l10n.endereco,
-                      hint: l10n.ruaNumeroMunicipio,
-                      prefixIcon: Icons.place_outlined,
-                      controller: _addressController,
-                    ),
-                    const SizedBox(height: 16),
-                    CustomInput(
-                      label: l10n.whatsappLabel,
-                      hint: '+244 9XX XXX XXX',
-                      prefixIcon: Icons.chat_bubble_outline_rounded,
-                      keyboardType: TextInputType.phone,
-                      controller: _whatsappController,
-                    ),
-                    const SizedBox(height: 16),
-                    CustomInput(
-                      label: l10n.licenca,
-                      hint: l10n.numeroLicenca,
-                      prefixIcon: Icons.fact_check_outlined,
-                      controller: _licenseController,
-                    ),
-                    const SizedBox(height: 32),
-                    CustomButton(
-                      text: l10n.guadarPerfil,
-                      isFullWidth: true,
-                      size: CustomButtonSize.large,
-                      isLoading: _isSaving,
-                      onPressed: _handleSave,
-                    ),
-                    const SizedBox(height: 32),
-                  ],
+                  ),
                 ),
-              ),
-            ),
+        ),
+      ),
     );
   }
 

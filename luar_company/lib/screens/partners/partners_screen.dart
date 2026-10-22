@@ -8,6 +8,7 @@ import '../../core/models/user_model.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/providers/partner_provider.dart';
 import '../../core/theme/app_palette.dart';
+import '../../core/utils/responsive.dart';
 import '../../core/utils/routes.dart';
 import '../../l10n/app_localizations.dart';
 import '../../widgets/empty_state.dart';
@@ -93,37 +94,44 @@ class _PartnersScreenState extends State<PartnersScreen> {
               label: Text(l10n.meuPerfil),
             )
           : null,
-      body: Consumer<PartnerProvider>(
-        builder: (context, provider, _) {
-          if (provider.isLoading && provider.partners.isEmpty) {
-            return LoadingWidget(message: l10n.carregandoParceiros);
-          }
+      body: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: Responsive.contentMaxWidth(context),
+          ),
+          child: Consumer<PartnerProvider>(
+            builder: (context, provider, _) {
+              if (provider.isLoading && provider.partners.isEmpty) {
+                return LoadingWidget(message: l10n.carregandoParceiros);
+              }
 
-          if (provider.error != null && provider.partners.isEmpty) {
-            return _buildErrorState(provider.error!);
-          }
+              if (provider.error != null && provider.partners.isEmpty) {
+                return _buildErrorState(provider.error!);
+              }
 
-          if (provider.partners.isEmpty) {
-            return EmptyState(
-              icon: Icons.handshake_outlined,
-              title: l10n.nenhumParceiro,
-              message: l10n.osParceirosAqui,
-            );
-          }
+              if (provider.partners.isEmpty) {
+                return EmptyState(
+                  icon: Icons.handshake_outlined,
+                  title: l10n.nenhumParceiro,
+                  message: l10n.osParceirosAqui,
+                );
+              }
 
-          return RefreshIndicator(
-            onRefresh: _loadPartners,
-            color: AppColors.gold,
-            child: ListView.separated(
-              padding: const EdgeInsets.all(16),
-              itemCount: provider.partners.length,
-              separatorBuilder: (_, _) => const SizedBox(height: 12),
-              itemBuilder: (context, index) {
-                return _buildPartnerCard(provider.partners[index]);
-              },
-            ),
-          );
-        },
+              return RefreshIndicator(
+                onRefresh: _loadPartners,
+                color: AppColors.gold,
+                child: ListView.separated(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: provider.partners.length,
+                  separatorBuilder: (_, _) => const SizedBox(height: 12),
+                  itemBuilder: (context, index) {
+                    return _buildPartnerCard(provider.partners[index]);
+                  },
+                ),
+              );
+            },
+          ),
+        ),
       ),
     );
   }

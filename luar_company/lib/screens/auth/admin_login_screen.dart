@@ -5,10 +5,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/constants/app_text_styles.dart';
+import '../../core/models/user_model.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/services/auth_service.dart';
 import '../../core/services/supabase_service.dart';
 import '../../core/theme/app_palette.dart';
+import '../../core/utils/permissions.dart';
 import '../../core/utils/responsive.dart';
 import '../../core/utils/routes.dart';
 import '../../l10n/app_localizations.dart';
@@ -75,8 +77,8 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
 
       if (!mounted) return;
 
-      final role = profile?['role'] as String? ?? 'client';
-      if (role != 'admin' && role != 'agent') {
+      final role = userRoleFromString(profile?['role'] as String?);
+      if (!Permissions.canAccessAdminPanel(role)) {
         await client.auth.signOut();
         if (!mounted) return;
         setState(() {

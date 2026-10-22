@@ -124,7 +124,7 @@ class PropertyCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 140,
+        constraints: const BoxConstraints(minHeight: 140),
         decoration: BoxDecoration(
           color: context.palette.surface,
           borderRadius: BorderRadius.circular(16),
@@ -142,11 +142,17 @@ class PropertyCard extends StatelessWidget {
           ],
         ),
         clipBehavior: Clip.antiAlias,
-        child: Row(
-          children: [
-            _buildImage(width: 160, context: context),
-            Expanded(child: _buildHorizontalContent(context)),
-          ],
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(
+                width: 160,
+                child: _buildImage(context: context, expand: true),
+              ),
+              Expanded(child: _buildHorizontalContent(context)),
+            ],
+          ),
         ),
       ),
     );
@@ -155,9 +161,11 @@ class PropertyCard extends StatelessWidget {
   Widget _buildImage({
     double? height,
     double? width,
+    bool expand = false,
     required BuildContext context,
   }) {
     return Stack(
+      fit: expand ? StackFit.expand : StackFit.loose,
       children: [
         SizedBox(
           height: height,

@@ -92,7 +92,7 @@ class LandCard extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          height: 132,
+          constraints: const BoxConstraints(minHeight: 132),
           decoration: BoxDecoration(
             color: palette.surface,
             borderRadius: BorderRadius.circular(16),
@@ -105,11 +105,14 @@ class LandCard extends StatelessWidget {
             ],
           ),
           clipBehavior: Clip.antiAlias,
-          child: Row(
-            children: [
-              SizedBox(width: 132, child: _buildImage(context, height: 132)),
-              Expanded(child: _buildHorizontalContent(context)),
-            ],
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(width: 132, child: _buildImage(context, expand: true)),
+                Expanded(child: _buildHorizontalContent(context)),
+              ],
+            ),
           ),
         ),
       ),
@@ -291,9 +294,14 @@ class LandCard extends StatelessWidget {
     );
   }
 
-  Widget _buildImage(BuildContext context, {double? height}) {
+  Widget _buildImage(
+    BuildContext context, {
+    double? height,
+    bool expand = false,
+  }) {
     final palette = context.palette;
     return Stack(
+      fit: expand ? StackFit.expand : StackFit.loose,
       children: [
         SizedBox(
           height: height ?? 220,

@@ -74,6 +74,75 @@ e este projeto adota o [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Favoritos (o coração não guardava)**: guardar um favorito que já existia
+  no servidor falhava com `409 duplicate key value violates unique constraint
+  "favorites_user_property_unique"`. O `INSERT` passou a `upsert`
+  (`ON CONFLICT DO UPDATE` com `missing=default`, para preservar o `created_at`
+  original) e a remoção passou a ser feita pela chave lógica
+  (`user_id` + `property_id`/`land_id`) em vez do id da linha — assim também
+  funciona quando o estado local está dessincronizado do servidor. O
+  `FavoriteProvider.toggleFavorite` devolve agora
+  `FavoriteToggleResult{added, removed, failed}` (antes devolvia `bool`, que
+  tratava uma falha como "removido" e mostrava o coração por preencher), e o
+  novo helper `toggleFavoriteWithFeedback`
+  (`lib/core/utils/favorite_actions.dart`) avisa o utilizador com um snackbar
+  quando a gravação falha. Os cartões das listagens (Imóveis, Terrenos e
+  Pesquisa) passaram a receber `isFavorite`/`onFavoriteTap` e a carregar os
+  favoritos do utilizador — o botão de like não existia nessas listas.
+- **Privacidade dos favoritos (RLS)**: a migration
+  `032_favorites_rls.sql` remove as policies legacy permissivas ("Favorites
+  read for anon" e "Favorites all for authenticated") — qualquer visitante
+  anónimo lia os favoritos de todos os utilizadores e qualquer conta
+  autenticada podia escrever em qualquer linha. Passam a valer as policies
+  "own" (read/insert/update/delete) mais o acesso total do admin; a policy de
+  `UPDATE` é necessária porque o `upsert` resolve conflitos com
+  `ON CONFLICT DO UPDATE`. Já aplicada em produção (`supabase db push`) e
+  validada contra a API de produção: 15/15 verificações na REST API (upsert
+  sem `409`, `created_at` preservado, leitura isolada por utilizador, escrita
+  bloqueada ao anónimo, `favorite_counts` correto antes/depois do `DELETE`) e
+  10/10 no script SQL `luar_company/supabase/verify_032_favorites.sql`
+  (`VERIFY RESULTADO: 10 PASS / 0 FAIL`), que cria e remove os seus próprios
+  utilizadores de teste.
+- **Migration `007_security_fixes.sql` (base de dados nova)**: a policy
+  "Bookings: update own" comparava as pseudo-colunas `OLD`/`NEW`, que só
+  existem dentro de funções trigger — nunca em policies RLS. A migration
+  abortava com `missing FROM-clause entry for table "old"`, pelo que
+  `supabase db reset`/`start` nunca completava numa base vazia. Passou a
+  usar a mesma formulação da migration 015 (a que a produção já executa): o
+  cliente só transita de `pending` para `cancelled`, enquanto agente e admin
+  confirmam ou cancelam definitivamente. As duas policies de `DELETE` do
+  storage passaram a comparar `owner_id::text = auth.uid()::text` (o
+  `owner_id` é TEXT em algumas versões do storage) — a mesma correção da
+  migration 017. Validado com a cadeia completa 001→032 aplicada numa base
+  nova (`supabase db start`) e o script `verify_032_favorites.sql` a correr
+  contra ela (`VERIFY RESULTADO: 10 PASS / 0 FAIL`).
+- **Deriva entre a cadeia de migrations e a produção (033 + 034)**: a
+  migration `002_rls_role_based_policies.sql` foi executada em produção antes
+  de ser revista e a `007` foi corrigida depois de já estar aplicada — o CLI
+  do Supabase regista version+name e nunca re-executa uma migration já
+  aplicada, pelo que a produção ficou com as policies originais. A migration
+  `033_reconcile_rls_policies.sql` remove as 19 policies legacy ("X read for
+  anon" com `USING (true)` e "X all for authenticated" com `FOR ALL`) que
+  deixavam qualquer visitante anónimo ler todas as reservas e todos os
+  perfis de utilizadores, e recria "Users: read own or admin" e "Users: insert
+  own" (apenas o perfil próprio). A migration
+  `034_reconcile_ownership_policies.sql` repõe a verificação de posse da
+  `007` nas imagens — em produção qualquer agente podia alterar ou apagar as
+  imagens do anúncio de outro agente —, alinha o `WITH CHECK` do `UPDATE` de
+  imóveis/terrenos (bloqueia a transferência de posse do anúncio, erro
+  `42501`) e recria os índices `idx_bookings_user_created` e
+  `idx_bookings_property_status`, que faltavam em produção. Os dados públicos
+  do agente (nome, avatar, verificação) continuam disponíveis através da view
+  `users_public`, sem expor e-mail nem telefone. Ambas aplicadas em
+  produção (`supabase db push`) e validadas com `supabase db diff --linked`
+  sem qualquer diferença entre a cadeia e a produção (0 statements), 27/27
+  verificações na REST API de produção e 7/7 num teste de posse (agente
+  gere as imagens do seu anúncio e não as de outro).
+- **Painel admin — contador de mensagens não lidas**: com a remoção da policy
+  legacy "Messages all for authenticated", o contador de mensagens por ler
+  (`admin_repository.fetchStats`) passa a contar apenas as mensagens do próprio
+  admin, em vez de todas as mensagens da plataforma — as mensagens dos
+  utilizadores deixaram de ser legíveis por qualquer conta autenticada.
 - **Testes de integração**: `main()` passa a ser aguardado antes das
   verificações e o assert da rota `home` verifica agora `MainShell`.
 - **WhatsApp**: botão de contacto nos detalhes de imóvel/terreno passa a

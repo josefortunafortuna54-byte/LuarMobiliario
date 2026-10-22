@@ -32,7 +32,21 @@ class LuarCompanyApp extends StatelessWidget {
       navigatorObservers: [AppNavigator.routeObserver],
       initialRoute: AppRoutes.splash,
       onGenerateRoute: onGenerateRoute,
-      builder: (context, child) => _OfflineBanner(child: child),
+      builder: (context, child) {
+        // Proteção global: escala de texto limitada (1.0–1.3) para evitar
+        // overflow de texto com fontes grandes do sistema, mantendo
+        // acessibilidade razoável.
+        final mediaQuery = MediaQuery.of(context);
+        return MediaQuery(
+          data: mediaQuery.copyWith(
+            textScaler: mediaQuery.textScaler.clamp(
+              minScaleFactor: 1.0,
+              maxScaleFactor: 1.3,
+            ),
+          ),
+          child: _OfflineBanner(child: child),
+        );
+      },
     );
   }
 }

@@ -9,6 +9,8 @@ import '../../core/providers/land_provider.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/services/storage_service.dart';
 import '../../core/theme/app_palette.dart';
+import '../../core/utils/permissions.dart';
+import '../../core/utils/responsive.dart';
 import '../../l10n/app_localizations.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_input.dart';
@@ -62,6 +64,20 @@ class _LandFormScreenState extends State<LandFormScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final land = ModalRoute.of(context)?.settings.arguments as LandModel?;
       if (land != null) {
+        // Só o dono do terreno (ou o administrador) pode editá-lo. O RLS já
+        // recusa a escrita no servidor, mas a UI não deve oferecer uma acção
+        // que vai falhar.
+        final user = context.read<AuthProvider>().user;
+        final canEdit = Permissions.ownsListing(
+          role: user?.role,
+          agentId: land.agentId,
+          currentUserId: user?.id,
+        );
+        if (!canEdit) {
+          _showError(AppLocalizations.of(context).permissaoNegada);
+          Navigator.of(context).pop();
+          return;
+        }
         setState(() => _existingLand = land);
         _titleController.text = land.title;
         _descController.text = land.description;

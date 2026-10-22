@@ -9,6 +9,8 @@ import '../../core/providers/property_provider.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/services/storage_service.dart';
 import '../../core/theme/app_palette.dart';
+import '../../core/utils/permissions.dart';
+import '../../core/utils/responsive.dart';
 import '../../l10n/app_localizations.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_input.dart';
@@ -68,6 +70,20 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final prop = ModalRoute.of(context)?.settings.arguments as PropertyModel?;
       if (prop != null) {
+        // Só o dono do anúncio (ou o administrador) pode editá-lo. O RLS já
+        // recusa a escrita no servidor, mas a UI não deve oferecer uma acção
+        // que vai falhar.
+        final user = context.read<AuthProvider>().user;
+        final canEdit = Permissions.ownsListing(
+          role: user?.role,
+          agentId: prop.agentId,
+          currentUserId: user?.id,
+        );
+        if (!canEdit) {
+          _showError(AppLocalizations.of(context).permissaoNegada);
+          Navigator.of(context).pop();
+          return;
+        }
         setState(() => _existingProperty = prop);
         _titleController.text = prop.title;
         _descController.text = prop.description;

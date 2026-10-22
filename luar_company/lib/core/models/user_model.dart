@@ -1,11 +1,16 @@
 enum UserRole { client, agent, admin }
 
-UserRole _roleFromString(String value) {
+/// Converte o valor textual do role (como guardado na base de dados) em
+/// [UserRole]. Valores desconhecidos caem em [UserRole.client], que é o
+/// role com menos permissões.
+UserRole userRoleFromString(String? value) {
   return UserRole.values.firstWhere(
     (e) => e.name == value,
     orElse: () => UserRole.client,
   );
 }
+
+UserRole _roleFromString(String value) => userRoleFromString(value);
 
 String _roleToString(UserRole role) => role.name;
 

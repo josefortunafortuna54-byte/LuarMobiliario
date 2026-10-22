@@ -18,6 +18,9 @@ android {
 
     defaultConfig {
         applicationId = "com.luar_imobiliario"
+        // Android 7.0 (API 24). The Flutter 3.44 engine and plugins (app_links)
+        // require 24+; lower values fail at manifest merge, and devices below
+        // Android 7 show "App not installed". Documented in docs/DEPLOYMENT.md.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

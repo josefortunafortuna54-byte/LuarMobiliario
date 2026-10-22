@@ -7,6 +7,7 @@ import '../../core/models/comparison_entry.dart';
 import '../../core/providers/comparison_provider.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/utils/formatters.dart';
+import '../../core/utils/responsive.dart';
 import '../../core/utils/routes.dart';
 import '../../l10n/app_localizations.dart';
 import '../../widgets/empty_state.dart';
@@ -53,14 +54,21 @@ class ComparisonScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Consumer<ComparisonProvider>(
-        builder: (context, provider, _) {
-          if (provider.isEmpty) {
-            return _buildEmptyState(context);
-          }
+      body: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: Responsive.contentMaxWidth(context),
+          ),
+          child: Consumer<ComparisonProvider>(
+            builder: (context, provider, _) {
+              if (provider.isEmpty) {
+                return _buildEmptyState(context);
+              }
 
-          return _buildComparisonView(context, provider);
-        },
+              return _buildComparisonView(context, provider);
+            },
+          ),
+        ),
       ),
     );
   }

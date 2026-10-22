@@ -5,6 +5,7 @@ import '../../core/constants/app_text_styles.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/providers/message_provider.dart';
 import '../../core/theme/app_palette.dart';
+import '../../core/utils/responsive.dart';
 import '../../l10n/app_localizations.dart';
 import '../../widgets/avatar_widget.dart';
 import '../../widgets/loading_widget.dart';
@@ -81,95 +82,106 @@ class _ChatScreenState extends State<ChatScreen> {
               borderColor: AppColors.gold,
             ),
             const SizedBox(width: 10),
-            Text(
-              _partnerName,
-              style: AppTextStyles.h6.copyWith(color: AppColors.white),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+            Flexible(
+              child: Text(
+                _partnerName,
+                style: AppTextStyles.h6.copyWith(color: AppColors.white),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ],
         ),
         iconTheme: const IconThemeData(color: AppColors.gold),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Consumer<MessageProvider>(
-              builder: (context, provider, _) {
-                if (provider.isLoading && provider.messages.isEmpty) {
-                  return LoadingWidget(message: l10n.carregandoMensagens);
-                }
+      body: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: Responsive.contentMaxWidth(context),
+          ),
+          child: Column(
+            children: [
+              Expanded(
+                child: Consumer<MessageProvider>(
+                  builder: (context, provider, _) {
+                    if (provider.isLoading && provider.messages.isEmpty) {
+                      return LoadingWidget(message: l10n.carregandoMensagens);
+                    }
 
-                if (provider.messages.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.chat_bubble_outline_rounded,
-                          size: 64,
-                          color: palette.textMuted,
+                    if (provider.messages.isEmpty) {
+                      return Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.chat_bubble_outline_rounded,
+                              size: 64,
+                              color: palette.textMuted,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              l10n.inicieConversa,
+                              style: AppTextStyles.h6.copyWith(
+                                color: palette.textSecondary,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              l10n.envieMensagem,
+                              style: AppTextStyles.bodySmall.copyWith(
+                                color: palette.textMuted,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 16),
-                        Text(
-                          l10n.inicieConversa,
-                          style: AppTextStyles.h6.copyWith(
-                            color: palette.textSecondary,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          l10n.envieMensagem,
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color: palette.textMuted,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }
+                      );
+                    }
 
-                WidgetsBinding.instance.addPostFrameCallback(
-                  (_) => _scrollToBottom(),
-                );
+                    WidgetsBinding.instance.addPostFrameCallback(
+                      (_) => _scrollToBottom(),
+                    );
 
-                return ListView.builder(
-                  controller: _scrollController,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                  itemCount: provider.messages.length,
-                  itemBuilder: (context, index) {
-                    final msg = provider.messages[index];
-                    final userId = context.read<AuthProvider>().user?.id ?? '';
-                    final isMine = msg.senderId == userId;
-                    return _buildMessageBubble(
-                      msg.content,
-                      isMine,
-                      msg.createdAt,
+                    return ListView.builder(
+                      controller: _scrollController,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      itemCount: provider.messages.length,
+                      itemBuilder: (context, index) {
+                        final msg = provider.messages[index];
+                        final userId =
+                            context.read<AuthProvider>().user?.id ?? '';
+                        final isMine = msg.senderId == userId;
+                        return _buildMessageBubble(
+                          msg.content,
+                          isMine,
+                          msg.createdAt,
+                        );
+                      },
                     );
                   },
-                );
-              },
-            ),
+                ),
+              ),
+              _buildInputBar(),
+            ],
           ),
-          _buildInputBar(),
-        ],
+        ),
       ),
     );
   }
 
   Widget _buildMessageBubble(String content, bool isMine, DateTime time) {
     final palette = context.palette;
+    // Em ecrãs largos a bolha não deve esticar além de 560px (legibilidade).
+    final widthLimit = MediaQuery.sizeOf(context).width * 0.75;
+    final bubbleMaxWidth = widthLimit > 560 ? 560.0 : widthLimit;
     return Align(
       alignment: isMine ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.75,
-        ),
+        constraints: BoxConstraints(maxWidth: bubbleMaxWidth),
         decoration: BoxDecoration(
           color: isMine ? AppColors.gold : palette.surface,
           borderRadius: BorderRadius.only(

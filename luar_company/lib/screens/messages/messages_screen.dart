@@ -5,6 +5,7 @@ import '../../core/constants/app_text_styles.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/providers/message_provider.dart';
 import '../../core/theme/app_palette.dart';
+import '../../core/utils/responsive.dart';
 import '../../core/utils/routes.dart';
 import '../../l10n/app_localizations.dart';
 import '../../widgets/avatar_widget.dart';
@@ -61,7 +62,14 @@ class _MessagesScreenState extends State<MessagesScreen> {
         ),
         iconTheme: const IconThemeData(color: AppColors.gold),
       ),
-      body: isGuest ? _buildGuestState() : _buildAuthenticatedBody(),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: Responsive.contentMaxWidth(context),
+          ),
+          child: isGuest ? _buildGuestState() : _buildAuthenticatedBody(),
+        ),
+      ),
     );
   }
 

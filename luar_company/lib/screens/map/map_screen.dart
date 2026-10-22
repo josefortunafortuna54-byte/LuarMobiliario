@@ -283,20 +283,31 @@ class _MapScreenState extends State<MapScreen> {
             bottom: false,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _CircleButton(
-                    icon: Icons.arrow_back_rounded,
-                    label: l10n.voltar,
-                    onTap: () => Navigator.of(context).maybePop(),
+                  Row(
+                    children: [
+                      _CircleButton(
+                        icon: Icons.arrow_back_rounded,
+                        label: l10n.voltar,
+                        onTap: () => Navigator.of(context).maybePop(),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(child: _buildSearchField(l10n, palette)),
+                    ],
                   ),
-                  const SizedBox(width: 10),
-                  Expanded(child: _buildSearchField(l10n, palette)),
+                  if (!_isLoading && _visible.isEmpty) ...[
+                    const SizedBox(height: 16),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: _buildEmptyBanner(l10n, palette),
+                    ),
+                  ],
                 ],
               ),
             ),
           ),
-          if (!_isLoading && _visible.isEmpty) _buildEmptyBanner(l10n, palette),
           Positioned(
             right: 14,
             bottom: _selected != null ? 210 : 24,
@@ -405,22 +416,17 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   Widget _buildEmptyBanner(AppLocalizations l10n, AppPalette palette) {
-    return Positioned(
-      left: 24,
-      right: 24,
-      top: MediaQuery.of(context).padding.top + 76,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: palette.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: palette.borderStrong),
-        ),
-        child: Text(
-          l10n.semImoveisNoMapa,
-          textAlign: TextAlign.center,
-          style: AppTextStyles.bodySmall.copyWith(color: palette.textSecondary),
-        ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: palette.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: palette.borderStrong),
+      ),
+      child: Text(
+        l10n.semImoveisNoMapa,
+        textAlign: TextAlign.center,
+        style: AppTextStyles.bodySmall.copyWith(color: palette.textSecondary),
       ),
     );
   }

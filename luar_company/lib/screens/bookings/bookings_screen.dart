@@ -7,6 +7,7 @@ import '../../core/models/booking_model.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/providers/booking_provider.dart';
 import '../../core/theme/app_palette.dart';
+import '../../core/utils/responsive.dart';
 import '../../l10n/app_localizations.dart';
 import '../../widgets/loading_widget.dart';
 
@@ -132,29 +133,38 @@ class _BookingsScreenState extends State<BookingsScreen>
                 ],
               ),
       ),
-      body: isGuest
-          ? _buildGuestState()
-          : Consumer<BookingProvider>(
-              builder: (context, provider, _) {
-                if (provider.isLoading) {
-                  return Center(
-                    child: LoadingWidget(message: l10n.carregandoAgendamentos),
-                  );
-                }
+      body: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: Responsive.contentMaxWidth(context),
+          ),
+          child: isGuest
+              ? _buildGuestState()
+              : Consumer<BookingProvider>(
+                  builder: (context, provider, _) {
+                    if (provider.isLoading) {
+                      return Center(
+                        child: LoadingWidget(
+                          message: l10n.carregandoAgendamentos,
+                        ),
+                      );
+                    }
 
-                if (provider.error != null) {
-                  return _buildErrorState(provider.error!);
-                }
+                    if (provider.error != null) {
+                      return _buildErrorState(provider.error!);
+                    }
 
-                return TabBarView(
-                  controller: _tabController,
-                  children: [
-                    _buildUpcomingTab(provider),
-                    _buildHistoryTab(provider),
-                  ],
-                );
-              },
-            ),
+                    return TabBarView(
+                      controller: _tabController,
+                      children: [
+                        _buildUpcomingTab(provider),
+                        _buildHistoryTab(provider),
+                      ],
+                    );
+                  },
+                ),
+        ),
+      ),
     );
   }
 

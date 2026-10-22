@@ -1,8 +1,12 @@
 # Android Release Signing Configuration
 # Copy this file to key.properties and fill in the values
 # NEVER commit key.properties to version control
+#
+# O alias e o keystore DEVEM ser os mesmos usados no CI (secrets
+# KEYSTORE_BASE64/KEY_ALIAS) — assinaturas diferentes impedem atualizações
+# ("App não instalado"). Alias real atual: luar (android/app/android.jks).
 
 storePassword=your-store-password
 keyPassword=your-key-password
-keyAlias=luar-company
-storeFile=luar-company-key.jks
+keyAlias=luar
+storeFile=android.jks

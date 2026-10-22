@@ -47,6 +47,10 @@ class _PremiumSplashBackgroundState extends State<PremiumSplashBackground>
             errorBuilder: (context, error, stackTrace) =>
                 const SizedBox.shrink(),
           ),
+          // Baixa a iluminação da foto de forma uniforme.
+          const DecoratedBox(
+            decoration: BoxDecoration(color: Color(0x38000000)),
+          ),
           // Scrim navy: garante contraste do texto/cartões sobre a foto.
           const DecoratedBox(
             decoration: BoxDecoration(gradient: _backgroundScrim),
@@ -71,9 +75,9 @@ const LinearGradient _backgroundScrim = LinearGradient(
   begin: Alignment.topCenter,
   end: Alignment.bottomCenter,
   colors: [
-    Color(0xB30E3A4B), // navy 70%
-    Color(0x8C17576B), // navyLight 55%
-    Color(0xE6081F27), // navyDark 90%
+    Color(0xD90E3A4B), // navy 85%
+    Color(0xCC17576B), // navyLight 80%
+    Color(0xF2081F27), // navyDark 95%
   ],
   stops: [0.0, 0.45, 1.0],
 );

@@ -6,9 +6,12 @@ import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/models/property_model.dart';
+import '../../core/providers/auth_provider.dart';
 import '../../core/providers/comparison_provider.dart';
+import '../../core/providers/favorite_provider.dart';
 import '../../core/providers/search_provider.dart';
 import '../../core/theme/app_palette.dart';
+import '../../core/utils/favorite_actions.dart';
 import '../../core/utils/responsive.dart';
 import '../../core/utils/routes.dart';
 import '../../l10n/app_localizations.dart';
@@ -27,6 +30,31 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounce;
+  String? _favoritesUserId;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _syncFavorites();
+  }
+
+  /// Garante que os favoritos carregados correspondem ao utilizador atual.
+  ///
+  /// O `watch` regista a dependência: quando a sessão é carregada (ou muda de
+  /// utilizador) este método volta a correr e os favoritos são recarregados.
+  void _syncFavorites() {
+    final userId =
+        context.watch<AuthProvider>().user?.id ?? FavoriteProvider.guestUserId;
+    if (userId == _favoritesUserId) return;
+    _favoritesUserId = userId;
+
+    // Adiado para fora do build: `ensureLoaded` notifica os listeners, o que
+    // dentro do build causaria "markNeedsBuild called during build".
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<FavoriteProvider>().ensureLoaded(userId);
+    });
+  }
 
   @override
   void dispose() {
@@ -535,6 +563,9 @@ class _SearchScreenState extends State<SearchScreen> {
     final palette = context.palette;
     final properties = provider.propertyResults;
     final lands = provider.landResults;
+    final favorites = context.watch<FavoriteProvider>();
+    final userId =
+        context.read<AuthProvider>().user?.id ?? FavoriteProvider.guestUserId;
 
     return NotificationListener<ScrollNotification>(
       onNotification: (notification) {
@@ -574,6 +605,16 @@ class _SearchScreenState extends State<SearchScreen> {
                             agentVerified: p.agentVerified,
                             onCompareTap: () =>
                                 _toggleComparison(context, comparison, p),
+                            isFavorite: favorites.isFavorite(
+                              userId,
+                              propertyId: p.id,
+                            ),
+                            onFavoriteTap: () => toggleFavoriteWithFeedback(
+                              context,
+                              favorites,
+                              userId,
+                              propertyId: p.id,
+                            ),
                             onTap: () => Navigator.pushNamed(
                               context,
                               AppRoutes.propertyDetail,
@@ -605,6 +646,13 @@ class _SearchScreenState extends State<SearchScreen> {
                   badgeLabel: l.type.name.toUpperCase(),
                   features: l.features,
                   agentVerified: l.agentVerified,
+                  isFavorite: favorites.isFavorite(userId, landId: l.id),
+                  onFavoriteTap: () => toggleFavoriteWithFeedback(
+                    context,
+                    favorites,
+                    userId,
+                    landId: l.id,
+                  ),
                   onTap: () => Navigator.pushNamed(
                     context,
                     AppRoutes.landDetail,

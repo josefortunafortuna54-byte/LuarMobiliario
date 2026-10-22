@@ -5,8 +5,11 @@ import '../../core/constants/app_categories.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/models/property_model.dart';
+import '../../core/providers/auth_provider.dart';
+import '../../core/providers/favorite_provider.dart';
 import '../../core/providers/property_provider.dart';
 import '../../core/theme/app_palette.dart';
+import '../../core/utils/favorite_actions.dart';
 import '../../core/utils/responsive.dart';
 import '../../core/utils/routes.dart';
 import '../../l10n/app_localizations.dart';
@@ -26,6 +29,7 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
   String _sortOption = 'recent';
   bool _showSortOptions = false;
   bool _routeArgumentApplied = false;
+  String? _favoritesUserId;
 
   List<String> get _filterKeys => propertyFilterKeys;
 
@@ -48,10 +52,30 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (_routeArgumentApplied) return;
-    _routeArgumentApplied = true;
-    _applyRouteArgument();
-    _loadProperties();
+    if (!_routeArgumentApplied) {
+      _routeArgumentApplied = true;
+      _applyRouteArgument();
+      _loadProperties();
+    }
+    _syncFavorites();
+  }
+
+  /// Garante que os favoritos carregados correspondem ao utilizador atual.
+  ///
+  /// O `watch` regista a dependência: quando a sessão é carregada (ou muda de
+  /// utilizador) este método volta a correr e os favoritos são recarregados.
+  void _syncFavorites() {
+    final userId =
+        context.watch<AuthProvider>().user?.id ?? FavoriteProvider.guestUserId;
+    if (userId == _favoritesUserId) return;
+    _favoritesUserId = userId;
+
+    // Adiado para fora do build: `ensureLoaded` notifica os listeners, o que
+    // dentro do build causaria "markNeedsBuild called during build".
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<FavoriteProvider>().ensureLoaded(userId);
+    });
   }
 
   void _applyRouteArgument() {
@@ -456,6 +480,9 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
   ) {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
+    final favorites = context.watch<FavoriteProvider>();
+    final userId =
+        context.read<AuthProvider>().user?.id ?? FavoriteProvider.guestUserId;
     return RefreshIndicator(
       onRefresh: () async => _loadProperties(),
       color: AppColors.gold,
@@ -485,6 +512,16 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
                   bathrooms: property.bathrooms,
                   area: property.area,
                   agentVerified: property.agentVerified,
+                  isFavorite: favorites.isFavorite(
+                    userId,
+                    propertyId: property.id,
+                  ),
+                  onFavoriteTap: () => toggleFavoriteWithFeedback(
+                    context,
+                    favorites,
+                    userId,
+                    propertyId: property.id,
+                  ),
                   onTap: () => Navigator.pushNamed(
                     context,
                     AppRoutes.propertyDetail,

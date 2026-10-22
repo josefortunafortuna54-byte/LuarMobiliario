@@ -8,6 +8,7 @@ import '../../core/providers/auth_provider.dart';
 import '../../core/providers/saved_search_provider.dart';
 import '../../core/providers/search_provider.dart';
 import '../../core/theme/app_palette.dart';
+import '../../core/utils/responsive.dart';
 import '../../l10n/app_localizations.dart';
 import '../../widgets/empty_state.dart';
 import '../../widgets/loading_widget.dart';
@@ -76,87 +77,97 @@ class _SavedSearchesScreenState extends State<SavedSearchesScreen> {
           style: AppTextStyles.h5.copyWith(color: AppColors.white),
         ),
       ),
-      body: Builder(
-        builder: (context) {
-          if (userId == null) {
-            return EmptyState(
-              icon: Icons.bookmark_border,
-              title: l10n.semPesquisasGuardadas,
-              message: l10n.guardarPesquisa,
-            );
-          }
-          if (provider.isLoading) {
-            return const LoadingWidget(isFullScreen: true);
-          }
-          if (provider.error != null) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      l10n.erroAoCarregar,
+      body: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: Responsive.contentMaxWidth(context),
+          ),
+          child: Builder(
+            builder: (context) {
+              if (userId == null) {
+                return EmptyState(
+                  icon: Icons.bookmark_border,
+                  title: l10n.semPesquisasGuardadas,
+                  message: l10n.guardarPesquisa,
+                );
+              }
+              if (provider.isLoading) {
+                return const LoadingWidget(isFullScreen: true);
+              }
+              if (provider.error != null) {
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          l10n.erroAoCarregar,
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: palette.textBody,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () => provider.load(userId),
+                          child: Text(l10n.tentarNovamente),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+              if (provider.isEmpty) {
+                return EmptyState(
+                  icon: Icons.bookmark_border,
+                  title: l10n.semPesquisasGuardadas,
+                  message: l10n.guardarPesquisa,
+                );
+              }
+
+              return ListView.separated(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                itemCount: provider.items.length,
+                separatorBuilder: (_, _) =>
+                    Divider(height: 1, color: palette.border),
+                itemBuilder: (context, index) {
+                  final item = provider.items[index];
+                  final date = item.createdAt;
+                  final dateLabel =
+                      '${date.day.toString().padLeft(2, '0')}/'
+                      '${date.month.toString().padLeft(2, '0')}/'
+                      '${date.year}';
+
+                  return ListTile(
+                    onTap: () => _apply(item),
+                    leading: const Icon(Icons.bookmark, color: AppColors.gold),
+                    title: Text(
+                      item.name,
                       style: AppTextStyles.bodyMedium.copyWith(
                         color: palette.textBody,
                       ),
-                      textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () => provider.load(userId),
-                      child: Text(l10n.tentarNovamente),
+                    subtitle: Text(
+                      '${_summary(item, l10n)} · $dateLabel',
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: palette.textSecondary,
+                      ),
                     ),
-                  ],
-                ),
-              ),
-            );
-          }
-          if (provider.isEmpty) {
-            return EmptyState(
-              icon: Icons.bookmark_border,
-              title: l10n.semPesquisasGuardadas,
-              message: l10n.guardarPesquisa,
-            );
-          }
-
-          return ListView.separated(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            itemCount: provider.items.length,
-            separatorBuilder: (_, _) =>
-                Divider(height: 1, color: palette.border),
-            itemBuilder: (context, index) {
-              final item = provider.items[index];
-              final date = item.createdAt;
-              final dateLabel =
-                  '${date.day.toString().padLeft(2, '0')}/'
-                  '${date.month.toString().padLeft(2, '0')}/'
-                  '${date.year}';
-
-              return ListTile(
-                onTap: () => _apply(item),
-                leading: const Icon(Icons.bookmark, color: AppColors.gold),
-                title: Text(
-                  item.name,
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: palette.textBody,
-                  ),
-                ),
-                subtitle: Text(
-                  '${_summary(item, l10n)} · $dateLabel',
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: palette.textSecondary,
-                  ),
-                ),
-                trailing: IconButton(
-                  icon: Icon(Icons.delete_outline, color: palette.textMuted),
-                  tooltip: l10n.eliminar,
-                  onPressed: () => provider.remove(item.id),
-                ),
+                    trailing: IconButton(
+                      icon: Icon(
+                        Icons.delete_outline,
+                        color: palette.textMuted,
+                      ),
+                      tooltip: l10n.eliminar,
+                      onPressed: () => provider.remove(item.id),
+                    ),
+                  );
+                },
               );
             },
-          );
-        },
+          ),
+        ),
       ),
     );
   }

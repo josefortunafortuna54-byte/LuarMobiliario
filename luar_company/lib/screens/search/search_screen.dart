@@ -9,6 +9,7 @@ import '../../core/models/property_model.dart';
 import '../../core/providers/comparison_provider.dart';
 import '../../core/providers/search_provider.dart';
 import '../../core/theme/app_palette.dart';
+import '../../core/utils/responsive.dart';
 import '../../core/utils/routes.dart';
 import '../../l10n/app_localizations.dart';
 import '../../widgets/property_card.dart';
@@ -116,18 +117,25 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
           ),
           Expanded(
-            child: Consumer<SearchProvider>(
-              builder: (_, provider, _) {
-                return Column(
-                  children: [
-                    if (provider.activeFilterCount > 0)
-                      _buildActiveFilters(provider),
-                    if (!provider.isLoading && provider.results.isNotEmpty)
-                      _buildSortBar(provider),
-                    Expanded(child: _buildResults(provider)),
-                  ],
-                );
-              },
+            child: Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: Responsive.gridMaxWidth(context),
+                ),
+                child: Consumer<SearchProvider>(
+                  builder: (_, provider, _) {
+                    return Column(
+                      children: [
+                        if (provider.activeFilterCount > 0)
+                          _buildActiveFilters(provider),
+                        if (!provider.isLoading && provider.results.isNotEmpty)
+                          _buildSortBar(provider),
+                        Expanded(child: _buildResults(provider)),
+                      ],
+                    );
+                  },
+                ),
+              ),
             ),
           ),
         ],
@@ -470,8 +478,8 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget _buildShimmerGrid() {
     return GridView.builder(
       padding: const EdgeInsets.all(16),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
+      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: Responsive.maxGridCellExtent,
         childAspectRatio: 0.65,
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,

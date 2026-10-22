@@ -12,6 +12,7 @@ import '../../core/providers/search_provider.dart';
 import '../../core/repositories/location_repository.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/utils/formatters.dart';
+import '../../core/utils/responsive.dart';
 import '../../core/utils/routes.dart';
 import '../../l10n/app_localizations.dart';
 
@@ -304,179 +305,188 @@ class _FiltersScreenState extends State<FiltersScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _SectionTitle(title: l10n.tipoTransacao),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
+      body: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: Responsive.contentMaxWidth(context),
+          ),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _GoldChip(
-                  label: l10n.comprar,
-                  selected: _transactionType == 'sale',
-                  onTap: () => _toggleTransaction('sale'),
+                _SectionTitle(title: l10n.tipoTransacao),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _GoldChip(
+                      label: l10n.comprar,
+                      selected: _transactionType == 'sale',
+                      onTap: () => _toggleTransaction('sale'),
+                    ),
+                    _GoldChip(
+                      label: l10n.arrendar,
+                      selected: _transactionType == 'rent',
+                      onTap: () => _toggleTransaction('rent'),
+                    ),
+                    _GoldChip(
+                      label: l10n.renovar,
+                      selected: _transactionType == 'renew',
+                      onTap: () => _toggleTransaction('renew'),
+                    ),
+                  ],
                 ),
-                _GoldChip(
-                  label: l10n.arrendar,
-                  selected: _transactionType == 'rent',
-                  onTap: () => _toggleTransaction('rent'),
+                const SizedBox(height: 24),
+                _SectionTitle(title: l10n.provincia),
+                const SizedBox(height: 10),
+                _DropdownField<String>(
+                  value: _province,
+                  hint: l10n.todos,
+                  items: _provinces,
+                  onChanged: (value) => setState(() => _province = value),
                 ),
-                _GoldChip(
-                  label: l10n.renovar,
-                  selected: _transactionType == 'renew',
-                  onTap: () => _toggleTransaction('renew'),
+                const SizedBox(height: 24),
+                _SectionTitle(title: l10n.municipio),
+                const SizedBox(height: 10),
+                _DropdownField<String>(
+                  value: _municipality,
+                  hint: l10n.todos,
+                  items: _municipalities,
+                  onChanged: (value) => setState(() => _municipality = value),
+                ),
+                const SizedBox(height: 24),
+                _SectionTitle(title: l10n.preco),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _PriceField(
+                        controller: _minPriceController,
+                        label: l10n.minimo,
+                        icon: Icons.arrow_downward_rounded,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _PriceField(
+                        controller: _maxPriceController,
+                        label: l10n.maximo,
+                        icon: Icons.arrow_upward_rounded,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                _SectionTitle(title: l10n.tipoImovel),
+                const SizedBox(height: 10),
+                _buildCategoryGrid(l10n),
+                const SizedBox(height: 24),
+                _SectionTitle(title: l10n.finalidade),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _GoldChip(
+                        label: l10n.residencial,
+                        selected: _purpose == 'residential',
+                        onTap: () => setState(() {
+                          _purpose = _purpose == 'residential'
+                              ? null
+                              : 'residential';
+                        }),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _GoldChip(
+                        label: l10n.comercial,
+                        selected: _purpose == 'commercial',
+                        onTap: () => setState(() {
+                          _purpose = _purpose == 'commercial'
+                              ? null
+                              : 'commercial';
+                        }),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                _SectionTitle(title: l10n.areaM2),
+                const SizedBox(height: 10),
+                _RangeField(
+                  min: _minArea,
+                  max: _maxArea,
+                  cap: _areaCap,
+                  unit: 'm²',
+                  onChanged: (values) => setState(() {
+                    _minArea = values.start;
+                    _maxArea = values.end;
+                  }),
+                ),
+                const SizedBox(height: 24),
+                _SectionTitle(title: l10n.quartosLabel),
+                const SizedBox(height: 10),
+                _OptionsRow(
+                  options: AppConstants.bedroomOptions,
+                  selectedIndex: _bedrooms != null ? _bedrooms! - 1 : null,
+                  onSelected: (i) {
+                    setState(() {
+                      _bedrooms = _bedrooms == i + 1 ? null : i + 1;
+                    });
+                  },
+                ),
+                const SizedBox(height: 24),
+                _SectionTitle(title: l10n.casasDeBanhoLabel),
+                const SizedBox(height: 10),
+                _OptionsRow(
+                  options: AppConstants.bedroomOptions,
+                  selectedIndex: _bathrooms != null ? _bathrooms! - 1 : null,
+                  onSelected: (i) {
+                    setState(() {
+                      _bathrooms = _bathrooms == i + 1 ? null : i + 1;
+                    });
+                  },
+                ),
+                const SizedBox(height: 24),
+                _SectionTitle(title: l10n.garagemLabel),
+                const SizedBox(height: 10),
+                _OptionsRow(
+                  options: AppConstants.parkingOptions,
+                  selectedIndex: _garage != null ? _garage! - 1 : null,
+                  onSelected: (i) {
+                    setState(() {
+                      _garage = _garage == i + 1 ? null : i + 1;
+                    });
+                  },
+                ),
+                const SizedBox(height: 32),
+                SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: ElevatedButton(
+                    onPressed: _apply,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.gold,
+                      foregroundColor: AppColors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 4,
+                      shadowColor: AppColors.gold.withValues(alpha: 0.4),
+                    ),
+                    child: Text(
+                      l10n.aplicarFiltros,
+                      style: AppTextStyles.buttonLarge.copyWith(
+                        color: AppColors.white,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 24),
-            _SectionTitle(title: l10n.provincia),
-            const SizedBox(height: 10),
-            _DropdownField<String>(
-              value: _province,
-              hint: l10n.todos,
-              items: _provinces,
-              onChanged: (value) => setState(() => _province = value),
-            ),
-            const SizedBox(height: 24),
-            _SectionTitle(title: l10n.municipio),
-            const SizedBox(height: 10),
-            _DropdownField<String>(
-              value: _municipality,
-              hint: l10n.todos,
-              items: _municipalities,
-              onChanged: (value) => setState(() => _municipality = value),
-            ),
-            const SizedBox(height: 24),
-            _SectionTitle(title: l10n.preco),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: _PriceField(
-                    controller: _minPriceController,
-                    label: l10n.minimo,
-                    icon: Icons.arrow_downward_rounded,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _PriceField(
-                    controller: _maxPriceController,
-                    label: l10n.maximo,
-                    icon: Icons.arrow_upward_rounded,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            _SectionTitle(title: l10n.tipoImovel),
-            const SizedBox(height: 10),
-            _buildCategoryGrid(l10n),
-            const SizedBox(height: 24),
-            _SectionTitle(title: l10n.finalidade),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: _GoldChip(
-                    label: l10n.residencial,
-                    selected: _purpose == 'residential',
-                    onTap: () => setState(() {
-                      _purpose = _purpose == 'residential'
-                          ? null
-                          : 'residential';
-                    }),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _GoldChip(
-                    label: l10n.comercial,
-                    selected: _purpose == 'commercial',
-                    onTap: () => setState(() {
-                      _purpose = _purpose == 'commercial' ? null : 'commercial';
-                    }),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            _SectionTitle(title: l10n.areaM2),
-            const SizedBox(height: 10),
-            _RangeField(
-              min: _minArea,
-              max: _maxArea,
-              cap: _areaCap,
-              unit: 'm²',
-              onChanged: (values) => setState(() {
-                _minArea = values.start;
-                _maxArea = values.end;
-              }),
-            ),
-            const SizedBox(height: 24),
-            _SectionTitle(title: l10n.quartosLabel),
-            const SizedBox(height: 10),
-            _OptionsRow(
-              options: AppConstants.bedroomOptions,
-              selectedIndex: _bedrooms != null ? _bedrooms! - 1 : null,
-              onSelected: (i) {
-                setState(() {
-                  _bedrooms = _bedrooms == i + 1 ? null : i + 1;
-                });
-              },
-            ),
-            const SizedBox(height: 24),
-            _SectionTitle(title: l10n.casasDeBanhoLabel),
-            const SizedBox(height: 10),
-            _OptionsRow(
-              options: AppConstants.bedroomOptions,
-              selectedIndex: _bathrooms != null ? _bathrooms! - 1 : null,
-              onSelected: (i) {
-                setState(() {
-                  _bathrooms = _bathrooms == i + 1 ? null : i + 1;
-                });
-              },
-            ),
-            const SizedBox(height: 24),
-            _SectionTitle(title: l10n.garagemLabel),
-            const SizedBox(height: 10),
-            _OptionsRow(
-              options: AppConstants.parkingOptions,
-              selectedIndex: _garage != null ? _garage! - 1 : null,
-              onSelected: (i) {
-                setState(() {
-                  _garage = _garage == i + 1 ? null : i + 1;
-                });
-              },
-            ),
-            const SizedBox(height: 32),
-            SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: ElevatedButton(
-                onPressed: _apply,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.gold,
-                  foregroundColor: AppColors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 4,
-                  shadowColor: AppColors.gold.withValues(alpha: 0.4),
-                ),
-                child: Text(
-                  l10n.aplicarFiltros,
-                  style: AppTextStyles.buttonLarge.copyWith(
-                    color: AppColors.white,
-                  ),
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

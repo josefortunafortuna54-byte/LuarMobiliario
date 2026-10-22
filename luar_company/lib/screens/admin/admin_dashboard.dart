@@ -9,9 +9,11 @@ import '../../core/providers/auth_provider.dart';
 import '../../core/repositories/admin_repository.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/utils/formatters.dart';
+import '../../core/utils/permissions.dart';
 import '../../core/utils/responsive.dart';
 import '../../core/utils/routes.dart';
 import '../../l10n/app_localizations.dart';
+import '../../widgets/access_denied_view.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -21,21 +23,19 @@ class AdminDashboard extends StatefulWidget {
 }
 
 class _AdminDashboardState extends State<AdminDashboard> {
+  bool _accessDenied = false;
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final user = context.read<AuthProvider>().user;
-      final isAgentOrAdmin =
-          user?.role == UserRole.agent || user?.role == UserRole.admin;
-      if (!isAgentOrAdmin && mounted) {
-        Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context).acessoRestritoAgentes),
-            backgroundColor: AppColors.error,
-          ),
-        );
+      final denied = denyUnlessAdmin(
+        context,
+        role: user?.role,
+        message: AppLocalizations.of(context).acessoRestritoAdmin,
+      );
+      if (denied) {
+        if (mounted) setState(() => _accessDenied = true);
         return;
       }
       _loadData();
@@ -50,6 +50,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    if (_accessDenied) {
+      return Scaffold(
+        backgroundColor: palette.surface,
+        body: AccessDeniedView(
+          message: AppLocalizations.of(context).acessoRestritoAdmin,
+        ),
+      );
+    }
     final l10n = AppLocalizations.of(context);
     final isAdmin = context.read<AuthProvider>().user?.role == UserRole.admin;
 

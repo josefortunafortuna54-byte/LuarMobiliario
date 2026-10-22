@@ -6,6 +6,7 @@ import 'package:luar_company/core/models/user_model.dart';
 import 'package:luar_company/core/providers/admin_provider.dart';
 import 'package:luar_company/core/providers/auth_provider.dart';
 import 'package:luar_company/screens/admin/admin_dashboard.dart';
+import 'package:luar_company/widgets/access_denied_view.dart';
 
 import '../helpers/test_app.dart';
 
@@ -86,7 +87,7 @@ void main() {
     expect(find.text('A carregar análise...'), findsOneWidget);
   });
 
-  testWidgets('oculta ações restritas a admin quando o utilizador é agente', (
+  testWidgets('nega o acesso ao painel quando o utilizador é agente', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -104,11 +105,13 @@ void main() {
     );
     await tester.pump();
 
-    expect(find.text('Bem-vindo, Admin'), findsOneWidget);
-    expect(find.text('Cadastrar\nImóvel'), findsOneWidget);
-    expect(find.text('Ver\nUtilizadores'), findsNothing);
-    expect(find.text('Denúncias'), findsNothing);
-    expect(find.text('Ver\nParceiros'), findsOneWidget);
+    // O painel é exclusivo do role admin: nenhum conteúdo administrativo é
+    // desenhado para um agente.
+    expect(find.text('Bem-vindo, Admin'), findsNothing);
+    expect(find.text('Cadastrar\nImóvel'), findsNothing);
+    expect(find.text('Ver\nParceiros'), findsNothing);
+    expect(find.byType(AccessDeniedView), findsOneWidget);
+    expect(find.text('Acesso restrito a administradores'), findsWidgets);
   });
 
   testWidgets('mostra estado de erro com botão para tentar novamente', (

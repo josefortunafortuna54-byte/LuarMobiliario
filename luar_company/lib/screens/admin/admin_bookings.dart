@@ -4,12 +4,14 @@ import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart';
 import '../../core/models/booking_model.dart';
-import '../../core/models/user_model.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/providers/booking_provider.dart';
 import '../../core/theme/app_palette.dart';
+import '../../core/utils/permissions.dart';
+import '../../core/utils/responsive.dart';
 import '../../core/utils/whatsapp_util.dart';
 import '../../l10n/app_localizations.dart';
+import '../../widgets/access_denied_view.dart';
 import '../../widgets/loading_widget.dart';
 
 class AdminBookingsScreen extends StatefulWidget {
@@ -20,6 +22,7 @@ class AdminBookingsScreen extends StatefulWidget {
 }
 
 class _AdminBookingsScreenState extends State<AdminBookingsScreen> {
+  bool _accessDenied = false;
   BookingStatus? _statusFilter;
 
   @override
@@ -27,16 +30,13 @@ class _AdminBookingsScreenState extends State<AdminBookingsScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final user = context.read<AuthProvider>().user;
-      final isAgentOrAdmin =
-          user?.role == UserRole.agent || user?.role == UserRole.admin;
-      if (!isAgentOrAdmin && mounted) {
-        Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context).acessoRestritoAgentes),
-            backgroundColor: AppColors.error,
-          ),
-        );
+      final denied = denyUnlessAdmin(
+        context,
+        role: user?.role,
+        message: AppLocalizations.of(context).acessoRestritoAdmin,
+      );
+      if (denied) {
+        if (mounted) setState(() => _accessDenied = true);
         return;
       }
       context.read<BookingProvider>().loadAllBookings();
@@ -79,6 +79,14 @@ class _AdminBookingsScreenState extends State<AdminBookingsScreen> {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    if (_accessDenied) {
+      return Scaffold(
+        backgroundColor: palette.surface,
+        body: AccessDeniedView(
+          message: AppLocalizations.of(context).acessoRestritoAdmin,
+        ),
+      );
+    }
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: palette.background,

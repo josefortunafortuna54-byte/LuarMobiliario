@@ -7,7 +7,10 @@ import '../../core/models/user_model.dart';
 import '../../core/providers/admin_provider.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/theme/app_palette.dart';
+import '../../core/utils/permissions.dart';
+import '../../core/utils/responsive.dart';
 import '../../l10n/app_localizations.dart';
+import '../../widgets/access_denied_view.dart';
 import '../../widgets/avatar_widget.dart';
 
 class AdminUsersScreen extends StatefulWidget {
@@ -18,6 +21,7 @@ class AdminUsersScreen extends StatefulWidget {
 }
 
 class _AdminUsersScreenState extends State<AdminUsersScreen> {
+  bool _accessDenied = false;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   List<UserModel> _filteredUsers = [];
@@ -29,18 +33,17 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final user = context.read<AuthProvider>().user;
-      if (user?.role != UserRole.admin && mounted) {
-        Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context).acessoRestritoAdmin),
-            backgroundColor: AppColors.error,
-          ),
-        );
+      final denied = denyUnlessAdmin(
+        context,
+        role: user?.role,
+        message: AppLocalizations.of(context).acessoRestritoAdmin,
+      );
+      if (denied) {
+        if (mounted) setState(() => _accessDenied = true);
         return;
       }
+      _loadUsers();
     });
-    _loadUsers();
   }
 
   @override
@@ -78,6 +81,14 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    if (_accessDenied) {
+      return Scaffold(
+        backgroundColor: palette.surface,
+        body: AccessDeniedView(
+          message: AppLocalizations.of(context).acessoRestritoAdmin,
+        ),
+      );
+    }
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: palette.surface,

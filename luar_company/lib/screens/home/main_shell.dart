@@ -64,14 +64,76 @@ class _MainShellState extends State<MainShell> {
 
     return Scaffold(
       backgroundColor: context.palette.background,
-      body: IndexedStack(
-        index: _index,
-        children: List.generate(
-          _tabCount,
-          (i) => _visited.contains(i) ? _screenFor(i) : const SizedBox.shrink(),
-        ),
+      body: Row(
+        children: [
+          if (isDesktop) _buildNavigationRail(),
+          Expanded(
+            child: IndexedStack(
+              index: _index,
+              children: List.generate(
+                _tabCount,
+                (i) => _visited.contains(i)
+                    ? _screenFor(i)
+                    : const SizedBox.shrink(),
+              ),
+            ),
+          ),
+        ],
       ),
       bottomNavigationBar: isDesktop ? null : _buildBottomNav(),
+    );
+  }
+
+  /// Navegação lateral para desktop — a bottom nav é escondida em ecrãs
+  /// largos sem substituto, deixando o utilizador sem navegação.
+  Widget _buildNavigationRail() {
+    final l10n = AppLocalizations.of(context);
+    final palette = context.palette;
+    return Container(
+      decoration: BoxDecoration(
+        color: palette.appBar,
+        border: Border(right: BorderSide(color: palette.borderStrong)),
+      ),
+      child: SafeArea(
+        child: NavigationRail(
+          backgroundColor: Colors.transparent,
+          selectedIndex: _index,
+          onDestinationSelected: _select,
+          labelType: NavigationRailLabelType.all,
+          selectedIconTheme: const IconThemeData(color: AppColors.gold),
+          unselectedIconTheme: IconThemeData(color: palette.textMuted),
+          selectedLabelTextStyle: AppTextStyles.bodyTiny.copyWith(
+            color: AppColors.gold,
+            fontWeight: FontWeight.w700,
+          ),
+          unselectedLabelTextStyle: AppTextStyles.bodyTiny.copyWith(
+            color: palette.textMuted,
+            fontWeight: FontWeight.w500,
+          ),
+          destinations: [
+            NavigationRailDestination(
+              icon: const Icon(Icons.explore_outlined),
+              selectedIcon: const Icon(Icons.explore_rounded),
+              label: Text(l10n.descobrir),
+            ),
+            NavigationRailDestination(
+              icon: const Icon(Icons.search_outlined),
+              selectedIcon: const Icon(Icons.search_rounded),
+              label: Text(l10n.pesquisar),
+            ),
+            NavigationRailDestination(
+              icon: const Icon(Icons.favorite_outline),
+              selectedIcon: const Icon(Icons.favorite_rounded),
+              label: Text(l10n.favoritos),
+            ),
+            NavigationRailDestination(
+              icon: const Icon(Icons.person_outline),
+              selectedIcon: const Icon(Icons.person_rounded),
+              label: Text(l10n.perfil),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

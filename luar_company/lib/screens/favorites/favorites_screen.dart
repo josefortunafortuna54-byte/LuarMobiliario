@@ -11,6 +11,7 @@ import '../../core/repositories/land_repository.dart';
 import '../../core/repositories/property_repository.dart';
 import '../../core/services/view_history_service.dart';
 import '../../core/theme/app_palette.dart';
+import '../../core/utils/responsive.dart';
 import '../../core/utils/routes.dart';
 import '../../l10n/app_localizations.dart';
 import '../../widgets/land_card.dart';
@@ -197,9 +198,16 @@ class _FavoritesScreenState extends State<FavoritesScreen>
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [_buildFavoritesTab(), _buildHistoryTab()],
+      body: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: Responsive.contentMaxWidth(context),
+          ),
+          child: TabBarView(
+            controller: _tabController,
+            children: [_buildFavoritesTab(), _buildHistoryTab()],
+          ),
+        ),
       ),
     );
   }

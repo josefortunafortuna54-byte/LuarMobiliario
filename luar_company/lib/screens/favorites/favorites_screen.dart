@@ -11,6 +11,7 @@ import '../../core/repositories/land_repository.dart';
 import '../../core/repositories/property_repository.dart';
 import '../../core/services/view_history_service.dart';
 import '../../core/theme/app_palette.dart';
+import '../../core/utils/favorite_actions.dart';
 import '../../core/utils/responsive.dart';
 import '../../core/utils/routes.dart';
 import '../../l10n/app_localizations.dart';
@@ -144,10 +145,20 @@ class _FavoritesScreenState extends State<FavoritesScreen>
       setState(
         () => _favoriteProperties.removeWhere((p) => p.id == property.id),
       );
-      await favorites.toggleFavorite(userId, propertyId: property.id);
+      await toggleFavoriteWithFeedback(
+        context,
+        favorites,
+        userId,
+        propertyId: property.id,
+      );
     } else if (land != null) {
       setState(() => _favoriteLands.removeWhere((l) => l.id == land.id));
-      await favorites.toggleFavorite(userId, landId: land.id);
+      await toggleFavoriteWithFeedback(
+        context,
+        favorites,
+        userId,
+        landId: land.id,
+      );
     }
     if (mounted) await _loadFavorites();
   }
@@ -378,7 +389,9 @@ class _FavoritesScreenState extends State<FavoritesScreen>
   Future<void> _toggleFavoriteFromHistory(PropertyModel property) async {
     final userId =
         context.read<AuthProvider>().user?.id ?? FavoriteProvider.guestUserId;
-    await context.read<FavoriteProvider>().toggleFavorite(
+    await toggleFavoriteWithFeedback(
+      context,
+      context.read<FavoriteProvider>(),
       userId,
       propertyId: property.id,
     );
@@ -388,7 +401,9 @@ class _FavoritesScreenState extends State<FavoritesScreen>
   Future<void> _toggleLandFavoriteFromHistory(LandModel land) async {
     final userId =
         context.read<AuthProvider>().user?.id ?? FavoriteProvider.guestUserId;
-    await context.read<FavoriteProvider>().toggleFavorite(
+    await toggleFavoriteWithFeedback(
+      context,
+      context.read<FavoriteProvider>(),
       userId,
       landId: land.id,
     );

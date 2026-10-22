@@ -15,6 +15,7 @@ import '../../core/providers/comparison_provider.dart';
 import '../../core/providers/auth_provider.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/utils/deep_links.dart';
+import '../../core/utils/favorite_actions.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/utils/routes.dart';
 import '../../core/utils/whatsapp_util.dart';
@@ -190,7 +191,12 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
         ),
         IconButton(
           onPressed: () async {
-            await favoriteProvider.toggleFavorite(userId, landId: land.id);
+            await toggleFavoriteWithFeedback(
+              context,
+              favoriteProvider,
+              userId,
+              landId: land.id,
+            );
           },
           icon: Icon(
             _isFavorite

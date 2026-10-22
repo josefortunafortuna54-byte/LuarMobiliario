@@ -16,6 +16,7 @@ import '../../core/providers/search_provider.dart';
 import '../../core/services/connectivity_service.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/utils/deep_links.dart';
+import '../../core/utils/favorite_actions.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/utils/navigation.dart';
 import '../../core/utils/routes.dart';
@@ -831,8 +832,12 @@ class _DiscoverPage extends StatelessWidget {
           label: _compactCount(likeCount),
           semanticsLabel: l10n.favoritos,
           color: isFavorite ? AppColors.error : AppColors.white,
-          onTap: () =>
-              favorites.toggleFavorite(userId, propertyId: property.id),
+          onTap: () => toggleFavoriteWithFeedback(
+            context,
+            favorites,
+            userId,
+            propertyId: property.id,
+          ),
         ),
         const SizedBox(height: 16),
         _ActionButton(

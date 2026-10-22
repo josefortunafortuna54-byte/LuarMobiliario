@@ -15,6 +15,7 @@ import '../../core/providers/auth_provider.dart';
 import '../../core/providers/comparison_provider.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/utils/deep_links.dart';
+import '../../core/utils/favorite_actions.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/utils/responsive.dart';
 import '../../core/utils/routes.dart';
@@ -293,7 +294,9 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
                       : Icons.favorite_border_rounded,
                   label: l10n.favoritos,
                   color: _isFavorite ? AppColors.error : AppColors.white,
-                  onTap: () => favoriteProvider.toggleFavorite(
+                  onTap: () => toggleFavoriteWithFeedback(
+                    context,
+                    favoriteProvider,
                     userId,
                     propertyId: property.id,
                   ),

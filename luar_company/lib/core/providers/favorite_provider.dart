@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 import '../models/favorite_model.dart';
@@ -5,6 +7,13 @@ import '../models/property_model.dart';
 import '../models/land_model.dart';
 import '../repositories/favorite_repository.dart';
 import '../services/guest_favorites_service.dart';
+
+/// Resultado de um toggle de favorito.
+///
+/// Distingue "removido" de "falhou": o `bool` anterior devolvia `false` nos
+/// dois casos, o que fazia o ecrã mostrar o coração por preencher mesmo
+/// quando a gravação falhava.
+enum FavoriteToggleResult { added, removed, failed }
 
 class FavoriteProvider extends ChangeNotifier {
   FavoriteProvider({FavoriteRepository? repository})
@@ -51,11 +60,31 @@ class FavoriteProvider extends ChangeNotifier {
   }
 
   /// Ajusta a contagem local após um toggle, sem nova query.
+  ///
+  /// Quando a contagem ainda não foi carregada semeia-a a partir de zero, para
+  /// que o contador do Discover reflita o toggle em vez de ficar congelado.
   void _adjustLikeCount(String? propertyId, {required int delta}) {
     if (propertyId == null || propertyId.isEmpty) return;
-    final current = _likeCounts[propertyId];
-    if (current == null) return;
+    final current = _likeCounts[propertyId] ?? 0;
     _likeCounts[propertyId] = (current + delta).clamp(0, 1 << 31);
+  }
+
+  /// Recarrega a contagem de um imóvel a partir da RPC `favorite_counts`.
+  ///
+  /// O `upsert` do repositório é idempotente, por isso não dá para saber
+  /// pelo resultado se a linha já existia: a contagem real só é garantida
+  /// depois de a consultar.
+  Future<void> _refreshLikeCount(String? propertyId) async {
+    if (propertyId == null || propertyId.isEmpty) return;
+    try {
+      final counts = await _repository.countLikes([propertyId]);
+      final total = counts[propertyId];
+      if (total == null) return;
+      _likeCounts[propertyId] = total;
+      notifyListeners();
+    } catch (_) {
+      // Sem backend disponível — mantém a contagem otimista local.
+    }
   }
 
   Future<void> loadFavorites(String userId) async {
@@ -106,14 +135,24 @@ class FavoriteProvider extends ChangeNotifier {
     ];
   }
 
-  Future<bool> toggleFavorite(
+  /// Alterna o favorito de [userId] para o imóvel/terreno indicado.
+  ///
+  /// Devolve [FavoriteToggleResult] para que o ecrã consiga distinguir
+  /// "adicionado", "removido" e "falhou" — o `bool` anterior tratava falha
+  /// como remoção, e o erro acabava silenciado sem qualquer aviso.
+  Future<FavoriteToggleResult> toggleFavorite(
     String userId, {
     String? propertyId,
     String? landId,
   }) async {
+    if (propertyId == null && landId == null) {
+      return FavoriteToggleResult.failed;
+    }
+
     if (userId == guestUserId) {
       return _toggleGuestFavorite(propertyId: propertyId, landId: landId);
     }
+
     try {
       final existingIndex = _favorites.indexWhere(
         (f) =>
@@ -123,14 +162,16 @@ class FavoriteProvider extends ChangeNotifier {
       );
 
       if (existingIndex != -1) {
-        final existing = _favorites[existingIndex];
-
-        await _repository.remove(existing.id);
+        await _repository.remove(
+          userId: userId,
+          propertyId: propertyId,
+          landId: landId,
+        );
 
         _favorites.removeAt(existingIndex);
         _adjustLikeCount(propertyId, delta: -1);
         notifyListeners();
-        return false;
+        return FavoriteToggleResult.removed;
       } else {
         final newFavorite = await _repository.add(
           userId: userId,
@@ -138,18 +179,30 @@ class FavoriteProvider extends ChangeNotifier {
           landId: landId,
         );
 
+        // A linha pode já existir no servidor (o `upsert` é idempotente):
+        // evita duplicar no estado local.
+        _favorites.removeWhere(
+          (f) =>
+              f.userId == userId &&
+              ((propertyId != null && f.propertyId == propertyId) ||
+                  (landId != null && f.landId == landId)),
+        );
         _favorites.insert(0, newFavorite);
         _adjustLikeCount(propertyId, delta: 1);
         notifyListeners();
-        return true;
+
+        // Confirma a contagem real (o `upsert` não diz se a linha já existia).
+        unawaited(_refreshLikeCount(propertyId));
+
+        return FavoriteToggleResult.added;
       }
     } catch (e) {
-      return false;
+      return FavoriteToggleResult.failed;
     }
   }
 
   /// Alterna um favorito local (modo convidado), persistindo no dispositivo.
-  Future<bool> _toggleGuestFavorite({
+  Future<FavoriteToggleResult> _toggleGuestFavorite({
     String? propertyId,
     String? landId,
   }) async {
@@ -160,7 +213,7 @@ class FavoriteProvider extends ChangeNotifier {
       } else if (landId != null && landId.isNotEmpty) {
         added = await GuestFavorites.toggleLand(landId);
       } else {
-        return false;
+        return FavoriteToggleResult.failed;
       }
 
       final existingIndex = _favorites.indexWhere(
@@ -186,9 +239,9 @@ class FavoriteProvider extends ChangeNotifier {
       }
 
       notifyListeners();
-      return added;
+      return added ? FavoriteToggleResult.added : FavoriteToggleResult.removed;
     } catch (e) {
-      return false;
+      return FavoriteToggleResult.failed;
     }
   }
 

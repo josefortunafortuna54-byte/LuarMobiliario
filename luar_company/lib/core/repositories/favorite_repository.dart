@@ -20,26 +20,52 @@ class FavoriteRepository {
         .toList();
   }
 
-  Future<void> remove(String favoriteId) async {
-    await _client.from('favorites').delete().eq('id', favoriteId);
+  /// Remove o favorito de [userId] para o imóvel/terreno indicado.
+  ///
+  /// Apaga pela chave lógica (`user_id` + `property_id`/`land_id`) e não pelo id
+  /// da linha: assim a remoção continua a funcionar mesmo quando o estado
+  /// local está dessincronizado do servidor (a linha já não existe, ou o id
+  /// guardado em cache é de outra sessão).
+  Future<void> remove({
+    required String userId,
+    String? propertyId,
+    String? landId,
+  }) async {
+    var query = _client.from('favorites').delete().eq('user_id', userId);
+
+    if (propertyId != null) {
+      query = query.eq('property_id', propertyId);
+    } else if (landId != null) {
+      query = query.eq('land_id', landId);
+    }
+
+    await query;
   }
 
+  /// Guarda (ou confirma) um favorito.
+  ///
+  /// Usa `upsert` em vez de `insert`: guardar um favorito que já existe no
+  /// servidor deixava de falhar com `409 duplicate key value violates unique
+  /// constraint "favorites_user_property_unique"`. Com `missing=default` as
+  /// colunas em falta não são apagadas no conflito, por isso o `created_at`
+  /// original do favorito é preservado.
   Future<FavoriteModel> add({
     required String userId,
     String? propertyId,
     String? landId,
   }) async {
-    final data = <String, dynamic>{
-      'user_id': userId,
-      'created_at': DateTime.now().toIso8601String(),
-    };
+    final data = <String, dynamic>{'user_id': userId};
 
     if (propertyId != null) data['property_id'] = propertyId;
     if (landId != null) data['land_id'] = landId;
 
+    final onConflict = propertyId != null
+        ? 'user_id,property_id'
+        : 'user_id,land_id';
+
     final response = await _client
         .from('favorites')
-        .insert(data)
+        .upsert(data, onConflict: onConflict, defaultToNull: false)
         .select()
         .single();
 

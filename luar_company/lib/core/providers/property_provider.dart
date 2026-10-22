@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../constants/app_constants.dart';
 import '../models/property_model.dart';
 import '../repositories/property_repository.dart';
+import '../utils/error_mapper.dart';
 import '../utils/pagination.dart';
 
 class PropertyProvider extends ChangeNotifier {
@@ -44,7 +45,7 @@ class PropertyProvider extends ChangeNotifier {
       _hasMore = slice.hasMore;
       _currentPage = 1;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -70,7 +71,7 @@ class PropertyProvider extends ChangeNotifier {
       _hasMore = slice.hasMore;
       _currentPage++;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -85,7 +86,7 @@ class PropertyProvider extends ChangeNotifier {
     try {
       _featuredProperties = await _repository.fetchFeatured();
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -101,7 +102,7 @@ class PropertyProvider extends ChangeNotifier {
       _selectedProperty = await _repository.fetchById(id);
       _repository.registerView(id);
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -120,7 +121,7 @@ class PropertyProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       _isLoading = false;
       notifyListeners();
       return false;
@@ -151,7 +152,7 @@ class PropertyProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       _isLoading = false;
       notifyListeners();
       return false;
@@ -176,7 +177,7 @@ class PropertyProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       _isLoading = false;
       notifyListeners();
       return false;
@@ -200,7 +201,7 @@ class PropertyProvider extends ChangeNotifier {
       _hasMore = slice.hasMore;
       _currentPage = 1;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
     } finally {
       _isLoading = false;
       notifyListeners();

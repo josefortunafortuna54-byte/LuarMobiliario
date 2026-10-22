@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/message_model.dart';
 import '../repositories/message_repository.dart';
+import '../utils/error_mapper.dart';
 
 class MessageProvider extends ChangeNotifier {
   final MessageRepository _repository = MessageRepository();
@@ -26,7 +27,7 @@ class MessageProvider extends ChangeNotifier {
     try {
       _conversations = await _repository.fetchConversations(userId);
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -43,7 +44,7 @@ class MessageProvider extends ChangeNotifier {
 
       await _repository.markConversationAsRead(otherUserId, userId);
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -62,7 +63,7 @@ class MessageProvider extends ChangeNotifier {
       _messages.add(message);
       notifyListeners();
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       notifyListeners();
     }
   }

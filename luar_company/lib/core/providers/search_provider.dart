@@ -6,6 +6,7 @@ import '../models/property_model.dart';
 import '../models/land_model.dart';
 import '../repositories/land_repository.dart';
 import '../repositories/property_repository.dart';
+import '../utils/error_mapper.dart';
 import '../utils/pagination.dart';
 
 class SearchProvider extends ChangeNotifier {
@@ -318,7 +319,7 @@ class SearchProvider extends ChangeNotifier {
       _results = slice.items;
       _hasMore = slice.hasMore;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       _results = [];
     } finally {
       _isLoading = false;
@@ -342,7 +343,7 @@ class SearchProvider extends ChangeNotifier {
         _hasMore = slice.hasMore;
       }
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
     } finally {
       _isLoadingMore = false;
       notifyListeners();

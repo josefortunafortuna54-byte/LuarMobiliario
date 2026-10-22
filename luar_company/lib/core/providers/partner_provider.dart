@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../models/partner_model.dart';
 import '../repositories/partner_repository.dart';
+import '../utils/error_mapper.dart';
 
 class PartnerProvider extends ChangeNotifier {
   final PartnerRepository _repository = PartnerRepository();
@@ -24,7 +25,7 @@ class PartnerProvider extends ChangeNotifier {
     try {
       _partners = await _repository.fetchAll();
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -37,7 +38,7 @@ class PartnerProvider extends ChangeNotifier {
     try {
       _mine = await _repository.fetchMine(userId);
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
     } finally {
       notifyListeners();
     }
@@ -53,7 +54,7 @@ class PartnerProvider extends ChangeNotifier {
       await loadMine(partner.userId);
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       return false;
     } finally {
       _isLoading = false;
@@ -72,7 +73,7 @@ class PartnerProvider extends ChangeNotifier {
       if (_mine?.id == id) _mine = null;
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       return false;
     } finally {
       _isLoading = false;

@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../constants/app_constants.dart';
 import '../models/land_model.dart';
 import '../repositories/land_repository.dart';
+import '../utils/error_mapper.dart';
 import '../utils/pagination.dart';
 
 class LandProvider extends ChangeNotifier {
@@ -42,7 +43,7 @@ class LandProvider extends ChangeNotifier {
       _hasMore = slice.hasMore;
       _currentPage = 1;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -68,7 +69,7 @@ class LandProvider extends ChangeNotifier {
       _hasMore = slice.hasMore;
       _currentPage++;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -83,7 +84,7 @@ class LandProvider extends ChangeNotifier {
     try {
       _featuredLands = await _repository.fetchFeatured();
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -99,7 +100,7 @@ class LandProvider extends ChangeNotifier {
       _selectedLand = await _repository.fetchById(id);
       _repository.registerView(id);
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -118,7 +119,7 @@ class LandProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       _isLoading = false;
       notifyListeners();
       return false;
@@ -147,7 +148,7 @@ class LandProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       _isLoading = false;
       notifyListeners();
       return false;
@@ -172,7 +173,7 @@ class LandProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       _isLoading = false;
       notifyListeners();
       return false;
@@ -193,7 +194,7 @@ class LandProvider extends ChangeNotifier {
       _hasMore = slice.hasMore;
       _currentPage = 1;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
     } finally {
       _isLoading = false;
       notifyListeners();

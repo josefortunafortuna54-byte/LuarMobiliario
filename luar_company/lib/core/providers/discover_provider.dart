@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../constants/app_constants.dart';
 import '../models/property_model.dart';
 import '../repositories/property_repository.dart';
+import '../utils/error_mapper.dart';
 import '../utils/pagination.dart';
 
 /// Estado do feed vertical (Luar Discover).
@@ -53,7 +54,7 @@ class DiscoverProvider extends ChangeNotifier {
       _page = 1;
       _hasMore = slice.hasMore && _items.length < AppConstants.discoverMaxItems;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -78,7 +79,7 @@ class DiscoverProvider extends ChangeNotifier {
       _page++;
       _hasMore = slice.hasMore && _items.length < AppConstants.discoverMaxItems;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
     } finally {
       _isLoadingMore = false;
       notifyListeners();

@@ -4,6 +4,7 @@ import '../models/user_model.dart';
 import '../repositories/admin_repository.dart';
 import '../services/notification_preferences.dart';
 import '../services/notification_service.dart';
+import '../utils/error_mapper.dart';
 
 class AdminProvider extends ChangeNotifier {
   final AdminRepository _repository = AdminRepository();
@@ -38,7 +39,7 @@ class AdminProvider extends ChangeNotifier {
       _totalUsers = stats.users;
       _totalUnreadMessages = stats.unreadMessages;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -52,7 +53,7 @@ class AdminProvider extends ChangeNotifier {
       _analytics = await _repository.fetchAnalytics();
       notifyListeners();
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       notifyListeners();
     }
   }
@@ -65,7 +66,7 @@ class AdminProvider extends ChangeNotifier {
     try {
       _allUsers = await _repository.fetchUsers();
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -83,7 +84,7 @@ class AdminProvider extends ChangeNotifier {
       }
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       notifyListeners();
       return false;
     }
@@ -120,7 +121,7 @@ class AdminProvider extends ChangeNotifier {
       }
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       notifyListeners();
       return false;
     }
@@ -134,7 +135,7 @@ class AdminProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       notifyListeners();
       return false;
     }

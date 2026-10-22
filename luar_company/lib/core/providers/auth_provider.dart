@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/user_model.dart';
 import '../repositories/auth_repository.dart';
 import '../services/notification_service.dart';
+import '../utils/error_mapper.dart';
 
 class AuthProvider extends ChangeNotifier {
   final AuthRepository _authRepository = AuthRepository();
@@ -33,7 +34,7 @@ class AuthProvider extends ChangeNotifier {
       if (user != null) _registerFcmToken(user.id);
     } catch (e) {
       _user = null;
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -59,7 +60,7 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
       return false;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       _isLoading = false;
       notifyListeners();
       return false;
@@ -95,7 +96,7 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
       return false;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       _isLoading = false;
       notifyListeners();
       return false;
@@ -114,7 +115,7 @@ class AuthProvider extends ChangeNotifier {
       await _authRepository.signOut();
       _user = null;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -144,7 +145,7 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       _isLoading = false;
       notifyListeners();
       return false;
@@ -161,7 +162,7 @@ class AuthProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       _isLoading = false;
       notifyListeners();
       rethrow;

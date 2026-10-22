@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../models/saved_search_model.dart';
 import '../repositories/saved_search_repository.dart';
+import '../utils/error_mapper.dart';
 
 class SavedSearchProvider extends ChangeNotifier {
   SavedSearchProvider({SavedSearchRepository? repository})
@@ -26,7 +27,7 @@ class SavedSearchProvider extends ChangeNotifier {
     try {
       _items = await _repository.fetchByUser(userId);
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       _items = [];
     } finally {
       _isLoading = false;
@@ -53,7 +54,7 @@ class SavedSearchProvider extends ChangeNotifier {
       notifyListeners();
       return item;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       notifyListeners();
       return null;
     }
@@ -69,7 +70,7 @@ class SavedSearchProvider extends ChangeNotifier {
       return true;
     } catch (e) {
       _items = previous;
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       notifyListeners();
       return false;
     }

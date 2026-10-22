@@ -4,6 +4,7 @@ import '../models/report_model.dart';
 import '../repositories/report_repository.dart';
 import '../services/notification_preferences.dart';
 import '../services/notification_service.dart';
+import '../utils/error_mapper.dart';
 
 class ReportProvider extends ChangeNotifier {
   ReportProvider({ReportRepository? repository})
@@ -27,7 +28,7 @@ class ReportProvider extends ChangeNotifier {
     try {
       _reports = await _repository.fetchAll(status: status);
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -52,7 +53,7 @@ class ReportProvider extends ChangeNotifier {
       );
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       notifyListeners();
       return false;
     }
@@ -92,7 +93,7 @@ class ReportProvider extends ChangeNotifier {
       }
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       notifyListeners();
       return false;
     }
@@ -139,7 +140,7 @@ class ReportProvider extends ChangeNotifier {
       }
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       notifyListeners();
       return false;
     }

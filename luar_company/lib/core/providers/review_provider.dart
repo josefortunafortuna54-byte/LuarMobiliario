@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../models/review_model.dart';
 import '../repositories/review_repository.dart';
+import '../utils/error_mapper.dart';
 
 class ReviewProvider extends ChangeNotifier {
   ReviewProvider({ReviewRepository? repository})
@@ -66,7 +67,7 @@ class ReviewProvider extends ChangeNotifier {
     try {
       _reviews = await _repository.fetchByProperty(propertyId);
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       _reviews = [];
     } finally {
       _isLoading = false;
@@ -106,7 +107,7 @@ class ReviewProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       notifyListeners();
       return false;
     }
@@ -127,7 +128,7 @@ class ReviewProvider extends ChangeNotifier {
       return true;
     } catch (e) {
       _reviews = previous;
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       notifyListeners();
       return false;
     }

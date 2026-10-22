@@ -4,6 +4,7 @@ import '../models/booking_model.dart';
 import '../repositories/booking_repository.dart';
 import '../services/notification_preferences.dart';
 import '../services/notification_service.dart';
+import '../utils/error_mapper.dart';
 
 class BookingProvider extends ChangeNotifier {
   final BookingRepository _repository = BookingRepository();
@@ -46,7 +47,7 @@ class BookingProvider extends ChangeNotifier {
     try {
       _bookings = await _repository.fetchByUser(userId);
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       _bookings = [];
     } finally {
       _isLoading = false;
@@ -62,7 +63,7 @@ class BookingProvider extends ChangeNotifier {
     try {
       _allBookings = await _repository.fetchAll();
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       _allBookings = [];
     } finally {
       _isLoading = false;
@@ -110,7 +111,7 @@ class BookingProvider extends ChangeNotifier {
       }
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       notifyListeners();
       return false;
     }
@@ -128,7 +129,7 @@ class BookingProvider extends ChangeNotifier {
       notifyListeners();
       return newBooking;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       _isLoading = false;
       notifyListeners();
       return null;
@@ -154,7 +155,7 @@ class BookingProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       _isLoading = false;
       notifyListeners();
       return false;
@@ -180,7 +181,7 @@ class BookingProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _error = e.toString();
+      _error = ErrorMapper.toMessage(e);
       _isLoading = false;
       notifyListeners();
       return false;

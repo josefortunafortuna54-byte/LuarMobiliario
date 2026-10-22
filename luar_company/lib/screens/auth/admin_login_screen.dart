@@ -221,7 +221,14 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
               ),
             ),
             const SizedBox(width: 10),
-            Text(l10n.acessoAdmin, style: AppTextStyles.h4),
+            Flexible(
+              child: Text(
+                l10n.acessoAdmin,
+                style: AppTextStyles.h4,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 8),

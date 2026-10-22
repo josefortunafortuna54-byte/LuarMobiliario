@@ -122,11 +122,15 @@ class _SplashScreenState extends State<SplashScreen>
                     opacity: _fadeAnimation,
                     child: Column(
                       children: [
-                        Text(
-                          l10n.appName,
-                          style: AppTextStyles.h2White.copyWith(
-                            letterSpacing: 2,
-                            fontWeight: FontWeight.w700,
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            l10n.appName,
+                            maxLines: 1,
+                            style: AppTextStyles.h2White.copyWith(
+                              letterSpacing: 2,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -138,12 +142,17 @@ class _SplashScreenState extends State<SplashScreen>
                           ),
                         ),
                         const SizedBox(height: 12),
-                        Text(
-                          l10n.appTagline.toUpperCase(),
-                          style: AppTextStyles.overline.copyWith(
-                            color: AppColors.goldLight,
-                            letterSpacing: 3,
-                            fontSize: 11,
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            l10n.appTagline.toUpperCase(),
+                            maxLines: 2,
+                            textAlign: TextAlign.center,
+                            style: AppTextStyles.overline.copyWith(
+                              color: AppColors.goldLight,
+                              letterSpacing: 3,
+                              fontSize: 11,
+                            ),
                           ),
                         ),
                       ],

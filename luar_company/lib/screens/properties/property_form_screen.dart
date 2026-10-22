@@ -316,173 +316,182 @@ class _PropertyFormScreenState extends State<PropertyFormScreen> {
         ),
         iconTheme: const IconThemeData(color: AppColors.gold),
       ),
-      body: _isSubmitting
-          ? LoadingWidget(isFullScreen: true, message: l10n.guardando)
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildImageSection(),
-                    const SizedBox(height: 24),
-                    _buildVideoSection(),
-                    const SizedBox(height: 24),
-                    Text(l10n.informacoesBasicas, style: AppTextStyles.h6),
-                    const SizedBox(height: 16),
-                    CustomInput(
-                      label: l10n.titulo,
-                      hint: l10n.exTituloImovel,
-                      prefixIcon: Icons.title,
-                      controller: _titleController,
-                      validator: (v) =>
-                          (v == null || v.isEmpty) ? l10n.obrigatorio : null,
-                    ),
-                    const SizedBox(height: 16),
-                    CustomInput(
-                      label: l10n.descricao,
-                      hint: l10n.descrevaImovel,
-                      prefixIcon: Icons.description_outlined,
-                      controller: _descController,
-                      maxLines: 4,
-                      validator: (v) =>
-                          (v == null || v.isEmpty) ? l10n.obrigatorio : null,
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
+      body: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: Responsive.contentMaxWidth(context),
+          ),
+          child: _isSubmitting
+              ? LoadingWidget(isFullScreen: true, message: l10n.guardando)
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(child: _buildTypeDropdown()),
-                        const SizedBox(width: 12),
-                        Expanded(child: _buildTransactionDropdown()),
+                        _buildImageSection(),
+                        const SizedBox(height: 24),
+                        _buildVideoSection(),
+                        const SizedBox(height: 24),
+                        Text(l10n.informacoesBasicas, style: AppTextStyles.h6),
+                        const SizedBox(height: 16),
+                        CustomInput(
+                          label: l10n.titulo,
+                          hint: l10n.exTituloImovel,
+                          prefixIcon: Icons.title,
+                          controller: _titleController,
+                          validator: (v) => (v == null || v.isEmpty)
+                              ? l10n.obrigatorio
+                              : null,
+                        ),
+                        const SizedBox(height: 16),
+                        CustomInput(
+                          label: l10n.descricao,
+                          hint: l10n.descrevaImovel,
+                          prefixIcon: Icons.description_outlined,
+                          controller: _descController,
+                          maxLines: 4,
+                          validator: (v) => (v == null || v.isEmpty)
+                              ? l10n.obrigatorio
+                              : null,
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(child: _buildTypeDropdown()),
+                            const SizedBox(width: 12),
+                            Expanded(child: _buildTransactionDropdown()),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        Text(l10n.detalhes, style: AppTextStyles.h6),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: CustomInput(
+                                label: l10n.precoAOA,
+                                hint: '0',
+                                prefixIcon: Icons.attach_money,
+                                keyboardType: TextInputType.number,
+                                controller: _priceController,
+                                validator: (v) => (v == null || v.isEmpty)
+                                    ? l10n.obrigatorio
+                                    : null,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: CustomInput(
+                                label: l10n.areaM2,
+                                hint: '0',
+                                prefixIcon: Icons.square_foot_outlined,
+                                keyboardType: TextInputType.number,
+                                controller: _areaController,
+                                validator: (v) => (v == null || v.isEmpty)
+                                    ? l10n.obrigatorio
+                                    : null,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: CustomInput(
+                                label: l10n.quartosLabel,
+                                hint: '0',
+                                prefixIcon: Icons.king_bed_outlined,
+                                keyboardType: TextInputType.number,
+                                controller: _bedroomsController,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: CustomInput(
+                                label: l10n.wc,
+                                hint: '0',
+                                prefixIcon: Icons.bathroom_outlined,
+                                keyboardType: TextInputType.number,
+                                controller: _bathroomsController,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: CustomInput(
+                                label: l10n.garagemLabel,
+                                hint: '0',
+                                prefixIcon: Icons.garage_outlined,
+                                keyboardType: TextInputType.number,
+                                controller: _garageController,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        Text(l10n.caracteristicas, style: AppTextStyles.h6),
+                        const SizedBox(height: 12),
+                        _buildFeaturesChips(),
+                        const SizedBox(height: 24),
+                        Text(l10n.localizacao, style: AppTextStyles.h6),
+                        const SizedBox(height: 16),
+                        CustomInput(
+                          label: l10n.endereco,
+                          hint: l10n.ruaNumero,
+                          prefixIcon: Icons.home_outlined,
+                          controller: _addressController,
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: CustomInput(
+                                label: l10n.cidade,
+                                hint: 'Luanda',
+                                prefixIcon: Icons.location_city_outlined,
+                                controller: _cityController,
+                                validator: (v) => (v == null || v.isEmpty)
+                                    ? l10n.obrigatorio
+                                    : null,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: CustomInput(
+                                label: l10n.municipio,
+                                hint: 'Talatona',
+                                prefixIcon: Icons.map_outlined,
+                                controller: _municipalityController,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        CustomInput(
+                          label: l10n.bairro,
+                          hint: 'Kilamba',
+                          prefixIcon: Icons.place_outlined,
+                          controller: _neighborhoodController,
+                        ),
+                        const SizedBox(height: 32),
+                        CustomButton(
+                          text: _isEditing
+                              ? l10n.atualizarImovel
+                              : l10n.criarImovel,
+                          isFullWidth: true,
+                          size: CustomButtonSize.large,
+                          isLoading: _isSubmitting,
+                          onPressed: _handleSubmit,
+                        ),
+                        const SizedBox(height: 32),
                       ],
                     ),
-                    const SizedBox(height: 24),
-                    Text(l10n.detalhes, style: AppTextStyles.h6),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: CustomInput(
-                            label: l10n.precoAOA,
-                            hint: '0',
-                            prefixIcon: Icons.attach_money,
-                            keyboardType: TextInputType.number,
-                            controller: _priceController,
-                            validator: (v) => (v == null || v.isEmpty)
-                                ? l10n.obrigatorio
-                                : null,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: CustomInput(
-                            label: l10n.areaM2,
-                            hint: '0',
-                            prefixIcon: Icons.square_foot_outlined,
-                            keyboardType: TextInputType.number,
-                            controller: _areaController,
-                            validator: (v) => (v == null || v.isEmpty)
-                                ? l10n.obrigatorio
-                                : null,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: CustomInput(
-                            label: l10n.quartosLabel,
-                            hint: '0',
-                            prefixIcon: Icons.king_bed_outlined,
-                            keyboardType: TextInputType.number,
-                            controller: _bedroomsController,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: CustomInput(
-                            label: l10n.wc,
-                            hint: '0',
-                            prefixIcon: Icons.bathroom_outlined,
-                            keyboardType: TextInputType.number,
-                            controller: _bathroomsController,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: CustomInput(
-                            label: l10n.garagemLabel,
-                            hint: '0',
-                            prefixIcon: Icons.garage_outlined,
-                            keyboardType: TextInputType.number,
-                            controller: _garageController,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    Text(l10n.caracteristicas, style: AppTextStyles.h6),
-                    const SizedBox(height: 12),
-                    _buildFeaturesChips(),
-                    const SizedBox(height: 24),
-                    Text(l10n.localizacao, style: AppTextStyles.h6),
-                    const SizedBox(height: 16),
-                    CustomInput(
-                      label: l10n.endereco,
-                      hint: l10n.ruaNumero,
-                      prefixIcon: Icons.home_outlined,
-                      controller: _addressController,
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: CustomInput(
-                            label: l10n.cidade,
-                            hint: 'Luanda',
-                            prefixIcon: Icons.location_city_outlined,
-                            controller: _cityController,
-                            validator: (v) => (v == null || v.isEmpty)
-                                ? l10n.obrigatorio
-                                : null,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: CustomInput(
-                            label: l10n.municipio,
-                            hint: 'Talatona',
-                            prefixIcon: Icons.map_outlined,
-                            controller: _municipalityController,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    CustomInput(
-                      label: l10n.bairro,
-                      hint: 'Kilamba',
-                      prefixIcon: Icons.place_outlined,
-                      controller: _neighborhoodController,
-                    ),
-                    const SizedBox(height: 32),
-                    CustomButton(
-                      text: _isEditing
-                          ? l10n.atualizarImovel
-                          : l10n.criarImovel,
-                      isFullWidth: true,
-                      size: CustomButtonSize.large,
-                      isLoading: _isSubmitting,
-                      onPressed: _handleSubmit,
-                    ),
-                    const SizedBox(height: 32),
-                  ],
+                  ),
                 ),
-              ),
-            ),
+        ),
+      ),
     );
   }
 

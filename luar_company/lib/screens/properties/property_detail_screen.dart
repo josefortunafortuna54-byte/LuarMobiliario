@@ -16,6 +16,7 @@ import '../../core/providers/comparison_provider.dart';
 import '../../core/theme/app_palette.dart';
 import '../../core/utils/deep_links.dart';
 import '../../core/utils/formatters.dart';
+import '../../core/utils/responsive.dart';
 import '../../core/utils/routes.dart';
 import '../../core/utils/whatsapp_util.dart';
 import '../../core/services/view_history_service.dart';
@@ -194,9 +195,15 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
     final location = _displayLocation(property);
     final topPad = MediaQuery.of(context).padding.top;
     final canPop = Navigator.of(context).canPop();
+    // Altura proporcional: não estica em tablets/desktop nem afunila em
+    // dispositivos baixos (landscape).
+    final heroHeight = (MediaQuery.sizeOf(context).height * 0.42).clamp(
+      260.0,
+      420.0,
+    );
 
     return SizedBox(
-      height: 340,
+      height: heroHeight,
       width: double.infinity,
       child: Stack(
         fit: StackFit.expand,
@@ -427,24 +434,35 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
         ],
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildFeatureItem(
-            icon: Icons.king_bed_outlined,
-            value: '${property.bedrooms}',
-            label: l10n.quartosLabel,
+          Expanded(
+            child: Center(
+              child: _buildFeatureItem(
+                icon: Icons.king_bed_outlined,
+                value: '${property.bedrooms}',
+                label: l10n.quartosLabel,
+              ),
+            ),
           ),
           Container(width: 1, height: 40, color: palette.borderStrong),
-          _buildFeatureItem(
-            icon: Icons.bathroom_outlined,
-            value: '${property.bathrooms}',
-            label: l10n.wc,
+          Expanded(
+            child: Center(
+              child: _buildFeatureItem(
+                icon: Icons.bathroom_outlined,
+                value: '${property.bathrooms}',
+                label: l10n.wc,
+              ),
+            ),
           ),
           Container(width: 1, height: 40, color: palette.borderStrong),
-          _buildFeatureItem(
-            icon: Icons.square_foot_outlined,
-            value: '${property.area.toStringAsFixed(0)} m\u00b2',
-            label: l10n.areaLabel,
+          Expanded(
+            child: Center(
+              child: _buildFeatureItem(
+                icon: Icons.square_foot_outlined,
+                value: '${property.area.toStringAsFixed(0)} m\u00b2',
+                label: l10n.areaLabel,
+              ),
+            ),
           ),
         ],
       ),
@@ -464,6 +482,8 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
         const SizedBox(height: 6),
         Text(
           value,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: AppTextStyles.bodyMediumBold.copyWith(
             color: palette.textTitle,
           ),
@@ -471,6 +491,8 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
         const SizedBox(height: 2),
         Text(
           label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: AppTextStyles.bodyTiny.copyWith(color: palette.textSecondary),
         ),
       ],
@@ -533,12 +555,19 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
         ),
         const SizedBox(height: 12),
         GridView.count(
-          crossAxisCount: 2,
+          crossAxisCount: Responsive.gridColumns(
+            context,
+            mobile: 2,
+            tablet: 3,
+            desktop: 3,
+          ),
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           mainAxisSpacing: 10,
           crossAxisSpacing: 12,
-          childAspectRatio: 3.4,
+          // Altura fixa por célula: comporta 2 linhas de texto sem transbordar,
+          // independentemente da largura (aspectRatio quebrava com fontes grandes).
+          mainAxisExtent: 44,
           children: property.features.map((feature) {
             return Row(
               children: [
@@ -897,8 +926,8 @@ class _PropertyDetailScreenState extends State<PropertyDetailScreen> {
     }
     return GridView.builder(
       padding: const EdgeInsets.all(20),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
+      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: 240,
         mainAxisSpacing: 12,
         crossAxisSpacing: 12,
         childAspectRatio: 1.25,

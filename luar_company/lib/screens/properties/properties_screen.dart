@@ -7,6 +7,7 @@ import '../../core/constants/app_text_styles.dart';
 import '../../core/models/property_model.dart';
 import '../../core/providers/property_provider.dart';
 import '../../core/theme/app_palette.dart';
+import '../../core/utils/responsive.dart';
 import '../../core/utils/routes.dart';
 import '../../l10n/app_localizations.dart';
 import '../../widgets/property_card.dart';
@@ -137,31 +138,38 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
         elevation: 0,
         centerTitle: true,
       ),
-      body: Column(
-        children: [
-          _buildFilterBar(),
-          _buildSortBar(),
-          Expanded(
-            child: Consumer<PropertyProvider>(
-              builder: (_, provider, _) {
-                if (provider.isLoading && provider.properties.isEmpty) {
-                  return _buildShimmerGrid();
-                }
-
-                if (provider.error != null && provider.properties.isEmpty) {
-                  return _buildErrorState(provider);
-                }
-
-                if (provider.properties.isEmpty) {
-                  return _buildEmptyState();
-                }
-
-                final sorted = _sortProperties(provider.properties);
-                return _buildPropertyGrid(sorted, provider);
-              },
-            ),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: Responsive.gridMaxWidth(context),
           ),
-        ],
+          child: Column(
+            children: [
+              _buildFilterBar(),
+              _buildSortBar(),
+              Expanded(
+                child: Consumer<PropertyProvider>(
+                  builder: (_, provider, _) {
+                    if (provider.isLoading && provider.properties.isEmpty) {
+                      return _buildShimmerGrid();
+                    }
+
+                    if (provider.error != null && provider.properties.isEmpty) {
+                      return _buildErrorState(provider);
+                    }
+
+                    if (provider.properties.isEmpty) {
+                      return _buildEmptyState();
+                    }
+
+                    final sorted = _sortProperties(provider.properties);
+                    return _buildPropertyGrid(sorted, provider);
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -170,45 +178,52 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
     final palette = context.palette;
     final labels = _filterLabels(AppLocalizations.of(context));
     return Container(
-      height: 60,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
         color: palette.surface,
         border: Border(bottom: BorderSide(color: palette.borderStrong)),
       ),
-      child: ListView.separated(
+      // Altura intrínseca (sem fixa) — evita corte de chips com fontes grandes.
+      child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        itemCount: labels.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 8),
-        itemBuilder: (_, index) {
-          final isSelected = _selectedFilterIndex == index;
-          return Center(
-            child: GestureDetector(
-              onTap: () => _onFilterSelected(index),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: isSelected ? AppColors.navy : Colors.transparent,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: isSelected ? AppColors.navy : palette.textMuted,
+        child: Row(
+          children: [
+            for (var index = 0; index < labels.length; index++) ...[
+              if (index > 0) const SizedBox(width: 8),
+              GestureDetector(
+                onTap: () => _onFilterSelected(index),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 18,
+                    vertical: 10,
                   ),
-                ),
-                child: Text(
-                  labels[index],
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: isSelected ? AppColors.white : palette.textBody,
-                    fontWeight: FontWeight.w600,
+                  decoration: BoxDecoration(
+                    color: _selectedFilterIndex == index
+                        ? AppColors.navy
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: _selectedFilterIndex == index
+                          ? AppColors.navy
+                          : palette.textMuted,
+                    ),
+                  ),
+                  child: Text(
+                    labels[index],
+                    maxLines: 1,
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: _selectedFilterIndex == index
+                          ? AppColors.white
+                          : palette.textBody,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        },
+            ],
+          ],
+        ),
       ),
     );
   }
@@ -324,8 +339,8 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
   Widget _buildShimmerGrid() {
     return GridView.builder(
       padding: const EdgeInsets.all(16),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
+      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: Responsive.maxGridCellExtent,
         childAspectRatio: 0.65,
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
@@ -450,8 +465,8 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
             sliver: SliverGrid(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
+              gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: Responsive.maxGridCellExtent,
                 childAspectRatio: 0.65,
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,

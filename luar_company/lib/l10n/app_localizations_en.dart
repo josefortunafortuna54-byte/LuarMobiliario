@@ -210,6 +210,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get detalhes => 'Details';
 
   @override
+  String get mostrarDetalhes => 'Show details';
+
+  @override
+  String get ocultarDetalhes => 'Hide details';
+
+  @override
   String get acessoAdmin => 'Admin Access';
 
   @override

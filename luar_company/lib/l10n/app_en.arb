@@ -64,6 +64,8 @@
   "lote": "Plot",
   "fazenda": "Farm",
   "detalhes": "Details",
+  "mostrarDetalhes": "Show details",
+  "ocultarDetalhes": "Hide details",
   "acessoAdmin": "Admin Access",
   "insiraEmailCodigo": "Enter your email to receive the access code",
   "emailAdmin": "Admin e-mail",

@@ -48,6 +48,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> with RouteAware {
   final PageController _pageController = PageController();
   int _activeIndex = 0;
 
+  /// O cartão inferior começa escondido para não tapar a imagem/vídeo.
+  /// O utilizador mostra-o com o botão ℹ (estado mantido na sessão).
+  bool _isCardVisible = false;
+
   /// Falso quando outro ecrã é empurrado por cima desta rota (RouteAware).
   bool _routeIsCurrent = true;
 
@@ -234,6 +238,9 @@ class _DiscoverScreenState extends State<DiscoverScreen> with RouteAware {
                     return _DiscoverPage(
                       property: items[index],
                       isActive: _screenIsActive && index == _activeIndex,
+                      isCardVisible: _isCardVisible,
+                      onToggleCard: () =>
+                          setState(() => _isCardVisible = !_isCardVisible),
                     );
                   },
                 ),
@@ -242,10 +249,24 @@ class _DiscoverScreenState extends State<DiscoverScreen> with RouteAware {
                 top: 0,
                 left: 0,
                 right: 0,
-                child: SafeArea(bottom: false, child: _buildTopBar(l10n)),
-              ),
-              _buildMediaCounter(
-                items[_activeIndex.clamp(0, items.length - 1)],
+                child: SafeArea(
+                  bottom: false,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _buildTopBar(l10n),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 12),
+                          child: _buildMediaCounter(
+                            items[_activeIndex.clamp(0, items.length - 1)],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
               if (provider.isLoadingMore)
                 const Positioned(
@@ -290,27 +311,33 @@ class _DiscoverScreenState extends State<DiscoverScreen> with RouteAware {
           else
             const SizedBox(width: 38),
           Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _TopTab(
-                  label: l10n.descobrir,
-                  selected: true,
-                  onTap: () => _goToTab(0),
-                ),
-                const SizedBox(width: 20),
-                _TopTab(
-                  label: l10n.pesquisar,
-                  selected: false,
-                  onTap: () => _goToTab(1),
-                ),
-                const SizedBox(width: 20),
-                _TopTab(
-                  label: l10n.favoritos,
-                  selected: false,
-                  onTap: () => _goToTab(2),
-                ),
-              ],
+            // Encolhe os tabs quando as fontes do sistema são grandes,
+            // em vez de transbordar para fora da barra superior.
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _TopTab(
+                    label: l10n.descobrir,
+                    selected: true,
+                    onTap: () => _goToTab(0),
+                  ),
+                  const SizedBox(width: 20),
+                  _TopTab(
+                    label: l10n.pesquisar,
+                    selected: false,
+                    onTap: () => _goToTab(1),
+                  ),
+                  const SizedBox(width: 20),
+                  _TopTab(
+                    label: l10n.favoritos,
+                    selected: false,
+                    onTap: () => _goToTab(2),
+                  ),
+                ],
+              ),
             ),
           ),
           _CircleIconButton(
@@ -326,25 +353,22 @@ class _DiscoverScreenState extends State<DiscoverScreen> with RouteAware {
   }
 
   /// Contador de galeria do imóvel ativo (ex.: `1/5`), como no design.
+  /// Flui logo abaixo da barra superior (sem offset fixo).
   Widget _buildMediaCounter(PropertyModel property) {
     final total = property.images.length + property.videos.length;
     if (total <= 1) return const SizedBox.shrink();
 
-    return Positioned(
-      top: MediaQuery.of(context).padding.top + 56,
-      right: 12,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-        decoration: BoxDecoration(
-          color: AppColors.black.withValues(alpha: 0.55),
-          borderRadius: BorderRadius.circular(14),
-        ),
-        child: Text(
-          '1/$total',
-          style: AppTextStyles.bodyTiny.copyWith(
-            color: AppColors.white,
-            fontWeight: FontWeight.w700,
-          ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppColors.black.withValues(alpha: 0.55),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Text(
+        '1/$total',
+        style: AppTextStyles.bodyTiny.copyWith(
+          color: AppColors.white,
+          fontWeight: FontWeight.w700,
         ),
       ),
     );
@@ -401,10 +425,26 @@ class _DiscoverScreenState extends State<DiscoverScreen> with RouteAware {
 }
 
 class _DiscoverPage extends StatelessWidget {
-  const _DiscoverPage({required this.property, required this.isActive});
+  const _DiscoverPage({
+    required this.property,
+    required this.isActive,
+    required this.isCardVisible,
+    required this.onToggleCard,
+  });
 
   final PropertyModel property;
   final bool isActive;
+
+  /// Visibilidade do cartão inferior (escondido por omissão).
+  final bool isCardVisible;
+
+  /// Mostra/esconde o cartão inferior (estado partilhado pelo feed).
+  final VoidCallback onToggleCard;
+
+  /// Sombra suave para os textos do cartão lerem bem sobre qualquer foto.
+  static const List<Shadow> _cardTextShadow = [
+    Shadow(color: Color(0x99000000), blurRadius: 6),
+  ];
 
   /// Contagem compacta de likes no estilo do design (`12.4k`, `1.2M`).
   static String _compactCount(int count) {
@@ -470,11 +510,27 @@ class _DiscoverPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Expanded(
-                      child: _buildCard(
-                        context,
-                        l10n,
-                        isRent: isRent,
-                        location: location,
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 180),
+                        layoutBuilder: (currentChild, previousChildren) =>
+                            Stack(
+                              alignment: Alignment.bottomLeft,
+                              children: [...previousChildren, ?currentChild],
+                            ),
+                        child: isCardVisible
+                            ? KeyedSubtree(
+                                key: const ValueKey('discover-card'),
+                                child: _buildCard(
+                                  context,
+                                  l10n,
+                                  isRent: isRent,
+                                  location: location,
+                                ),
+                              )
+                            : KeyedSubtree(
+                                key: const ValueKey('discover-card-hidden'),
+                                child: _buildShowCardButton(l10n),
+                              ),
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -545,134 +601,211 @@ class _DiscoverPage extends StatelessWidget {
     );
   }
 
+  /// Botão pequeno (ℹ) que volta a mostrar o cartão do imóvel.
+  Widget _buildShowCardButton(AppLocalizations l10n) {
+    return Semantics(
+      button: true,
+      label: l10n.mostrarDetalhes,
+      child: Material(
+        color: AppColors.black.withValues(alpha: 0.5),
+        shape: CircleBorder(
+          side: BorderSide(color: AppColors.white.withValues(alpha: 0.22)),
+        ),
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: onToggleCard,
+          child: const SizedBox(
+            width: 46,
+            height: 46,
+            child: Icon(
+              Icons.info_outline_rounded,
+              size: 24,
+              color: AppColors.white,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Botão ⌄ no canto do cartão que o volta a esconder.
+  Widget _buildCollapseButton(AppLocalizations l10n) {
+    return Semantics(
+      button: true,
+      label: l10n.ocultarDetalhes,
+      child: Material(
+        color: AppColors.white.withValues(alpha: 0.14),
+        shape: const CircleBorder(),
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: onToggleCard,
+          child: const SizedBox(
+            width: 30,
+            height: 30,
+            child: Icon(
+              Icons.keyboard_arrow_down_rounded,
+              size: 20,
+              color: AppColors.white,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   /// Cartão inferior com preço, título, especificações, descrição e ação
-  /// "Ver imóvel" — réplica do design de referência.
+  /// "Ver imóvel". Começa escondido (mostra-se com o botão ℹ) e inclui um
+  /// botão ⌄ para o voltar a esconder.
   Widget _buildCard(
     BuildContext context,
     AppLocalizations l10n, {
     required bool isRent,
     required String location,
   }) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
-      decoration: BoxDecoration(
-        color: AppColors.black.withValues(alpha: 0.55),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.white.withValues(alpha: 0.10)),
+    // Fontes grandes do sistema não podem rebentar o layout do cartão.
+    final mediaQuery = MediaQuery.of(context);
+
+    return MediaQuery(
+      data: mediaQuery.copyWith(
+        textScaler: mediaQuery.textScaler.clamp(
+          minScaleFactor: 1.0,
+          maxScaleFactor: 1.4,
+        ),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.baseline,
-                      textBaseline: TextBaseline.alphabetic,
-                      children: [
-                        Flexible(
-                          child: Text(
-                            formatPrice(property.price),
-                            style: AppTextStyles.h5.copyWith(
-                              color: AppColors.white,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
+        decoration: BoxDecoration(
+          color: AppColors.black.withValues(alpha: 0.62),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: AppColors.white.withValues(alpha: 0.16)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          formatPrice(property.price),
+                          style: AppTextStyles.priceMedium.copyWith(
+                            fontSize: 26,
+                            shadows: _cardTextShadow,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (isRent) ...[
+                        const SizedBox(width: 4),
+                        Text(
+                          l10n.perMes,
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: AppColors.white.withValues(alpha: 0.8),
+                            fontWeight: FontWeight.w600,
+                            shadows: _cardTextShadow,
                           ),
                         ),
-                        if (isRent) ...[
-                          const SizedBox(width: 4),
-                          Text(
-                            l10n.perMes,
-                            style: AppTextStyles.bodySmall.copyWith(
-                              color: AppColors.white.withValues(alpha: 0.8),
-                            ),
-                          ),
-                        ],
                       ],
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Text(
-            location.isEmpty ? property.title : '${property.title} • $location',
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.white,
-              fontWeight: FontWeight.w600,
+                const SizedBox(width: 8),
+                _buildCollapseButton(l10n),
+              ],
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 10),
-          Wrap(
-            spacing: 16,
-            runSpacing: 6,
-            children: [
-              if (property.bedrooms > 0)
-                _SpecItem(
-                  icon: Icons.king_bed_outlined,
-                  value: '${property.bedrooms}',
-                  semanticsLabel: l10n.quartosLabel,
-                ),
-              if (property.bathrooms > 0)
-                _SpecItem(
-                  icon: Icons.bathroom_outlined,
-                  value: '${property.bathrooms}',
-                  semanticsLabel: l10n.wc,
-                ),
-              if (property.area > 0)
-                _SpecItem(
-                  icon: Icons.square_foot_outlined,
-                  value: formatArea(property.area),
-                  semanticsLabel: l10n.areaLabel,
-                ),
-            ],
-          ),
-          if (property.description.isNotEmpty) ...[
             const SizedBox(height: 10),
             Text(
-              property.description,
-              style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.white.withValues(alpha: 0.75),
-                height: 1.4,
+              location.isEmpty
+                  ? property.title
+                  : '${property.title} • $location',
+              style: AppTextStyles.bodyLarge.copyWith(
+                color: AppColors.white,
+                fontWeight: FontWeight.w700,
+                height: 1.3,
+                shadows: _cardTextShadow,
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
-          ],
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            height: 46,
-            child: ElevatedButton(
-              onPressed: () => Navigator.of(
-                context,
-              ).pushNamed(AppRoutes.propertyDetail, arguments: property.id),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.gold,
-                foregroundColor: AppColors.white,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 16,
+              runSpacing: 6,
+              children: [
+                if (property.bedrooms > 0)
+                  _SpecItem(
+                    icon: Icons.king_bed_outlined,
+                    value: '${property.bedrooms}',
+                    semanticsLabel: l10n.quartosLabel,
+                  ),
+                if (property.bathrooms > 0)
+                  _SpecItem(
+                    icon: Icons.bathroom_outlined,
+                    value: '${property.bathrooms}',
+                    semanticsLabel: l10n.wc,
+                  ),
+                if (property.area > 0)
+                  _SpecItem(
+                    icon: Icons.square_foot_outlined,
+                    value: formatArea(property.area),
+                    semanticsLabel: l10n.areaLabel,
+                  ),
+              ],
+            ),
+            if (property.description.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              Text(
+                property.description,
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.white.withValues(alpha: 0.85),
+                  height: 1.45,
+                  shadows: _cardTextShadow,
                 ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
-              child: Text(
-                l10n.verImovel,
-                style: AppTextStyles.buttonLarge.copyWith(
-                  color: AppColors.white,
+            ],
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Navigator.of(
+                  context,
+                ).pushNamed(AppRoutes.propertyDetail, arguments: property.id),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.gold,
+                  foregroundColor: AppColors.white,
+                  elevation: 0,
+                  // Altura mínima sem cortar: cresce com fontes grandes.
+                  minimumSize: const Size(0, 46),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  l10n.verImovel,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.buttonLarge.copyWith(
+                    color: AppColors.white,
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -746,13 +879,13 @@ class _SpecItem extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: AppColors.white.withValues(alpha: 0.85)),
+          Icon(icon, size: 18, color: AppColors.white.withValues(alpha: 0.9)),
           const SizedBox(width: 5),
           Text(
             value,
             style: AppTextStyles.bodySmall.copyWith(
               color: AppColors.white,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ],

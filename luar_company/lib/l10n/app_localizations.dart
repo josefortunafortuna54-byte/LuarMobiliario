@@ -482,6 +482,18 @@ abstract class AppLocalizations {
   /// **'Detalhes'**
   String get detalhes;
 
+  /// No description provided for @mostrarDetalhes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mostrar detalhes'**
+  String get mostrarDetalhes;
+
+  /// No description provided for @ocultarDetalhes.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ocultar detalhes'**
+  String get ocultarDetalhes;
+
   /// No description provided for @acessoAdmin.
   ///
   /// In pt, this message translates to:

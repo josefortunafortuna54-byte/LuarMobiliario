@@ -210,6 +210,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get detalhes => 'Detalhes';
 
   @override
+  String get mostrarDetalhes => 'Mostrar detalhes';
+
+  @override
+  String get ocultarDetalhes => 'Ocultar detalhes';
+
+  @override
   String get acessoAdmin => 'Acesso Admin';
 
   @override

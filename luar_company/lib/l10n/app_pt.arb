@@ -64,6 +64,8 @@
   "lote": "Lote",
   "fazenda": "Fazenda",
   "detalhes": "Detalhes",
+  "mostrarDetalhes": "Mostrar detalhes",
+  "ocultarDetalhes": "Ocultar detalhes",
   "acessoAdmin": "Acesso Admin",
   "insiraEmailCodigo": "Insira o email para receber o código de acesso",
   "emailAdmin": "E-mail do administrador",

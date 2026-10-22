@@ -21,26 +21,21 @@ CREATE POLICY "Bookings: authenticated insert" ON bookings
 -- (agentes/admins são os únicos que confirmam/cancelam definitivamente).
 -- O próprio utilizador mantém o direito de cancelar o seu agendamento (pending -> cancelled),
 -- mas não pode auto-confirmar.
+--
+-- As policies RLS não expõem OLD/NEW (só existem em funções trigger):
+-- referenciá-las aqui fazia a migration falhar com
+-- "missing FROM-clause entry for table old" e impedia criar uma base nova.
+-- Em USING as colunas referem-se à linha existente, em WITH CHECK aos novos
+-- valores — assim o cliente só passa de 'pending' para 'cancelled'.
 DROP POLICY IF EXISTS "Bookings: update own" ON bookings;
 CREATE POLICY "Bookings: update own" ON bookings
   FOR UPDATE USING (
-    auth.uid() = user_id
-    OR public.get_user_role() IN ('agent', 'admin')
+    public.get_user_role() IN ('agent', 'admin')
+    OR (auth.uid() = user_id AND status = 'pending')
   )
   WITH CHECK (
-    (
-      public.get_user_role() IN ('agent', 'admin')
-      AND auth.uid() = user_id
-    )
-    OR (
-      auth.uid() = user_id
-      AND (
-        OLD.status = 'pending'
-        AND NEW.status = 'cancelled'
-        AND NEW.user_id = OLD.user_id
-        AND NEW.property_id = OLD.property_id
-      )
-    )
+    public.get_user_role() IN ('agent', 'admin')
+    OR (auth.uid() = user_id AND status = 'cancelled')
   );
 
 -- ════════════════════════════════════════════════════════════════════════
@@ -150,6 +145,8 @@ CREATE POLICY "Land images: agents and admins manage" ON land_images
 -- ════════════════════════════════════════════════════════════════════════
 -- 5. STORAGE — verificar ownership dos objetos
 -- storage.objects usa owner_id (uuid do auth user) para objetos criados via API.
+-- O owner_id é TEXT em algumas versões do storage: o cast ::text nos dois
+-- lados mantém a comparação válida em qualquer versão (ver migration 017).
 -- ════════════════════════════════════════════════════════════════════════
 
 DROP POLICY IF EXISTS "Property images: delete own" ON storage.objects;
@@ -157,7 +154,7 @@ CREATE POLICY "Property images: delete own" ON storage.objects
   FOR DELETE TO authenticated
   USING (
     bucket_id = 'property-images'
-    AND owner_id = auth.uid()
+    AND owner_id::text = auth.uid()::text
   );
 
 DROP POLICY IF EXISTS "Avatars: delete own" ON storage.objects;
@@ -165,7 +162,7 @@ CREATE POLICY "Avatars: delete own" ON storage.objects
   FOR DELETE TO authenticated
   USING (
     bucket_id = 'avatars'
-    AND owner_id = auth.uid()
+    AND owner_id::text = auth.uid()::text
   );
 
 -- ════════════════════════════════════════════════════════════════════════

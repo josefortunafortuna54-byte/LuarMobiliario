@@ -809,6 +809,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get erroAoGuardar => 'Erro ao guardar';
 
   @override
+  String get erroAoGuardarFavorito =>
+      'Não foi possível guardar o favorito. Tente novamente.';
+
+  @override
   String get erroAoCarregar => 'Erro ao carregar';
 
   @override

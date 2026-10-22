@@ -250,6 +250,7 @@
   "guadarPerfil": "Save Profile",
   "guardarAlteracoes": "Save Changes",
   "erroAoGuardar": "Error saving",
+  "erroAoGuardarFavorito": "Could not save the favorite. Please try again.",
   "erroAoCarregar": "Error loading",
   "naoFoiPossivelCarregar": "Could not load",
   "tentarNovamente": "Try again",

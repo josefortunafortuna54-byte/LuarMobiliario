@@ -250,6 +250,7 @@
   "guadarPerfil": "Guardar Perfil",
   "guardarAlteracoes": "Guardar Alterações",
   "erroAoGuardar": "Erro ao guardar",
+  "erroAoGuardarFavorito": "Não foi possível guardar o favorito. Tente novamente.",
   "erroAoCarregar": "Erro ao carregar",
   "naoFoiPossivelCarregar": "Não foi possível carregar",
   "tentarNovamente": "Tentar novamente",

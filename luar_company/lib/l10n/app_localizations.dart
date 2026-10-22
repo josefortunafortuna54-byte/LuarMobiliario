@@ -1598,6 +1598,12 @@ abstract class AppLocalizations {
   /// **'Erro ao guardar'**
   String get erroAoGuardar;
 
+  /// No description provided for @erroAoGuardarFavorito.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível guardar o favorito. Tente novamente.'**
+  String get erroAoGuardarFavorito;
+
   /// No description provided for @erroAoCarregar.
   ///
   /// In pt, this message translates to:

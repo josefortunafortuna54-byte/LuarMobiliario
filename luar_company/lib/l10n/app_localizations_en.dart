@@ -803,6 +803,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get erroAoGuardar => 'Error saving';
 
   @override
+  String get erroAoGuardarFavorito =>
+      'Could not save the favorite. Please try again.';
+
+  @override
   String get erroAoCarregar => 'Error loading';
 
   @override

@@ -442,6 +442,15 @@ class ProfileScreen extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
+            const SizedBox(height: 28),
+            CustomButton(
+              text: l10n.entrar,
+              variant: CustomButtonVariant.outline,
+              size: CustomButtonSize.medium,
+              icon: Icons.admin_panel_settings_outlined,
+              onPressed: () =>
+                  Navigator.of(context).pushNamed(AppRoutes.adminLogin),
+            ),
           ],
         ),
       ),

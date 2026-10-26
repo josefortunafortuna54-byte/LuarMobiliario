@@ -38,7 +38,16 @@ class FavoriteProvider extends ChangeNotifier {
   /// Contagem de favoritos por imóvel (contador de "gostos" do Discover).
   Map<String, int> get likeCounts => Map.unmodifiable(_likeCounts);
 
-  int likeCount(String propertyId) => _likeCounts[propertyId] ?? 0;
+  int likeCount(String propertyId) {
+    final count = _likeCounts[propertyId] ?? 0;
+    final likedByGuest =
+        _loadedFor == guestUserId &&
+        _favorites.any(
+          (f) => f.userId == guestUserId && f.propertyId == propertyId,
+        );
+    if (likedByGuest && count < 1) return 1;
+    return count;
+  }
 
   /// Carrega as contagens de favoritos dos [propertyIds] ainda não conhecidos.
   /// Falhas (offline, sem backend) são silenciadas: o feed mantém-se funcional
@@ -237,6 +246,10 @@ class FavoriteProvider extends ChangeNotifier {
       } else if (!added && existingIndex != -1) {
         _favorites.removeAt(existingIndex);
       }
+
+      // O like de convidado é local, mas o contador do Discover deve refletir
+      // a ação imediatamente (antes ficava sempre a 0).
+      _adjustLikeCount(propertyId, delta: added ? 1 : -1);
 
       notifyListeners();
       return added ? FavoriteToggleResult.added : FavoriteToggleResult.removed;

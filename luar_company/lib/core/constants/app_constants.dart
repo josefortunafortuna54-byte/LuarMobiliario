@@ -1,7 +1,7 @@
 abstract final class AppConstants {
   static const String appName = 'Luar Mobiliario';
   static const String appTagline = 'Seu novo lar começa aqui';
-  static const String appVersion = '1.0.0';
+  static const String appVersion = '1.0.2';
 
   // ── Supabase (via .env) ───────────────────────────────────────────
   // Valores carregados de EnvConfig - nao hardcode aqui

@@ -21,6 +21,11 @@ class VideoPlayerWidget extends StatefulWidget {
   /// apenas a página ativa deve ter [isActive] a `true`.
   final bool isActive;
 
+  /// Como o vídeo ocupa a área disponível: [BoxFit.contain] preserva o ratio
+  /// nativo com barras; [BoxFit.cover] preenche a área (modo TikTok) e recorta
+  /// o excesso.
+  final BoxFit fit;
+
   const VideoPlayerWidget({
     super.key,
     required this.url,
@@ -28,6 +33,7 @@ class VideoPlayerWidget extends StatefulWidget {
     this.autoPlay = false,
     this.looping = false,
     this.isActive = true,
+    this.fit = BoxFit.contain,
   });
 
   @override
@@ -208,6 +214,37 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget>
     );
   }
 
+  Widget _buildVideo(VideoPlayerController controller) {
+    final size = controller.value.size;
+    final canCover =
+        widget.fit == BoxFit.cover && size.width > 0 && size.height > 0;
+
+    if (!canCover) {
+      return Center(
+        child: AspectRatio(
+          aspectRatio: controller.value.aspectRatio,
+          child: VideoPlayer(controller),
+        ),
+      );
+    }
+
+    // `BoxFit.cover`: preenche a área disponível e recorta o excesso, como no
+    // feed vertical estilo TikTok (evita as barras pretas do letterbox).
+    return SizedBox.expand(
+      child: ClipRect(
+        child: FittedBox(
+          fit: BoxFit.cover,
+          alignment: Alignment.center,
+          child: SizedBox(
+            width: size.width,
+            height: size.height,
+            child: VideoPlayer(controller),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildContent() {
     if (_hasError) {
       return Stack(
@@ -273,12 +310,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget>
       child: Stack(
         alignment: Alignment.center,
         children: [
-          Center(
-            child: AspectRatio(
-              aspectRatio: controller.value.aspectRatio,
-              child: VideoPlayer(controller),
-            ),
-          ),
+          _buildVideo(controller),
           if (!controller.value.isPlaying)
             Container(
               width: 64,

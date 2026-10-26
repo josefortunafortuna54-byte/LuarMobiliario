@@ -56,6 +56,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> with RouteAware {
   /// Falso quando outro ecrã é empurrado por cima desta rota (RouteAware).
   bool _routeIsCurrent = true;
 
+  /// Referência guardada para remover o listener em [dispose] sem aceder ao
+  /// `context` (que já não é válido nessa fase).
+  DiscoverProvider? _discoverProvider;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -83,15 +87,26 @@ class _DiscoverScreenState extends State<DiscoverScreen> with RouteAware {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       final provider = context.read<DiscoverProvider>();
+      _discoverProvider = provider..addListener(_onDiscoverProviderChanged);
       if (provider.items.isEmpty && !provider.isLoading) {
         provider.load();
       }
-      _loadLikeCounts(0);
+      _loadLikeCounts(_activeIndex);
       _watchConnectivity();
       final userId =
           context.read<AuthProvider>().user?.id ?? FavoriteProvider.guestUserId;
       context.read<FavoriteProvider>().ensureLoaded(userId);
     });
+  }
+
+  /// As contagens só podem ser pedidas depois de o feed ter itens; como o
+  /// `load()` é assíncrono, reagimos às notificações do provider em vez de
+  /// pedir logo no arranque (quando `items` ainda está vazio).
+  void _onDiscoverProviderChanged() {
+    if (!mounted) return;
+    if (_discoverProvider?.items.isNotEmpty ?? false) {
+      _loadLikeCounts(_activeIndex);
+    }
   }
 
   /// Volta a carregar o feed quando a ligação regressa e o último pedido
@@ -122,6 +137,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> with RouteAware {
 
   @override
   void dispose() {
+    _discoverProvider?.removeListener(_onDiscoverProviderChanged);
     AppNavigator.routeObserver.unsubscribe(this);
     _pageController.dispose();
     super.dispose();
@@ -565,6 +581,7 @@ class _DiscoverPage extends StatelessWidget {
         autoPlay: autoplay,
         looping: true,
         isActive: isActive,
+        fit: BoxFit.cover,
       );
     }
 

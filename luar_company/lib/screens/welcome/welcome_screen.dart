@@ -199,7 +199,23 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                 size: CustomButtonSize.large,
                 onPressed: _goToHome,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
+              TextButton.icon(
+                onPressed: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.adminLogin),
+                icon: const Icon(
+                  Icons.admin_panel_settings_outlined,
+                  color: AppColors.gold,
+                  size: 18,
+                ),
+                label: Text(
+                  l10n.entrar,
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.gold,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
               Text(
                 l10n.versao(AppConstants.appVersion),
                 style: AppTextStyles.bodyTiny.copyWith(

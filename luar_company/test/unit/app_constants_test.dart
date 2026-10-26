@@ -11,8 +11,8 @@ void main() {
       expect(AppConstants.appTagline, 'Seu novo lar começa aqui');
     });
 
-    test('appVersion is 1.0.0', () {
-      expect(AppConstants.appVersion, '1.0.0');
+    test('appVersion is 1.0.2', () {
+      expect(AppConstants.appVersion, '1.0.2');
     });
   });
 
